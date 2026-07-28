@@ -12,6 +12,9 @@ export default async function DashboardPage() {
   const user = await getUser();
   const supabase = await createClient();
 
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
   const [{ data: provider }, { data: services }, { data: availability }, { data: bookings }] = await Promise.all([
     supabase.from("providers").select("*").eq("id", user!.id).single(),
     supabase.from("provider_services").select("*").eq("provider_id", user!.id).order("created_at"),
@@ -21,7 +24,7 @@ export default async function DashboardPage() {
       .select("*")
       .eq("provider_id", user!.id)
       .eq("status", "confirmed")
-      .gte("starts_at", new Date().toISOString())
+      .gte("starts_at", startOfToday.toISOString())
       .order("starts_at"),
   ]);
 
@@ -42,7 +45,10 @@ export default async function DashboardPage() {
           <ServicesSection services={(services ?? []) as ProviderService[]} />
           <AvailabilitySection availability={(availability ?? []) as Availability[]} />
           {provider && <BookingLinkCard provider={provider as Provider} siteUrl={siteUrl} />}
-          <BookingsSection bookings={(bookings ?? []) as Booking[]} />
+          <BookingsSection
+            bookings={(bookings ?? []) as Booking[]}
+            availability={(availability ?? []) as Availability[]}
+          />
         </div>
       </Container>
     </section>

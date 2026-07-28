@@ -1,26 +1,104 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #ffffff;
+  --paper-alt: #f4f4f5;
+  --panel: #e4e4e7;
+  --line: #e0e0e3;
+  --ink: #16181c;
+  --ink-soft: #5b5f66;
+  --accent: #e63e6d;
+  --accent-light: #fbd5df;
+  --accent-dark: #b2224c;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-alt: var(--paper-alt);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  overflow-x: clip;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent-light);
+  color: var(--ink);
+}
+
+/*
+ * Radius scale — carried over unchanged from the "Lebegő lapok" structure:
+ *   rounded-3xl  — big floating sheets/panels (hero panel, showcase panel)
+ *   rounded-2xl  — cards, booking blocks, image thumbnails
+ *   rounded-xl   — inputs, small cells
+ *   rounded-full — buttons, chips, avatars, floating nav
+ */
+
+/*
+ * Shadow — neutral cool-black tint (was warm brown-black), matching the
+ * "Confident Minimal" ink. Two levels: sheets get more spread than cards.
+ */
+.shadow-sheet {
+  box-shadow: 0 28px 70px -28px rgba(22, 24, 28, 0.22);
+}
+
+.shadow-card {
+  box-shadow: 0 10px 30px -14px rgba(22, 24, 28, 0.18);
+}
+
+/* Legacy alias kept for not-yet-restyled sections (functional overlays). */
+.shadow-overlay {
+  box-shadow: 0 12px 32px -8px rgba(22, 24, 28, 0.3);
+}
+
+.bg-grain {
+  position: relative;
+}
+
+.bg-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: radial-gradient(var(--line) 0.6px, transparent 0.6px);
+  background-size: 14px 14px;
+}
+
+/* Confident, slightly desaturated grade — no warm sepia tint. */
+.photo-grade {
+  filter: contrast(1.08) saturate(0.9) brightness(0.99);
+}
+
+/* Collage photos stay black & white, with a touch more punch. */
+.photo-collage {
+  filter: grayscale(1) contrast(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

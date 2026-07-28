@@ -1,0 +1,30 @@
+export const featuredCities = [
+  "Budapest",
+  "Debrecen",
+  "Szeged",
+  "Miskolc",
+  "Pécs",
+  "Győr",
+];
+
+export const cities = [
+  ...featuredCities,
+  "Nyíregyháza",
+  "Kecskemét",
+  "Székesfehérvár",
+  "Szombathely",
+  "Szolnok",
+  "Veszprém",
+  "Békéscsaba",
+  "Zalaegerszeg",
+  "Sopron",
+  "Eger",
+  "Kaposvár",
+  "Salgótarján",
+  "Tatabánya",
+  "Nagykanizsa",
+  "Dunaújváros",
+  "Érd",
+  "Hódmezővásárhely",
+  "Szekszárd",
+].sort((a, b) => a.localeCompare(b, "hu"));

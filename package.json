@@ -1,5 +1,5 @@
 {
-  "name": "dorafoglaljitt_scaffold",
+  "name": "ittfoglalj",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.8",
+    "clsx": "^2.1.1",
+    "lenis": "^1.3.25",
+    "lucide-react": "^1.26.0",
+    "motion": "^12.42.2",
     "next": "16.2.11",
     "react": "19.2.4",
     "react-dom": "19.2.4"

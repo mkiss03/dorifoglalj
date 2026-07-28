@@ -14,37 +14,37 @@ export function ServicesSection({ services }: { services: ProviderService[] }) {
           <form
             key={s.id}
             action={updateServiceAction}
-            className="shadow-card grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 rounded-2xl bg-paper-alt/60 p-3"
+            className="shadow-card space-y-2 rounded-2xl bg-paper-alt/60 p-3"
           >
             <input type="hidden" name="id" value={s.id} />
             <input name="name" defaultValue={s.name} className={inputClass} placeholder="Szolgáltatás neve" />
-            <input
-              name="price_huf"
-              type="number"
-              min={0}
-              defaultValue={s.price_huf}
-              className={`${inputClass} w-24`}
-              placeholder="Ft"
-            />
-            <input
-              name="duration_minutes"
-              type="number"
-              min={1}
-              defaultValue={s.duration_minutes}
-              className={`${inputClass} w-20`}
-              placeholder="perc"
-            />
-            <div className="flex gap-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                name="price_huf"
+                type="number"
+                min={0}
+                defaultValue={s.price_huf}
+                className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
+                placeholder="Ft"
+              />
+              <input
+                name="duration_minutes"
+                type="number"
+                min={1}
+                defaultValue={s.duration_minutes}
+                className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
+                placeholder="perc"
+              />
               <button
                 type="submit"
-                className="rounded-full bg-ink px-3 py-2 text-xs font-semibold text-paper transition-colors hover:bg-ink/90"
+                className="shrink-0 rounded-full bg-ink px-3 py-2 text-xs font-semibold text-paper transition-colors hover:bg-ink/90"
               >
                 Mentés
               </button>
               <button
                 type="submit"
                 formAction={deleteServiceAction}
-                className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-ink-soft transition-colors hover:text-ink"
+                className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-semibold text-ink-soft transition-colors hover:text-ink"
               >
                 Törlés
               </button>
@@ -57,26 +57,32 @@ export function ServicesSection({ services }: { services: ProviderService[] }) {
         )}
       </div>
 
-      <form
-        action={addServiceAction}
-        className="mt-4 grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 border-t border-line pt-4"
-      >
+      <form action={addServiceAction} className="mt-4 space-y-2 border-t border-line pt-4">
         <input name="name" required className={inputClass} placeholder="Új szolgáltatás neve" />
-        <input name="price_huf" type="number" min={0} required className={`${inputClass} w-24`} placeholder="Ft" />
-        <input
-          name="duration_minutes"
-          type="number"
-          min={1}
-          required
-          className={`${inputClass} w-20`}
-          placeholder="perc"
-        />
-        <button
-          type="submit"
-          className="rounded-full bg-paper-alt px-3 py-2 text-xs font-semibold text-ink transition-colors hover:bg-panel"
-        >
-          + Hozzáadás
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            name="price_huf"
+            type="number"
+            min={0}
+            required
+            className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
+            placeholder="Ft"
+          />
+          <input
+            name="duration_minutes"
+            type="number"
+            min={1}
+            required
+            className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
+            placeholder="perc"
+          />
+          <button
+            type="submit"
+            className="shrink-0 rounded-full bg-paper-alt px-3 py-2 text-xs font-semibold text-ink shadow-card transition-colors hover:bg-panel"
+          >
+            + Hozzáadás
+          </button>
+        </div>
       </form>
     </div>
   );

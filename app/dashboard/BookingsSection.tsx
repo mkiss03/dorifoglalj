@@ -80,7 +80,7 @@ export function BookingsSection({
   const gridHeight = (dayEnd - dayStart) * PX_PER_HOUR;
 
   return (
-    <div className="shadow-sheet rounded-3xl bg-white p-4 lg:col-span-2 lg:p-6">
+    <div className="shadow-sheet rounded-3xl bg-white p-4 lg:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
         <p className="font-display text-lg text-ink">{formatDayHeader(selectedDate)}</p>
         <button

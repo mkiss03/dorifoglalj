@@ -3,8 +3,14 @@ export type Provider = {
   business_name: string;
   category: string | null;
   city: string | null;
+  address: string | null;
   phone: string | null;
   description: string | null;
+  website: string | null;
+  facebook_url: string | null;
+  instagram_url: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
   status: "draft" | "pending_review" | "published";
   slug: string;
   ics_token: string;
@@ -17,6 +23,8 @@ export type ProviderService = {
   id: string;
   provider_id: string;
   name: string;
+  description: string | null;
+  active: boolean;
   price_huf: number;
   duration_minutes: number;
   created_at: string;
@@ -53,17 +61,25 @@ export type PublicProvider = {
   slug: string;
   business_name: string;
   city: string | null;
+  address: string | null;
   category: string | null;
   description: string | null;
+  phone: string | null;
+  website: string | null;
+  facebook_url: string | null;
+  instagram_url: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
   services: {
     id: string;
     name: string;
+    description: string | null;
     price_huf: number;
     duration_minutes: number;
   }[];
 };
 
-/** A `create_booking` RPC visszatérési alakja. */
+/** A `create_booking` / `create_manual_booking` RPC-k visszatérési alakja. */
 export type CreateBookingResult =
   | { ok: true; booking_id: string; service_name: string; starts_at: string; ends_at: string }
   | {

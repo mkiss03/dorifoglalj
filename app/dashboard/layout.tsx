@@ -4,6 +4,7 @@ import { getUser } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/Container";
 import { signOutAction } from "@/app/auth/actions";
+import { DashboardNav } from "./DashboardNav";
 
 export default async function DashboardLayout({
   children,
@@ -30,7 +31,11 @@ export default async function DashboardLayout({
           </form>
         </Container>
       </header>
-      {children}
+
+      <Container className="flex flex-col gap-6 py-8 lg:flex-row lg:gap-10 lg:py-14">
+        <DashboardNav />
+        <main className="min-w-0 flex-1">{children}</main>
+      </Container>
     </div>
   );
 }

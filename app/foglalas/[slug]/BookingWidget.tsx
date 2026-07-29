@@ -43,6 +43,27 @@ function formatCountdown(ms: number) {
   return `${mm}:${String(ss).padStart(2, "0")}`;
 }
 
+function releaseHoldReliably(token: string) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return;
+  // `keepalive: true` kell ide — a supabase-js kliens sima fetch-hívása
+  // megszakadna, ha a felhasználó épp ekkor zárja be a fület vagy tölti
+  // újra az oldalt (a böngésző lő eldobja a navigáció alatt induló, nem
+  // "keepalive" kéréseket), így a zárolás phantom módon a lejáratáig
+  // (5 percig) állva maradna.
+  void fetch(`${url}/rest/v1/rpc/release_hold`, {
+    method: "POST",
+    keepalive: true,
+    headers: {
+      "Content-Type": "application/json",
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({ p_hold_token: token }),
+  }).catch(() => {});
+}
+
 function buildIcsDataUri(opts: { title: string; start: string; end: string; description: string }) {
   const dt = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   const uid = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}`;
@@ -159,8 +180,7 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
     if (!holdToken) return;
     const token = holdToken;
     return () => {
-      const supabase = createClient();
-      void supabase.rpc("release_hold", { p_hold_token: token });
+      releaseHoldReliably(token);
     };
   }, [holdToken]);
 

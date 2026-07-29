@@ -2,7 +2,9 @@
 -- IttFoglalj.hu — schema_v4: szünet (puffer) + időpont-zárolás
 -- Additív a schema.sql + schema_v2.sql + schema_v3.sql-hez.
 -- Egyszer lefuttatandó a Supabase SQL Editorban.
--- A script újrafuttatható (idempotens, ahol lehet).
+-- A script újrafuttatható (idempotens, ahol lehet) — ha már
+-- lefuttattad korábban, nyugodtan futtasd újra: a `coalesce(buffer_
+-- minutes, 0)` védelem hozzáadásán kívül semmi nem változott.
 -- ============================================================
 
 -- ------------------------------------------------------------
@@ -78,7 +80,7 @@ declare
   v_dur interval;
   v_step interval := interval '30 minutes';
 begin
-  select id, make_interval(mins => buffer_minutes) into v_provider_id, v_buffer
+  select id, make_interval(mins => coalesce(buffer_minutes, 0)) into v_provider_id, v_buffer
     from public.providers where slug = p_slug and booking_enabled = true;
   if v_provider_id is null then
     return v_result;
@@ -152,7 +154,7 @@ begin
     return v_result;
   end if;
 
-  select make_interval(mins => buffer_minutes) into v_buffer
+  select make_interval(mins => coalesce(buffer_minutes, 0)) into v_buffer
     from public.providers where id = v_provider_id;
 
   select duration_minutes into v_duration from public.provider_services
@@ -222,7 +224,7 @@ declare
   v_hold_token uuid;
   v_expires_at timestamptz;
 begin
-  select id, make_interval(mins => buffer_minutes) into v_provider_id, v_buffer
+  select id, make_interval(mins => coalesce(buffer_minutes, 0)) into v_provider_id, v_buffer
     from public.providers where slug = p_slug and booking_enabled = true;
   if v_provider_id is null then
     return json_build_object('ok', false, 'error', 'provider_not_found');
@@ -349,7 +351,7 @@ begin
     return json_build_object('ok', false, 'error', 'missing_fields');
   end if;
 
-  select id, make_interval(mins => buffer_minutes) into v_provider_id, v_buffer
+  select id, make_interval(mins => coalesce(buffer_minutes, 0)) into v_provider_id, v_buffer
     from public.providers where slug = p_slug and booking_enabled = true;
   if v_provider_id is null then
     return json_build_object('ok', false, 'error', 'provider_not_found');
@@ -485,7 +487,7 @@ begin
     return json_build_object('ok', false, 'error', 'missing_fields');
   end if;
 
-  select make_interval(mins => buffer_minutes) into v_buffer
+  select make_interval(mins => coalesce(buffer_minutes, 0)) into v_buffer
     from public.providers where id = v_provider_id;
 
   delete from public.bookings

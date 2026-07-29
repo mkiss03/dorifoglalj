@@ -93,8 +93,8 @@ export function BookingsSection({
       </div>
 
       <div className="flex gap-6 pt-4">
-        <div className="hidden shrink-0 md:block md:w-44">
-          <MiniCalendar selected={selectedDate} onSelect={setSelectedDate} compact />
+        <div className="hidden shrink-0 md:block md:w-72">
+          <MiniCalendar selected={selectedDate} onSelect={setSelectedDate} />
         </div>
 
         <div className="min-w-0 flex-1 overflow-x-auto">

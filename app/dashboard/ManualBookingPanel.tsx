@@ -98,7 +98,6 @@ function ManualBookingForm({ services, onDone }: { services: ProviderService[]; 
               setDate(d);
               setSelectedSlot(null);
             }}
-            compact
           />
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Szabad időpontok</p>

@@ -1,16 +1,24 @@
 "use client";
 
 import { useActionState, useEffect, useMemo, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { MiniCalendar } from "@/components/ui/MiniCalendar";
 import { createBookingAction, type BookingFormState } from "./actions";
-import type { CreateBookingResult, PublicProvider } from "@/lib/supabase/types";
+import type { CreateBookingResult, CreateHoldResult, PublicProvider } from "@/lib/supabase/types";
 
 const initialState: BookingFormState = { status: "idle" };
 
 const inputClass =
   "w-full rounded-2xl bg-paper-alt px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-soft/60 focus:ring-2 focus:ring-accent-light";
+
+const HOLD_ERROR_MESSAGES: Record<string, string> = {
+  provider_not_found: "Ez a foglalási oldal jelenleg nem elérhető.",
+  service_not_found: "Ez a szolgáltatás nem található.",
+  in_past: "Ez az időpont már elmúlt — válassz másikat.",
+  outside_hours: "Ez az időpont már nem elérhető — válassz másikat.",
+  slot_taken: "Ezt az időpontot időközben lefoglalták — válassz másikat.",
+};
 
 function formatHuf(n: number) {
   return new Intl.NumberFormat("hu-HU").format(n) + " Ft";
@@ -26,6 +34,13 @@ function formatSlotTime(iso: string) {
 
 function toDateParam(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function formatCountdown(ms: number) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const mm = Math.floor(total / 60);
+  const ss = total % 60;
+  return `${mm}:${String(ss).padStart(2, "0")}`;
 }
 
 function buildIcsDataUri(opts: { title: string; start: string; end: string; description: string }) {
@@ -98,6 +113,15 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
   const [slotsKey, setSlotsKey] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
+  // Amint a vendég rákattint egy sávra, a rendszer rövid időre ténylegesen
+  // lezárolja neki (create_hold RPC) — így amíg az űrlapot tölti ki, más
+  // nem kaphatja meg ugyanazt/átfedő időpontot.
+  const [holding, setHolding] = useState(false);
+  const [holdToken, setHoldToken] = useState<string | null>(null);
+  const [holdExpiresAt, setHoldExpiresAt] = useState<string | null>(null);
+  const [holdError, setHoldError] = useState<string | null>(null);
+  const [nowTick, setNowTick] = useState(() => Date.now());
+
   const [state, formAction, pending] = useActionState(createBookingAction, initialState);
 
   const requestKey = serviceId ? `${serviceId}|${toDateParam(date)}` : null;
@@ -127,10 +151,73 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
     };
   }, [serviceId, date, provider.slug]);
 
+  // A korábbi zárolást mindig feloldjuk, amint másikra váltunk (vagy a
+  // widget elhagyásakor) — a cleanup a `holdToken` MINDEN változásakor
+  // lefut, nem csak unmountkor, így ez az egyetlen hely, ahol a release
+  // hívás történik.
+  useEffect(() => {
+    if (!holdToken) return;
+    const token = holdToken;
+    return () => {
+      const supabase = createClient();
+      void supabase.rpc("release_hold", { p_hold_token: token });
+    };
+  }, [holdToken]);
+
+  useEffect(() => {
+    if (!holdExpiresAt) return;
+    const id = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [holdExpiresAt]);
+
   const selectedService = useMemo(
     () => provider.services.find((s) => s.id === serviceId) ?? null,
     [provider.services, serviceId]
   );
+
+  const holdRemainingMs = holdExpiresAt ? new Date(holdExpiresAt).getTime() - nowTick : 0;
+  const holdExpired = holdToken !== null && holdRemainingMs <= 0;
+
+  async function selectSlot(slot: string) {
+    if (!selectedService || holding) return;
+    setSelectedSlot(null);
+    setHoldToken(null);
+    setHoldExpiresAt(null);
+    setHoldError(null);
+    setHolding(true);
+
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("create_hold", {
+      p_slug: provider.slug,
+      p_service_id: selectedService.id,
+      p_starts_at: slot,
+    });
+
+    setHolding(false);
+
+    if (error || !data) {
+      setHoldError("Nem sikerült lefoglalni ezt az időpontot. Próbáld újra.");
+      return;
+    }
+
+    const result = data as CreateHoldResult;
+    if (!result.ok) {
+      setHoldError(HOLD_ERROR_MESSAGES[result.error] ?? "Nem sikerült lefoglalni ezt az időpontot.");
+      setSlots((prev) => prev.filter((s) => s !== slot));
+      return;
+    }
+
+    setHoldToken(result.hold_token);
+    setHoldExpiresAt(result.expires_at);
+    setSelectedSlot(slot);
+  }
+
+  function resetSelection() {
+    setSelectedSlot(null);
+    setHoldToken(null);
+    setHoldExpiresAt(null);
+    setHoldError(null);
+  }
 
   if (state.status === "success" && state.result) {
     return <BookingConfirmation provider={provider} result={state.result} />;
@@ -155,7 +242,7 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
               type="button"
               onClick={() => {
                 setServiceId(s.id);
-                setSelectedSlot(null);
+                resetSelection();
               }}
               className={
                 "flex items-center justify-between rounded-2xl px-4 py-3 text-left transition-colors duration-200 " +
@@ -177,7 +264,7 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
             selected={date}
             onSelect={(d) => {
               setDate(d);
-              setSelectedSlot(null);
+              resetSelection();
             }}
           />
           <div>
@@ -192,9 +279,10 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
                   <button
                     key={slot}
                     type="button"
-                    onClick={() => setSelectedSlot(slot)}
+                    disabled={holding}
+                    onClick={() => selectSlot(slot)}
                     className={
-                      "rounded-full py-2 text-sm font-semibold tabular-nums transition-colors duration-200 " +
+                      "rounded-full py-2 text-sm font-semibold tabular-nums transition-colors duration-200 disabled:opacity-50 " +
                       (selectedSlot === slot
                         ? "bg-accent-dark text-paper"
                         : "bg-paper-alt text-ink-soft hover:bg-panel")
@@ -204,17 +292,27 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
                   </button>
                 ))}
             </div>
+            {holding && <p className="mt-2 text-sm text-ink-soft">Időpont rögzítése…</p>}
+            {holdError && <p className="mt-2 text-sm text-red-700">{holdError}</p>}
           </div>
         </div>
       )}
 
-      {selectedSlot && selectedService && (
+      {selectedSlot && selectedService && holdToken && !holdExpired && (
         <form action={formAction} className="mt-6 space-y-3 border-t border-line pt-6">
           <input type="hidden" name="slug" value={provider.slug} />
           <input type="hidden" name="service_id" value={selectedService.id} />
           <input type="hidden" name="starts_at" value={selectedSlot} />
+          <input type="hidden" name="hold_token" value={holdToken} />
 
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Foglalás véglegesítése</p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Foglalás véglegesítése</p>
+            <p className="flex items-center gap-1 text-xs font-semibold tabular-nums text-accent-dark">
+              <Clock className="h-3.5 w-3.5" strokeWidth={2.25} />
+              {formatCountdown(holdRemainingMs)}
+            </p>
+          </div>
+          <p className="text-xs text-ink-soft">Ennyi ideig tartjuk neked ezt az időpontot.</p>
           <input name="customer_name" required placeholder="Neved" className={inputClass} />
           <input name="customer_phone" required placeholder="Telefonszámod" className={inputClass} />
           <input name="customer_email" type="email" placeholder="E-mail címed (nem kötelező)" className={inputClass} />
@@ -229,6 +327,12 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
             {pending ? "Foglalás…" : `Foglalás — ${formatHuf(selectedService.price_huf)}`}
           </button>
         </form>
+      )}
+
+      {holdExpired && (
+        <div className="mt-6 border-t border-line pt-6">
+          <p className="text-sm text-red-700">A foglalási idő lejárt — válaszd ki újra az időpontot.</p>
+        </div>
       )}
     </div>
   );

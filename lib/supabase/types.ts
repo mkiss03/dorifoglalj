@@ -11,6 +11,7 @@ export type Provider = {
   instagram_url: string | null;
   logo_url: string | null;
   cover_url: string | null;
+  buffer_minutes: number;
   status: "draft" | "pending_review" | "published";
   slug: string;
   ics_token: string;
@@ -85,4 +86,12 @@ export type CreateBookingResult =
   | {
       ok: false;
       error: "missing_fields" | "provider_not_found" | "service_not_found" | "in_past" | "outside_hours" | "slot_taken";
+    };
+
+/** A `create_hold` RPC visszatérési alakja — rövid életű zárolás egy sávra. */
+export type CreateHoldResult =
+  | { ok: true; hold_token: string; expires_at: string; ends_at: string }
+  | {
+      ok: false;
+      error: "provider_not_found" | "service_not_found" | "in_past" | "outside_hours" | "slot_taken";
     };

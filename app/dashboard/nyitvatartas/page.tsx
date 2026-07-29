@@ -1,15 +1,15 @@
 import { getUser, createClient } from "@/lib/supabase/server";
-import type { Availability } from "@/lib/supabase/types";
+import type { Availability, Provider } from "@/lib/supabase/types";
 import { AvailabilitySection } from "../AvailabilitySection";
+import { BufferSettingsCard } from "../BufferSettingsCard";
 
 export default async function DashboardAvailabilityPage() {
   const user = await getUser();
   const supabase = await createClient();
-  const { data: availability } = await supabase
-    .from("provider_availability")
-    .select("*")
-    .eq("provider_id", user!.id)
-    .order("weekday");
+  const [{ data: availability }, { data: provider }] = await Promise.all([
+    supabase.from("provider_availability").select("*").eq("provider_id", user!.id).order("weekday"),
+    supabase.from("providers").select("buffer_minutes").eq("id", user!.id).single(),
+  ]);
 
   return (
     <section>
@@ -21,6 +21,8 @@ export default async function DashboardAvailabilityPage() {
       <div className="mt-6">
         <AvailabilitySection availability={(availability ?? []) as Availability[]} />
       </div>
+
+      <BufferSettingsCard bufferMinutes={(provider as Pick<Provider, "buffer_minutes"> | null)?.buffer_minutes ?? 0} />
     </section>
   );
 }

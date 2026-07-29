@@ -25,6 +25,7 @@ export async function createBookingAction(
   const slug = String(formData.get("slug") ?? "");
   const serviceId = String(formData.get("service_id") ?? "");
   const startsAt = String(formData.get("starts_at") ?? "");
+  const holdToken = String(formData.get("hold_token") ?? "").trim();
   const name = String(formData.get("customer_name") ?? "").trim();
   const phone = String(formData.get("customer_phone") ?? "").trim();
   const email = String(formData.get("customer_email") ?? "").trim();
@@ -44,6 +45,7 @@ export async function createBookingAction(
     p_customer_name: name,
     p_customer_phone: phone,
     p_customer_email: email || null,
+    p_hold_token: holdToken || null,
   });
 
   if (error) {

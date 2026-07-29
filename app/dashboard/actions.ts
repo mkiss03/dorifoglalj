@@ -264,6 +264,37 @@ export async function updateAvailabilityAction(
   return { status: "success", message: "Nyitvatartás mentve." };
 }
 
+export type BufferState = {
+  status: "idle" | "error" | "success";
+  message?: string;
+};
+
+export async function updateBufferAction(
+  _prevState: BufferState,
+  formData: FormData
+): Promise<BufferState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const bufferMinutes = Number(formData.get("buffer_minutes"));
+  if (!Number.isFinite(bufferMinutes) || bufferMinutes < 0 || bufferMinutes > 180) {
+    return { status: "error", message: "Érvénytelen szünet-hossz." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("providers")
+    .update({ buffer_minutes: Math.round(bufferMinutes) })
+    .eq("id", user.id);
+
+  if (error) {
+    return { status: "error", message: "Hiba történt a mentés során." };
+  }
+
+  revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Szünet mentve." };
+}
+
 export type BookingLinkState = {
   status: "idle" | "error" | "success";
   message?: string;

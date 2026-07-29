@@ -146,9 +146,17 @@ export async function updateCoverAction(_prevState: MediaState, formData: FormDa
   return { status: "success", message: "Borítókép frissítve." };
 }
 
-export async function addServiceAction(formData: FormData) {
+export type ServiceState = {
+  status: "idle" | "error" | "success";
+  message?: string;
+};
+
+export async function addServiceAction(
+  _prevState: ServiceState,
+  formData: FormData
+): Promise<ServiceState> {
   const user = await getUser();
-  if (!user) return;
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
 
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -156,11 +164,11 @@ export async function addServiceAction(formData: FormData) {
   const durationMinutes = Number(formData.get("duration_minutes"));
 
   if (!name || !Number.isFinite(priceHuf) || priceHuf < 0 || !Number.isFinite(durationMinutes) || durationMinutes <= 0) {
-    return;
+    return { status: "error", message: "Add meg helyesen a nevet, az árat és az időtartamot." };
   }
 
   const supabase = await createClient();
-  await supabase.from("provider_services").insert({
+  const { error } = await supabase.from("provider_services").insert({
     provider_id: user.id,
     name,
     description: description || null,
@@ -168,12 +176,20 @@ export async function addServiceAction(formData: FormData) {
     duration_minutes: Math.round(durationMinutes),
   });
 
+  if (error) {
+    return { status: "error", message: `Hiba történt a mentés során (${error.message}).` };
+  }
+
   revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Szolgáltatás hozzáadva." };
 }
 
-export async function updateServiceAction(formData: FormData) {
+export async function updateServiceAction(
+  _prevState: ServiceState,
+  formData: FormData
+): Promise<ServiceState> {
   const user = await getUser();
-  if (!user) return;
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
 
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
@@ -183,11 +199,11 @@ export async function updateServiceAction(formData: FormData) {
   const durationMinutes = Number(formData.get("duration_minutes"));
 
   if (!id || !name || !Number.isFinite(priceHuf) || priceHuf < 0 || !Number.isFinite(durationMinutes) || durationMinutes <= 0) {
-    return;
+    return { status: "error", message: "Add meg helyesen a nevet, az árat és az időtartamot." };
   }
 
   const supabase = await createClient();
-  await supabase
+  const { error } = await supabase
     .from("provider_services")
     .update({
       name,
@@ -199,7 +215,12 @@ export async function updateServiceAction(formData: FormData) {
     .eq("id", id)
     .eq("provider_id", user.id);
 
+  if (error) {
+    return { status: "error", message: `Hiba történt a mentés során (${error.message}).` };
+  }
+
   revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Mentve." };
 }
 
 export async function deleteServiceAction(formData: FormData) {
@@ -288,7 +309,7 @@ export async function updateBufferAction(
     .eq("id", user.id);
 
   if (error) {
-    return { status: "error", message: "Hiba történt a mentés során." };
+    return { status: "error", message: `Hiba történt a mentés során (${error.message}).` };
   }
 
   revalidatePath("/dashboard", "layout");

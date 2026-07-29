@@ -200,13 +200,24 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
 
   async function selectSlot(slot: string) {
     if (!selectedService || holding) return;
+
+    const previousToken = holdToken;
     setSelectedSlot(null);
-    setHoldToken(null);
-    setHoldExpiresAt(null);
     setHoldError(null);
     setHolding(true);
 
     const supabase = createClient();
+
+    // Ha volt aktív zárolásunk (ugyanerre vagy egy másik sávra), előbb
+    // MEGVÁRVA szabadítjuk fel, mielőtt újat kérnénk. Enélkül a két hívás
+    // versenyezne: ha a create_hold a szerveren előbb futna le, mint a
+    // release_hold törlése, a saját (még nem törölt) korábbi zárolásunkba
+    // ütközne — pont ez okozta, hogy egy szabad sávra kattintva időnként
+    // "már lefoglalták" hibát kaptunk.
+    if (previousToken) {
+      await supabase.rpc("release_hold", { p_hold_token: previousToken });
+    }
+
     const { data, error } = await supabase.rpc("create_hold", {
       p_slug: provider.slug,
       p_service_id: selectedService.id,
@@ -216,12 +227,16 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
     setHolding(false);
 
     if (error || !data) {
+      setHoldToken(null);
+      setHoldExpiresAt(null);
       setHoldError("Nem sikerült lefoglalni ezt az időpontot. Próbáld újra.");
       return;
     }
 
     const result = data as CreateHoldResult;
     if (!result.ok) {
+      setHoldToken(null);
+      setHoldExpiresAt(null);
       setHoldError(HOLD_ERROR_MESSAGES[result.error] ?? "Nem sikerült lefoglalni ezt az időpontot.");
       setSlots((prev) => prev.filter((s) => s !== slot));
       return;
@@ -234,9 +249,13 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
 
   function resetSelection() {
     setSelectedSlot(null);
-    setHoldToken(null);
-    setHoldExpiresAt(null);
     setHoldError(null);
+    // Szándékosan NEM ürítjük itt a holdToken-t/holdExpiresAt-et: a
+    // zárolás a háttérben tovább él (mást úgysem engedne be), és a
+    // selectSlot majd megvárva szabadítja fel, amikor tényleg új sávot
+    // választanak — így ez sem versenyezhet egy másik hívással. Ha a
+    // vendég inkább elhagyja az oldalt, az unmount-effekt gondoskodik
+    // a felszabadításról.
   }
 
   if (state.status === "success" && state.result) {

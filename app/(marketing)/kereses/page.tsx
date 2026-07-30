@@ -2,14 +2,9 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/Container";
+import { SearchBar } from "@/components/search/SearchBar";
 import { categories } from "@/lib/categories";
-import { cities } from "@/lib/cities";
 import { PROVIDER_TAGS, TAG_LABELS, type ProviderTag, type SearchProvider } from "@/lib/supabase/types";
-
-const inputClass =
-  "w-full rounded-2xl bg-paper-alt px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-soft/60 focus:ring-2 focus:ring-accent-light";
-
-const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-soft";
 
 type SearchParams = {
   category?: string;
@@ -34,7 +29,10 @@ function ProviderCard({ provider }: { provider: SearchProvider }) {
       href={`/foglalas/${provider.slug}`}
       className="shadow-card group flex flex-col overflow-hidden rounded-2xl bg-white transition-all duration-200 hover:-translate-y-1"
     >
-      <div className="relative h-32 w-full overflow-hidden">
+      {/* Nincs overflow-hidden ezen a dobozon: a logó "-bottom-5"-tel lóg ki
+          belőle, hogy a fehér tartalom-sávra lógjon át — a kártya külső
+          overflow-hidden-je csak a kártya saját sarkait vágja, ezt nem. */}
+      <div className="relative h-32 w-full shrink-0">
         {provider.cover_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={provider.cover_url} alt="" className="h-full w-full object-cover" />
@@ -116,77 +114,9 @@ export default async function KeresesPage({
           Szűrj kategória, település, dátum vagy alkalom szerint — regisztráció nélkül, azonnal foglalhatsz.
         </p>
 
-        <form method="get" className="shadow-sheet mt-8 rounded-3xl bg-white p-5 lg:p-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <label htmlFor="category" className={labelClass}>
-                Kategória
-              </label>
-              <select id="category" name="category" defaultValue={category} className={inputClass}>
-                <option value="">Összes kategória</option>
-                {categories.map((c) => (
-                  <option key={c.slug} value={c.slug}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="city" className={labelClass}>
-                Település
-              </label>
-              <input
-                id="city"
-                name="city"
-                list="cities-list"
-                defaultValue={city}
-                placeholder="pl. Budapest"
-                className={inputClass}
-                autoComplete="off"
-              />
-              <datalist id="cities-list">
-                {cities.map((c) => (
-                  <option key={c} value={c} />
-                ))}
-              </datalist>
-            </div>
-
-            <div>
-              <label htmlFor="date" className={labelClass}>
-                Dátum
-              </label>
-              <input id="date" name="date" type="date" defaultValue={date} className={inputClass} />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <p className={labelClass}>Alkalom</p>
-            <div className="mt-1.5 flex flex-wrap gap-2">
-              {PROVIDER_TAGS.map((tag) => (
-                <label key={tag} className="cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="tags"
-                    value={tag}
-                    defaultChecked={selectedTags.includes(tag)}
-                    className="peer sr-only"
-                  />
-                  <span className="inline-block rounded-full border border-line bg-paper-alt px-4 py-2 text-sm font-medium text-ink-soft transition-colors duration-200 peer-checked:border-accent-dark peer-checked:bg-accent-dark peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-accent-light">
-                    {TAG_LABELS[tag]}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="mt-5 w-full rounded-full bg-ink px-6 py-3 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90 sm:w-auto"
-          >
-            Keresés
-          </button>
-        </form>
+        <div className="mt-8">
+          <SearchBar initialCategory={category} initialCity={city} initialDate={date} initialTags={selectedTags} />
+        </div>
 
         <div className="mt-10">
           {results.length === 0 ? (

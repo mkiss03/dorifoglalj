@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IttFoglalj.hu
 
-## Getting Started
+Magyar időpontfoglaló piactér szépség-/wellness-szolgáltatóknak (fodrász, köröm, kozmetika, masszázs stb.). A vendégek szolgáltatót keresnek és regisztráció nélkül foglalnak; a szolgáltatók egy Apple-stílusú irányítópulton kezelik a profiljukat, szolgáltatásaikat, nyitvatartásukat és a foglalásaikat.
 
-First, run the development server:
+Ez a dokumentum a projekt jelenlegi technikai állapotának összefoglalója — mire épül, hogyan áll össze, és mi van benne a mostani (v0.4.0) állapot szerint.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech stack
+
+- **Next.js 16** (App Router, Turbopack, Server Components + Server Actions)
+- **React 19** (`useActionState`, natív form actions)
+- **TypeScript**, **Tailwind CSS v4**
+- **Supabase**: Postgres adatbázis, Auth (e-mail/jelszó), Storage (profilképek)
+- **lucide-react** ikonok, **qrcode** (szerver-oldali QR-generálás), **motion**/**lenis** (marketing oldali animációk/scroll)
+- Deploy: **Vercel** (automatikus deploy minden `main`-push után), verziózás git tag-ekkel (`v0.1.0` … `v0.4.0`)
+
+## Design rendszer
+
+A vizuális nyelv neve **"Confident Minimal"**: közel-fekete/fehér alap + málna-korall (raspberry-coral) accent szín, `Archivo Black` display + `Ubuntu` body betűtípus. A pontos token-lista (színek, radius-skála, árnyék-osztályok) a [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)-ben van dokumentálva.
+
+## Könyvtárszerkezet
+
+```
+app/
+  (marketing)/         → nyitóoldal (Hero, Categories, HowItWorks, WhyUs, ForProviders, CtaBanner, Faq, Footer)
+  bejelentkezes/        → szolgáltatói bejelentkezés
+  regisztracio/         → szolgáltatói regisztráció
+  auth/                 → Supabase auth confirm/error route-ok
+  dashboard/            → szolgáltatói irányítópult (auth-védett, ld. lentebb)
+  foglalas/[slug]/       → publikus, brandelt foglalási landing page + widget
+  api/ics/[token]/       → egyirányú .ics naptár-feed (Google/Apple naptár-előfizetéshez)
+
+components/              → marketing oldali szekció-komponensek
+lib/
+  supabase/              → server/browser Supabase kliensek + megosztott TS típusok
+  categories.ts, cities.ts, faq.ts → statikus tartalom-adatok
+
+supabase/
+  schema.sql             → v0.1.0: providers, provider_services, regisztrációs trigger
+  schema_v2.sql           → v0.2.0: foglalási rendszer (availability, bookings, RPC-k)
+  schema_v3.sql           → v0.3.0: bővített profil, storage, szolgáltatás description/active
+  schema_v4.sql           → v0.4.0: szünet (puffer) + időpont-zárolás
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A `supabase/schema*.sql` fájlok **additívak és idempotensek** — mindegyiket egyszer, sorrendben kell lefuttatni a Supabase SQL Editorban egy éles projekten.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Szolgáltatói irányítópult (`app/dashboard`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Apple-stílusú, több menüpontos elrendezés (`DashboardNav.tsx`: bal oldali sáv desktopon, görgethető pill-sor mobilon), közös `layout.tsx` + megosztott `loading.tsx` a fülváltás érzékelt sebességéhez:
 
-## Learn More
+| Fül | Tartalom |
+|---|---|
+| **Áttekintés** (`/dashboard`) | Napi/heti statisztika-kártyák, teljes napi naptár (óra-rács, `MiniCalendar`), **"+ Új időpont"** — manuális/telefonos foglalás felvétele a szabad-sáv keresővel |
+| **Profil** (`/profil`) | Cégadatok (kategória, város, cím, telefon, leírás), online jelenlét (weboldal, Facebook, Instagram), logó- és borítókép-feltöltés (Supabase Storage, `provider-media` bucket) |
+| **Szolgáltatások** (`/szolgaltatasok`) | Név, leírás, ár, időtartam, **Aktív/Inaktív** kapcsoló szolgáltatásonként (inaktív = nem foglalható, de nem törölt) |
+| **Nyitvatartás** (`/nyitvatartas`) | Heti nyitvatartási sávok naponta, "másolás minden napra" gyorsgomb, **szünet (puffer)** beállítása két foglalás között |
+| **Megosztás** (`/megosztas`) | Publikus foglalási link + másolás, QR-kód (letölthető), Facebook-megosztás gomb, `.ics` naptár-feed link |
 
-To learn more about Next.js, take a look at the following resources:
+## Publikus foglalási oldal (`app/foglalas/[slug]`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Nem csak egy foglalási form, hanem egy mini brandelt landing page: borítókép/logó (vagy elegáns alapértelmezett megjelenés fotó nélkül), elérhetőség-sor (telefon, weboldal, közösségi linkek), leírás, szolgáltatás-előnézeti kártyák, majd a foglalási widget. Regisztráció nélkül foglalható.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Foglalási folyamat és versenyhelyzet-védelem
 
-## Deploy on Vercel
+1. Vendég kiválaszt egy szolgáltatást és dátumot → `get_available_slots` RPC visszaadja a szabad, 30 perces rácsra igazított kezdő-időpontokat (nyitvatartás − meglévő foglalások/zárolások − szünet-puffer).
+2. Sávra kattintva a rendszer **azonnal, valódi 5 perces zárolást (hold)** hoz létre a szerveren (`create_hold` RPC) — eddig a pontig csak vizuális kiválasztás volt, mostantól tényleges adatbázis-szintű foglalás, GiST kizárási megszorítással védve. Amíg a zárolás él, senki más (más vendég, másik böngészőfül) nem kaphatja meg ugyanazt vagy egy átfedő időpontot.
+3. Az űrlapon látható visszaszámláló mutatja, mennyi idő van hátra. Beküldéskor a `create_booking` RPC a zárolást váltja be végleges foglalássá; ha időközben lejárt vagy elveszett, friss validáción megy át (sosem enged át ütközést).
+4. Ha a vendég másik sávra vált vagy elhagyja az oldalt, a zárolás azonnal (vagy legkésőbb 5 percen belül automatikusan) felszabadul — a felszabadítás `keepalive` fetch-csel megy, hogy lapváltás/frissítés közben is célba érjen.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Szünet (puffer) két foglalás között
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Szolgáltatónként beállítható (0–180 perc), és minden meglévő foglalás **mindkét oldalán** szimmetrikusan érvényesül — tehát 15 perces puffer mellett egy 12:00–13:00-ás foglalás után a következő időpont csak 13:15-től ajánlható fel. Egységesen érvényesül a publikus foglalásnál és a dashboard manuális felvitelénél is.
+
+## Naptár-szinkron
+
+Egyirányú, feliratkozásos `.ics` feed (`app/api/ics/[token]/route.ts`) — a szolgáltató egyszer beteszi a linket a Google/Apple naptárába, az új foglalások automatikusan megjelennek benne (nem valós idejű, nincs kétirányú írás). A vendég a visszaigazoló képernyőn egy kliens-oldalon generált, egy-eseményes `.ics` letöltést is kap ("Hozzáadás a naptárhoz").
+
+## Adatbázis és biztonsági modell
+
+- **RLS mindenhol bekapcsolva.** A szolgáltató csak a saját sorait látja/módosítja (`auth.uid() = provider_id`/`id`).
+- **Nincs service-role kulcs használatban.** A vendég-oldali (anon) hozzáférés kizárólag `SECURITY DEFINER` RPC-ken keresztül történik (`get_public_provider`, `get_available_slots`, `create_hold`, `release_hold`, `create_booking`), amik pontosan a szükséges, publikus mezőket adják ki és minden validációt szerver-oldalon, újra elvégeznek.
+- **Dupla-foglalás elleni védelem két rétegben:** (1) alkalmazás-szintű validáció az RPC-kben (nyitvatartás, puffer, aktív szolgáltatás), (2) egy GiST **kizárási megszorítás** (`bookings_no_overlap`) az adatbázisban, ami versenyhelyzetben is garantálja, hogy két `confirmed`/`pending` foglalás sosem fedheti át egymást ugyanannál a szolgáltatónál.
+- **Storage:** `provider-media` bucket (publikus olvasás, tulajdonos csak a saját `{auth.uid()}/…` mappájába írhat), logó/borítókép feltöltéshez.
+
+## Verziótörténet
+
+| Tag | Tartalom |
+|---|---|
+| `v0.1.0` | Marketing oldal + szolgáltatói regisztráció/bejelentkezés + alap profil/szolgáltatás-kezelés |
+| `v0.2.0` | Foglalási rendszer: nyitvatartás, publikus foglalási oldal, `.ics` szinkron |
+| `v0.3.0` | Irányítópult-átalakítás: Apple-stílusú menük, bővített profil (logó/borítókép, közösségi linkek), szolgáltatás description/active, foglalási link megosztás (QR, Facebook) |
+| `v0.4.0` | Szünet (puffer) két időpont között + időpont-zárolás (hold) versenyhelyzet ellen |
+
+## Amit tudatosan később hagytunk
+
+- Valós idejű, **kétirányú** Google/Apple naptár-szinkron (OAuth-app kellene hozzá — külön, nagyobb projekt).
+- Több munkatárs / több oszlopos naptár egy szolgáltatónál.
+- Vendég-oldali e-mail értesítések (visszaigazoló/emlékeztető) — saját SMTP/Resend kellene, a Supabase beépített e-mailje csak auth-ra való.
+- Fizetés/előleg, vendég-oldali átfoglalás/lemondás.
+
+## Fejlesztői környezet
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run lint
+npm run build
+```
+
+Szükséges `.env.local` (ld. `.env.local.example`):
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+Supabase oldalon a `supabase/schema*.sql` fájlokat kell egyszer, sorrendben (schema → v2 → v3 → v4) lefuttatni az SQL Editorban. Új service-role kulcs vagy egyéb env-változó nem szükséges — minden anon-oldali hozzáférés a fent leírt RPC-ken keresztül, biztonságosan történik.

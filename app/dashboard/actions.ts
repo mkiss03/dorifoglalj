@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { categories } from "@/lib/categories";
 import { cities } from "@/lib/cities";
-import type { CreateBookingResult } from "@/lib/supabase/types";
+import { PROVIDER_TAGS, type CreateBookingResult, type ProviderTag } from "@/lib/supabase/types";
 
 export type ProfileState = {
   status: "idle" | "error" | "success";
@@ -36,6 +36,7 @@ export async function updateProfileAction(
   const website = String(formData.get("website") ?? "");
   const facebookUrl = String(formData.get("facebook_url") ?? "");
   const instagramUrl = String(formData.get("instagram_url") ?? "");
+  const tags = formData.getAll("tags").filter((t): t is ProviderTag => PROVIDER_TAGS.includes(t as ProviderTag));
 
   if (!businessName) {
     return { status: "error", message: "A vállalkozás neve kötelező." };
@@ -45,6 +46,9 @@ export async function updateProfileAction(
   }
   if (city && !cityNames.has(city)) {
     return { status: "error", message: "Érvénytelen település." };
+  }
+  if (tags.length === 0) {
+    return { status: "error", message: "Válassz legalább egy alkalmat, amire vállalsz munkát." };
   }
 
   const supabase = await createClient();
@@ -60,6 +64,7 @@ export async function updateProfileAction(
       website: normalizeUrl(website),
       facebook_url: normalizeUrl(facebookUrl),
       instagram_url: normalizeUrl(instagramUrl),
+      tags,
     })
     .eq("id", user.id);
 

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/Container";
 import { categories } from "@/lib/categories";
 import { BookingWidget } from "./BookingWidget";
-import type { PublicProvider } from "@/lib/supabase/types";
+import { TAG_LABELS, type PublicProvider } from "@/lib/supabase/types";
 
 function formatHuf(n: number) {
   return new Intl.NumberFormat("hu-HU").format(n) + " Ft";
@@ -57,6 +57,19 @@ export default async function BookingPage({
           <h1 className="mt-2 font-display text-3xl tracking-tight text-ink sm:text-4xl">
             {provider.business_name}
           </h1>
+
+          {provider.tags && provider.tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {provider.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-accent-light px-2.5 py-1 text-xs font-semibold text-accent-dark"
+                >
+                  {TAG_LABELS[tag]}
+                </span>
+              ))}
+            </div>
+          )}
 
           {locationLine && (
             <p className="mt-1.5 flex items-center gap-1.5 text-[15px] text-ink-soft">

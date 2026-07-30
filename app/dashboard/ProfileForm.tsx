@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { updateProfileAction, type ProfileState } from "./actions";
 import { categories } from "@/lib/categories";
 import { cities } from "@/lib/cities";
-import type { Provider } from "@/lib/supabase/types";
+import { PROVIDER_TAGS, TAG_LABELS, type Provider } from "@/lib/supabase/types";
 
 const initialState: ProfileState = { status: "idle" };
 
@@ -148,6 +148,29 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
               placeholder="instagram.com/pelda"
             />
           </div>
+        </div>
+      </div>
+
+      <div className="border-t border-line pt-4">
+        <p className={labelClass}>Milyen alkalmakra vállalsz munkát?</p>
+        <p className="mb-3 text-[13px] text-ink-soft">
+          Válassz legalább egyet — ez alapján tudnak majd rád szűrni a vendégek.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {PROVIDER_TAGS.map((tag) => (
+            <label key={tag} className="cursor-pointer">
+              <input
+                type="checkbox"
+                name="tags"
+                value={tag}
+                defaultChecked={provider?.tags?.includes(tag) ?? false}
+                className="peer sr-only"
+              />
+              <span className="inline-block rounded-full border border-line bg-paper-alt px-4 py-2 text-sm font-medium text-ink-soft transition-colors duration-200 peer-checked:border-accent-dark peer-checked:bg-accent-dark peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-accent-light">
+                {TAG_LABELS[tag]}
+              </span>
+            </label>
+          ))}
         </div>
       </div>
 

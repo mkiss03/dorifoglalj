@@ -1,3 +1,30 @@
+/** Előre definiált alkalom-címkék, amikre a szolgáltató munkát vállal. */
+export type ProviderTag =
+  | "eskuvo"
+  | "hetkoznapi"
+  | "party"
+  | "ballagas"
+  | "szuletesnap"
+  | "ceges_esemeny";
+
+export const PROVIDER_TAGS: ProviderTag[] = [
+  "eskuvo",
+  "hetkoznapi",
+  "party",
+  "ballagas",
+  "szuletesnap",
+  "ceges_esemeny",
+];
+
+export const TAG_LABELS: Record<ProviderTag, string> = {
+  eskuvo: "Esküvő",
+  hetkoznapi: "Hétköznapi",
+  party: "Party",
+  ballagas: "Ballagás",
+  szuletesnap: "Születésnap",
+  ceges_esemeny: "Céges esemény",
+};
+
 export type Provider = {
   id: string;
   business_name: string;
@@ -12,6 +39,7 @@ export type Provider = {
   logo_url: string | null;
   cover_url: string | null;
   buffer_minutes: number;
+  tags: ProviderTag[];
   status: "draft" | "pending_review" | "published";
   slug: string;
   ics_token: string;
@@ -71,6 +99,7 @@ export type PublicProvider = {
   instagram_url: string | null;
   logo_url: string | null;
   cover_url: string | null;
+  tags: ProviderTag[];
   services: {
     id: string;
     name: string;

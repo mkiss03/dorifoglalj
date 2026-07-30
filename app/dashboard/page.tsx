@@ -38,7 +38,7 @@ export default async function DashboardOverviewPage() {
   const todayCount = typedBookings.filter((b) => sameDay(new Date(b.starts_at), startOfToday)).length;
   const weekCount = typedBookings.filter((b) => new Date(b.starts_at) < in7Days).length;
   const activeServiceCount = typedServices.filter((s) => s.active).length;
-  const bookingActive = typedProvider?.booking_enabled ?? false;
+  const bookingActive = (typedProvider?.booking_enabled && typedProvider?.status === "active") ?? false;
 
   return (
     <section>

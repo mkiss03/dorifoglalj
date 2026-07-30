@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getUser } from "@/lib/supabase/server";
+import { getUser, createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/Container";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 import { signOutAction } from "@/app/auth/actions";
 import { DashboardNav } from "./DashboardNav";
 
@@ -13,6 +14,13 @@ export default async function DashboardLayout({
 }>) {
   const user = await getUser();
   if (!user) redirect("/bejelentkezes");
+
+  const supabase = await createClient();
+  const { data: provider } = await supabase
+    .from("providers")
+    .select("status")
+    .eq("id", user.id)
+    .single();
 
   return (
     <div className="min-h-screen bg-paper">
@@ -31,6 +39,19 @@ export default async function DashboardLayout({
           </form>
         </Container>
       </header>
+
+      {provider?.status === "pending" && (
+        <div className="border-b border-amber-200 bg-amber-50">
+          <Container className="py-3 text-center text-sm leading-relaxed text-amber-900">
+            🕐 Fiókod jóváhagyásra vár. Miután Dóri egyeztet és aktiválja a fiókodat, elérhető leszel a
+            keresésben és fogadni tudsz foglalásokat. Ez általában 1-2 munkanap. Kérdés esetén írj:{" "}
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold underline underline-offset-2">
+              {SUPPORT_EMAIL}
+            </a>
+            .
+          </Container>
+        </div>
+      )}
 
       <Container className="flex flex-col gap-6 py-8 lg:flex-row lg:gap-10 lg:py-14">
         <DashboardNav />

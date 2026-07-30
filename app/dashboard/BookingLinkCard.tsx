@@ -36,6 +36,13 @@ export function BookingLinkCard({
         Ezt a linket oszd meg (pl. a Facebook-oldaladon) — itt tudnak az ügyfeleid regisztráció nélkül foglalni.
       </p>
 
+      {provider.status === "pending" && (
+        <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
+          A link és a QR-kód már most elmenthető/kiosztható, de a foglalási oldal csak azután él, hogy a
+          fiókodat jóváhagytuk — addig a vendégek 404-et kapnak rá.
+        </p>
+      )}
+
       <div className="mt-4 flex items-center gap-2 rounded-2xl bg-paper-alt p-2 pl-4">
         <span className="min-w-0 flex-1 truncate text-sm text-ink">{bookingUrl}</span>
         <button

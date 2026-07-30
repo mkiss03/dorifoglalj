@@ -13,10 +13,16 @@ export function SignUpForm() {
 
   if (state.status === "success") {
     return (
-      <p className="mt-6 rounded-2xl bg-paper-alt p-4 text-[15px] leading-relaxed text-ink">
-        Elküldtük a megerősítő e-mailt — kattints a benne lévő linkre, utána
-        bejelentkezhetsz.
-      </p>
+      <div className="mt-6 space-y-3">
+        <p className="rounded-2xl bg-paper-alt p-4 text-[15px] leading-relaxed text-ink">
+          Elküldtük a megerősítő e-mailt — kattints a benne lévő linkre, utána
+          bejelentkezhetsz.
+        </p>
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-[15px] leading-relaxed text-amber-900">
+          Köszönjük a regisztrációt! Fiókod jóváhagyásra vár. Miután egyeztetünk veled
+          emailben, aktiváljuk a profilod. Addig is állítsd be az adataidat a dashboardban.
+        </p>
+      </div>
     );
   }
 

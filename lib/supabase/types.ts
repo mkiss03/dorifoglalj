@@ -25,6 +25,10 @@ export const TAG_LABELS: Record<ProviderTag, string> = {
   ceges_esemeny: "Céges esemény",
 };
 
+/** Szolgáltató jóváhagyási állapota — a regisztráció után 'pending', amíg
+ * Dóri manuálisan aktiválja a Supabase dashboardon. */
+export type ProviderStatus = "pending" | "active" | "suspended";
+
 export type Provider = {
   id: string;
   business_name: string;
@@ -40,7 +44,8 @@ export type Provider = {
   cover_url: string | null;
   buffer_minutes: number;
   tags: ProviderTag[];
-  status: "draft" | "pending_review" | "published";
+  status: ProviderStatus;
+  approved_at: string | null;
   slug: string;
   ics_token: string;
   booking_enabled: boolean;

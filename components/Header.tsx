@@ -10,6 +10,7 @@ import { Logo } from "./Logo";
 import { categories } from "@/lib/categories";
 
 const navLinks = [
+  { label: "Szolgáltatók keresése", href: "/kereses" },
   { label: "Szolgáltatóknak", href: "#szolgaltatoknak" },
   { label: "Árlista", href: "#arlista" },
   { label: "Blog", href: "#blog" },

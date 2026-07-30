@@ -20,10 +20,10 @@ const columns = [
   {
     title: "Vendégeknek",
     links: [
+      { label: "Szolgáltatók keresése", href: "/kereses" },
       { label: "Hogyan működik", href: "#kategoriak" },
       { label: "Kategóriák", href: "#kategoriak" },
       { label: "Gyakori kérdések", href: "#gyik" },
-      { label: "Időpontot keresek", href: "#kereses" },
     ],
   },
   {

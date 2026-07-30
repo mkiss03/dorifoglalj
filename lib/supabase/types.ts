@@ -84,6 +84,19 @@ export type Booking = {
   created_at: string;
 };
 
+/** A `search_providers` RPC visszatérési sorai — a kereső eredménylistájához. */
+export type SearchProvider = {
+  id: string;
+  slug: string;
+  business_name: string;
+  category: string | null;
+  city: string | null;
+  description: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
+  tags: ProviderTag[];
+};
+
 /** A `get_public_provider` RPC visszatérési alakja — csak publikus mezők. */
 export type PublicProvider = {
   id: string;

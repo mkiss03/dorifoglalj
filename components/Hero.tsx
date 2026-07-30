@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown, MapPin, Search, LayoutGrid, Wallet, Clock3, RefreshCcw } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { clsx } from "clsx";
@@ -214,12 +215,17 @@ function DateField() {
 }
 
 export function Hero() {
+  const router = useRouter();
   const [category, setCategory] = useState(categories[1].name);
   const [city, setCity] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    document.getElementById("kategoriak")?.scrollIntoView({ behavior: "smooth" });
+    const params = new URLSearchParams();
+    const categorySlug = categories.find((c) => c.name === category)?.slug;
+    if (categorySlug) params.set("category", categorySlug);
+    if (city.trim()) params.set("city", city.trim());
+    router.push(`/kereses${params.toString() ? `?${params.toString()}` : ""}`);
   }
 
   return (

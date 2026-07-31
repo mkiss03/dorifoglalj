@@ -3,6 +3,7 @@
 import { Reorder } from "motion/react";
 import { ChevronDown, ChevronUp, GripVertical, Plus, Trash2 } from "lucide-react";
 import { ImageField } from "./ImageField";
+import { domId } from "@/lib/content/anchors";
 import type { ItemFieldDef, ScalarKind } from "@/lib/content/types";
 
 export const inputClass =
@@ -25,11 +26,15 @@ export function ScalarControl({
   contentKey: string;
 }) {
   if (kind === "image") {
-    return <ImageField label={label} contentKey={contentKey} value={value || null} onChange={(url) => onChange(url ?? "")} />;
+    return (
+      <div id={domId(contentKey)}>
+        <ImageField label={label} contentKey={contentKey} value={value || null} onChange={(url) => onChange(url ?? "")} />
+      </div>
+    );
   }
   if (kind === "textarea" || kind === "richtext") {
     return (
-      <div>
+      <div id={domId(contentKey)}>
         <label className={labelClass}>{label}</label>
         <textarea
           rows={kind === "richtext" ? 5 : 3}
@@ -42,7 +47,7 @@ export function ScalarControl({
     );
   }
   return (
-    <div>
+    <div id={domId(contentKey)}>
       <label className={labelClass}>{label}</label>
       <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={inputClass} />
     </div>
@@ -54,11 +59,13 @@ export function StringListField({
   itemLabel,
   items,
   onChange,
+  anchor,
 }: {
   label: string;
   itemLabel: string;
   items: string[];
   onChange: (items: string[]) => void;
+  anchor: string;
 }) {
   function update(i: number, value: string) {
     const next = [...items];
@@ -77,7 +84,7 @@ export function StringListField({
   }
 
   return (
-    <div>
+    <div id={domId(anchor)}>
       <label className={labelClass}>{label}</label>
       <div className="space-y-2">
         {items.map((item, i) => (
@@ -144,12 +151,13 @@ function FieldControlDispatch({
         itemLabel={field.itemLabel}
         items={(value as string[]) ?? []}
         onChange={onChange}
+        anchor={contentKey}
       />
     );
   }
   if (field.kind === "sublist") {
     return (
-      <div>
+      <div id={domId(contentKey)}>
         <p className={labelClass}>{field.label}</p>
         <RepeaterField
           mode="free"

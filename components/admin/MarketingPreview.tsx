@@ -13,7 +13,14 @@ import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { resolveCategories } from "@/lib/content/resolveCategories";
-import type { SiteContent } from "@/lib/content/types";
+import type { SectionId, SiteContent } from "@/lib/content/types";
+
+/** A `data-preview-section` a kattintás-feloldó (ContentEditor) számára
+ * jelöli, melyik szekcióhoz ugorjon a bal oldali formban, ha a kattintott
+ * szövegre nincs pontos egyezés az indexben. */
+function Section({ id, children }: { id: SectionId; children: React.ReactNode }) {
+  return <div data-preview-section={id}>{children}</div>;
+}
 
 /** A valódi marketing-komponensek kézzel összeállított sorozata, draft
  * állapotból táplálva — NEM az egész app/(marketing)/layout.tsx, mert
@@ -24,20 +31,44 @@ export function MarketingPreview({ content }: { content: SiteContent }) {
 
   return (
     <div className="origin-top-left" style={{ colorScheme: "light" }}>
-      <Header content={content.header} categories={resolvedCategories} />
+      <Section id="header">
+        <Header content={content.header} categories={resolvedCategories} />
+      </Section>
       <main>
-        <Hero content={content.hero} categories={resolvedCategories} />
-        <Categories content={content.categories} categories={resolvedCategories} />
-        <FeaturedProviders content={content.featuredproviders} />
-        <HowItWorks content={content.howitworks} />
-        <Comparison content={content.comparison} />
-        <WhyUs content={content.whyus} />
-        <BrowseByCity content={content.browsebycity} />
-        <ForProviders content={content.forproviders} />
-        <CtaBanner content={content.ctabanner} />
-        <Faq content={content.faq} />
+        <Section id="hero">
+          <Hero content={content.hero} categories={resolvedCategories} />
+        </Section>
+        <Section id="categories">
+          <Categories content={content.categories} categories={resolvedCategories} />
+        </Section>
+        <Section id="featuredproviders">
+          <FeaturedProviders content={content.featuredproviders} />
+        </Section>
+        <Section id="howitworks">
+          <HowItWorks content={content.howitworks} />
+        </Section>
+        <Section id="comparison">
+          <Comparison content={content.comparison} />
+        </Section>
+        <Section id="whyus">
+          <WhyUs content={content.whyus} />
+        </Section>
+        <Section id="browsebycity">
+          <BrowseByCity content={content.browsebycity} />
+        </Section>
+        <Section id="forproviders">
+          <ForProviders content={content.forproviders} />
+        </Section>
+        <Section id="ctabanner">
+          <CtaBanner content={content.ctabanner} />
+        </Section>
+        <Section id="faq">
+          <Faq content={content.faq} />
+        </Section>
       </main>
-      <Footer content={content.footer} categories={resolvedCategories} />
+      <Section id="footer">
+        <Footer content={content.footer} categories={resolvedCategories} />
+      </Section>
     </div>
   );
 }

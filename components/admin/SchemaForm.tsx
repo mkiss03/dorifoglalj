@@ -2,6 +2,7 @@
 
 import { CONTENT_SCHEMA } from "@/lib/content/schema";
 import { fieldKey } from "@/lib/content/resolve";
+import { domId } from "@/lib/content/anchors";
 import { SECTION_LABELS, type SectionId, type SiteContent } from "@/lib/content/types";
 import { ScalarControl, StringListField, RepeaterField, labelClass, type RepeaterItem } from "./fields";
 
@@ -53,7 +54,7 @@ export function SchemaForm({
 
                 if (entry.kind === "list") {
                   return (
-                    <div key={entry.key}>
+                    <div key={entry.key} id={domId(entry.key)}>
                       <p className={labelClass}>{entry.label}</p>
                       <RepeaterField
                         mode={entry.mode}
@@ -75,6 +76,7 @@ export function SchemaForm({
                       itemLabel={entry.itemLabel}
                       items={value as string[]}
                       onChange={(items) => onFieldChange(section, field, items)}
+                      anchor={entry.key}
                     />
                   );
                 }

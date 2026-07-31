@@ -1,22 +1,19 @@
+"use client";
+
 import { ChevronDown, MapPin } from "lucide-react";
 import { Container } from "./ui/Container";
 import { featuredCities, cities } from "@/lib/cities";
+import type { SiteContent } from "@/lib/content/types";
 
-export function BrowseByCity() {
+export function BrowseByCity({ content }: { content: SiteContent["browsebycity"] }) {
   return (
     <section className="bg-paper-alt py-14 lg:py-20">
       <Container>
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">
-          Bárhol Magyarországon
-        </p>
-        <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
-          Böngéssz település szerint
-        </h2>
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
+        <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
 
         <div className="mt-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-            Legnépszerűbb
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{content.featured_label}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             {featuredCities.map((city) => (
               <a
@@ -33,7 +30,7 @@ export function BrowseByCity() {
 
         <details className="group mt-8">
           <summary className="shadow-card flex cursor-pointer list-none items-center justify-center gap-2 rounded-full bg-white py-3 text-sm font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 [&::-webkit-details-marker]:hidden">
-            Összes település megjelenítése
+            {content.expand_label}
             <ChevronDown className="h-4 w-4 transition-transform duration-200 group-open:rotate-180" />
           </summary>
           <div className="mt-6 columns-2 gap-x-8 sm:columns-3 lg:columns-4">

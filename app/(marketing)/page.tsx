@@ -8,36 +8,39 @@ import { BrowseByCity } from "@/components/BrowseByCity";
 import { ForProviders } from "@/components/ForProviders";
 import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
-import { categories } from "@/lib/categories";
-import { faqItems } from "@/lib/faq";
+import { getSiteContent } from "@/lib/content/get-site-content";
+import { resolveCategories } from "@/lib/content/resolveCategories";
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqItems.map((item) => ({
-    "@type": "Question",
-    name: item.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer.replace(/\n\n/g, " "),
-    },
-  })),
-};
+export default async function Home() {
+  const content = await getSiteContent();
+  const categories = resolveCategories(content);
 
-const servicesJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  itemListElement: categories.map((c, i) => ({
-    "@type": "Service",
-    position: i + 1,
-    name: c.name,
-    serviceType: c.items.join(", "),
-    provider: { "@type": "Organization", name: "IttFoglalj.hu" },
-    areaServed: "HU",
-  })),
-};
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: content.faq.items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer.replace(/\n\n/g, " "),
+      },
+    })),
+  };
 
-export default function Home() {
+  const servicesJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: categories.map((c, i) => ({
+      "@type": "Service",
+      position: i + 1,
+      name: c.name,
+      serviceType: c.items.join(", "),
+      provider: { "@type": "Organization", name: "IttFoglalj.hu" },
+      areaServed: "HU",
+    })),
+  };
+
   return (
     <>
       <script
@@ -48,16 +51,16 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
       />
-      <Hero />
-      <Categories />
-      <FeaturedProviders />
-      <HowItWorks />
-      <Comparison />
-      <WhyUs />
-      <BrowseByCity />
-      <ForProviders />
-      <CtaBanner />
-      <Faq />
+      <Hero content={content.hero} categories={categories} />
+      <Categories content={content.categories} categories={categories} />
+      <FeaturedProviders content={content.featuredproviders} />
+      <HowItWorks content={content.howitworks} />
+      <Comparison content={content.comparison} />
+      <WhyUs content={content.whyus} />
+      <BrowseByCity content={content.browsebycity} />
+      <ForProviders content={content.forproviders} />
+      <CtaBanner content={content.ctabanner} />
+      <Faq content={content.faq} />
     </>
   );
 }

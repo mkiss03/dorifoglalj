@@ -1,57 +1,28 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Container } from "./ui/Container";
 import { Logo } from "./Logo";
 import { FacebookGlyph, InstagramGlyph } from "./icons/BrandIcons";
-import { categories } from "@/lib/categories";
+import { featuredCities } from "@/lib/cities";
+import type { SiteContent } from "@/lib/content/types";
+import type { ResolvedCategory } from "@/lib/content/resolveCategories";
 
-const cities = [
-  "Budapest",
-  "Debrecen",
-  "Szeged",
-  "Miskolc",
-  "Pécs",
-  "Győr",
-  "Nyíregyháza",
-  "Kecskemét",
-];
-
-const columns = [
-  {
-    title: "Vendégeknek",
-    links: [
-      { label: "Szolgáltatók keresése", href: "/kereses" },
-      { label: "Hogyan működik", href: "#kategoriak" },
-      { label: "Kategóriák", href: "#kategoriak" },
-      { label: "Gyakori kérdések", href: "#gyik" },
-    ],
-  },
-  {
-    title: "Szolgáltatóknak",
-    links: [
-      { label: "Csatlakozom szolgáltatóként", href: "#szolgaltatoknak" },
-      { label: "Árlista", href: "#arlista" },
-      { label: "Funkciók", href: "#szolgaltatoknak" },
-    ],
-  },
-  {
-    title: "Jogi információk",
-    links: [
-      { label: "Adatkezelési tájékoztató", href: "#" },
-      { label: "Általános Szerződési Feltételek", href: "#" },
-      { label: "Impresszum", href: "#" },
-    ],
-  },
-];
-
-export function Footer() {
+export function Footer({
+  content,
+  categories,
+}: {
+  content: SiteContent["footer"];
+  categories: ResolvedCategory[];
+}) {
   return (
     <footer className="bg-paper pt-14 pb-10">
       <Container>
         <div className="grid gap-10 border-b border-line pb-8 sm:grid-cols-2">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft/70">
-              Népszerű kategóriák
+              {content.popular_categories_label}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {categories.map((c) => (
@@ -67,10 +38,10 @@ export function Footer() {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft/70">
-              Népszerű települések
+              {content.popular_cities_label}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {cities.map((city) => (
+              {featuredCities.map((city) => (
                 <Link
                   key={city}
                   href="#kereses"
@@ -88,19 +59,17 @@ export function Footer() {
             <Link href="/">
               <Logo className="text-lg" />
             </Link>
-            <p className="mt-4 max-w-[26ch] text-sm italic text-ink-soft">
-              Ahol a szabad időpontok várnak.
-            </p>
+            <p className="mt-4 max-w-[26ch] text-sm italic text-ink-soft">{content.tagline}</p>
             <div className="mt-6 flex gap-2">
               <a
-                href="#"
+                href={content.facebook_url}
                 aria-label="Facebook"
                 className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
               >
                 <FacebookGlyph className="h-4 w-4" />
               </a>
               <a
-                href="#"
+                href={content.instagram_url}
                 aria-label="Instagram"
                 className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
               >
@@ -110,14 +79,14 @@ export function Footer() {
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-            {columns.map((col) => (
-              <div key={col.title}>
+            {content.columns.map((col) => (
+              <div key={col.id}>
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft/70">
                   {col.title}
                 </p>
                 <ul className="mt-4 space-y-2.5">
                   {col.links.map((l) => (
-                    <li key={l.label}>
+                    <li key={l.id}>
                       <Link
                         href={l.href}
                         className="text-sm text-ink-soft hover:text-ink transition-colors"
@@ -133,11 +102,9 @@ export function Footer() {
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft/70">
-              Iratkozz fel hírlevelünkre
+              {content.newsletter_heading}
             </p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-              Új funkciók és szolgáltatók — ritkán, csak ha érdemes.
-            </p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">{content.newsletter_subtext}</p>
             <form className="shadow-card mt-4 flex items-center gap-2 rounded-full bg-paper-alt p-1.5 pl-4">
               <input
                 type="email"
@@ -156,8 +123,10 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-line pt-6 text-xs text-ink-soft sm:flex-row">
-          <p>© {new Date().getFullYear()} IttFoglalj.hu — Minden jog fenntartva.</p>
-          <p>Készült Magyarországon</p>
+          <p>
+            © {new Date().getFullYear()} {content.copyright_suffix}
+          </p>
+          <p>{content.bottom_note}</p>
         </div>
       </Container>
     </footer>

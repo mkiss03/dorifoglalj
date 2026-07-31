@@ -1,4 +1,4 @@
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 import { clsx } from "clsx";
 
 export function Collage({
@@ -7,7 +7,7 @@ export function Collage({
   letter = "I",
   className,
 }: {
-  image: StaticImageData;
+  image: string;
   alt: string;
   letter?: string;
   className?: string;

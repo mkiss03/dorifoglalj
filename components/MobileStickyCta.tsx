@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
+import type { SiteContent } from "@/lib/content/types";
 
-export function MobileStickyCta() {
+export function MobileStickyCta({ content }: { content: SiteContent["mobilestickycta"] }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export function MobileStickyCta() {
         className="flex items-center justify-center gap-2 px-4 py-3.5 text-[15px] font-semibold text-ink"
       >
         <Search className="h-4 w-4" strokeWidth={2} />
-        Időpontot keresek
+        {content.label}
       </a>
     </div>
   );

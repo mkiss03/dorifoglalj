@@ -2,23 +2,24 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, MapPin, Search, LayoutGrid, Wallet, Clock3, RefreshCcw } from "lucide-react";
+import { ChevronDown, MapPin, Search, LayoutGrid, Wallet, Clock3, RefreshCcw, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { clsx } from "clsx";
 import { Container } from "./ui/Container";
 import { RevealText } from "./ui/RevealText";
 import { MiniCalendar } from "./ui/MiniCalendar";
 import { Collage } from "./ui/Collage";
-import { categories } from "@/lib/categories";
 import { cities } from "@/lib/cities";
-import collageImg from "@/public/images/hair-styling.jpg";
+import { categoryIconBySlug } from "@/lib/categories";
+import type { SiteContent } from "@/lib/content/types";
+import type { ResolvedCategory } from "@/lib/content/resolveCategories";
 
-const stats = [
-  { icon: LayoutGrid, value: "10", label: "fő kategória, 50+ szolgáltatástípus" },
-  { icon: Wallet, value: "0 Ft", label: "regisztrációs és foglalási díj" },
-  { icon: Clock3, value: "0–24", label: "non-stop online időpontfoglalás" },
-  { icon: RefreshCcw, value: "1 naptár", label: "web és Facebook szinkronban" },
-];
+const STAT_ICONS: Record<string, LucideIcon> = {
+  categories: LayoutGrid,
+  free: Wallet,
+  hours: Clock3,
+  sync: RefreshCcw,
+};
 
 function useClickOutside(onOutside: () => void) {
   const ref = useRef<HTMLDivElement>(null);
@@ -32,7 +33,15 @@ function useClickOutside(onOutside: () => void) {
   return ref;
 }
 
-function CategoryField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function CategoryField({
+  value,
+  onChange,
+  categories,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  categories: ResolvedCategory[];
+}) {
   const [open, setOpen] = useState(false);
   const ref = useClickOutside(() => setOpen(false));
 
@@ -60,20 +69,23 @@ function CategoryField({ value, onChange }: { value: string; onChange: (v: strin
             transition={{ duration: 0.15 }}
             className="shadow-card absolute left-0 top-full z-20 mt-2 w-64 rounded-2xl bg-white p-1.5"
           >
-            {categories.map((c) => (
-              <button
-                type="button"
-                key={c.slug}
-                onClick={() => {
-                  onChange(c.name);
-                  setOpen(false);
-                }}
-                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-panel"
-              >
-                <c.icon className="h-4 w-4 text-ink" strokeWidth={1.75} />
-                {c.name}
-              </button>
-            ))}
+            {categories.map((c) => {
+              const Icon = categoryIconBySlug[c.slug];
+              return (
+                <button
+                  type="button"
+                  key={c.slug}
+                  onClick={() => {
+                    onChange(c.name);
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-panel"
+                >
+                  <Icon className="h-4 w-4 text-ink" strokeWidth={1.75} />
+                  {c.name}
+                </button>
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
@@ -214,9 +226,15 @@ function DateField() {
   );
 }
 
-export function Hero() {
+export function Hero({
+  content,
+  categories,
+}: {
+  content: SiteContent["hero"];
+  categories: ResolvedCategory[];
+}) {
   const router = useRouter();
-  const [category, setCategory] = useState(categories[1].name);
+  const [category, setCategory] = useState(categories[1]?.name ?? categories[0]?.name ?? "");
   const [city, setCity] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
@@ -228,6 +246,8 @@ export function Hero() {
     router.push(`/kereses${params.toString() ? `?${params.toString()}` : ""}`);
   }
 
+  const segmentByid = Object.fromEntries(content.heading_segments.map((s) => [s.id, s.text]));
+
   return (
     <section
       id="kereses"
@@ -237,40 +257,30 @@ export function Hero() {
         <div className="shadow-sheet relative rounded-3xl bg-white p-5 lg:p-12">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">
-                Foglalás 0–24 órában, online
-              </p>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
 
               <RevealText
                 as="h1"
                 className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
                 segments={[
-                  { text: "Fodrász, körmös, kozmetikus — időpont " },
-                  { text: "30 másodperc alatt,", className: "text-accent-dark" },
-                  { text: " telefon nélkül." },
+                  { text: segmentByid.lead ?? "" },
+                  { text: segmentByid.accent ?? "", className: "text-accent-dark" },
+                  { text: segmentByid.tail ?? "" },
                 ]}
               />
 
-              <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">
-                Az IttFoglalj.hu összeköti a vendégeket és a szépségipari
-                szolgáltatókat — böngéssz kategória vagy település szerint,
-                nézd meg a valós szabad időpontokat, és foglalj regisztráció
-                nélkül.
-              </p>
+              <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
             </div>
 
             <div className="relative hidden lg:block">
-              <Collage image={collageImg} alt="Fodrász munka közben, meleg fényben" />
+              <Collage image={content.collage_image} alt={content.collage_alt} />
             </div>
           </div>
 
           <div className="relative z-10 mt-6 lg:mt-10">
-            <form
-              onSubmit={handleSubmit}
-              className="shadow-card rounded-2xl bg-white"
-            >
+            <form onSubmit={handleSubmit} className="shadow-card rounded-2xl bg-white">
               <div className="flex flex-col divide-y divide-line sm:flex-row sm:divide-x sm:divide-y-0">
-                <CategoryField value={category} onChange={setCategory} />
+                <CategoryField value={category} onChange={setCategory} categories={categories} />
                 <CityField value={city} onChange={setCity} />
                 <DateField />
                 <div className="p-2 sm:flex sm:items-center">
@@ -279,7 +289,7 @@ export function Hero() {
                     className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90 sm:w-auto"
                   >
                     <Search className="h-4 w-4" strokeWidth={2} />
-                    Keresés
+                    {content.search_button_label}
                   </button>
                 </div>
               </div>
@@ -288,6 +298,7 @@ export function Hero() {
             <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mt-4">
               {categories.map((c) => {
                 const active = category === c.name;
+                const Icon = categoryIconBySlug[c.slug];
                 return (
                   <button
                     key={c.slug}
@@ -298,7 +309,7 @@ export function Hero() {
                       active ? "bg-ink text-paper" : "bg-paper-alt text-ink-soft hover:bg-panel"
                     )}
                   >
-                    <c.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
                     {c.name}
                   </button>
                 );
@@ -307,13 +318,16 @@ export function Hero() {
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-6 sm:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="flex flex-col gap-1.5">
-                <s.icon className="h-4 w-4 text-ink" strokeWidth={1.75} />
-                <p className="font-display text-2xl text-ink">{s.value}</p>
-                <p className="text-xs leading-snug text-ink-soft">{s.label}</p>
-              </div>
-            ))}
+            {content.stats.map((s) => {
+              const Icon = STAT_ICONS[s.id] ?? LayoutGrid;
+              return (
+                <div key={s.id} className="flex flex-col gap-1.5">
+                  <Icon className="h-4 w-4 text-ink" strokeWidth={1.75} />
+                  <p className="font-display text-2xl text-ink">{s.value}</p>
+                  <p className="text-xs leading-snug text-ink-soft">{s.label}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </Container>

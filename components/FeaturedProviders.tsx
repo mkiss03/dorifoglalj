@@ -1,59 +1,9 @@
-import Image, { type StaticImageData } from "next/image";
+"use client";
+
+import Image from "next/image";
 import { MapPin, Star, ArrowUpRight } from "lucide-react";
 import { Container } from "./ui/Container";
-import nailsImg from "@/public/images/nails-closeup.jpg";
-import hairImg from "@/public/images/hair-styling.jpg";
-import barberImg from "@/public/images/barber-shave.jpg";
-import facialImg from "@/public/images/facial-treatment.jpg";
-
-type Card = {
-  name: string;
-  category: string;
-  area: string;
-  rating: number;
-  tags: string[];
-  slots: string[];
-  image: StaticImageData;
-};
-
-const cards: Card[] = [
-  {
-    name: "Anna Nails Studio",
-    category: "Köröm",
-    area: "Budapest, XIII. kerület",
-    rating: 5,
-    tags: ["Gél lakk", "Műköröm"],
-    slots: ["10:00", "13:30", "16:00"],
-    image: nailsImg,
-  },
-  {
-    name: "Aurum Hajszalon",
-    category: "Haj",
-    area: "Budapest, VI. kerület",
-    rating: 4,
-    tags: ["Vágás", "Alkalmi frizura"],
-    slots: ["09:30", "14:00"],
-    image: hairImg,
-  },
-  {
-    name: "Classic Barber Stúdió",
-    category: "Haj · Barber",
-    area: "Debrecen",
-    rating: 5,
-    tags: ["Szakállvágás", "Fazon"],
-    slots: ["11:00", "15:30", "17:00"],
-    image: barberImg,
-  },
-  {
-    name: "Bella Kozmetika",
-    category: "Kozmetika",
-    area: "Szeged",
-    rating: 5,
-    tags: ["Arckezelés", "Hidratálás"],
-    slots: ["12:00", "16:30"],
-    image: facialImg,
-  },
-];
+import type { SiteContent } from "@/lib/content/types";
 
 function Stars({ count }: { count: number }) {
   return (
@@ -65,29 +15,22 @@ function Stars({ count }: { count: number }) {
   );
 }
 
-export function FeaturedProviders() {
+export function FeaturedProviders({ content }: { content: SiteContent["featuredproviders"] }) {
   return (
     <section className="bg-paper-alt py-14 lg:py-20">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">
-              Szolgáltatói adatlapok
-            </p>
-            <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
-              Így néz ki egy adatlap az IttFoglalj.hu-n
-            </h2>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
+            <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
           </div>
-          <p className="max-w-sm text-xs italic leading-relaxed text-ink-soft">
-            Előnézeti minta — indulás után valódi szolgáltatók adatlapjai
-            jelennek meg itt.
-          </p>
+          <p className="max-w-sm text-xs italic leading-relaxed text-ink-soft">{content.disclaimer}</p>
         </div>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {cards.map((c) => (
+          {content.cards.map((c) => (
             <a
-              key={c.name}
+              key={c.id}
               href="#kereses"
               className="shadow-card group flex flex-col rounded-2xl bg-white p-3 transition-all duration-200 hover:-translate-y-1"
             >
@@ -98,7 +41,6 @@ export function FeaturedProviders() {
                   fill
                   sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                   className="photo-grade object-cover"
-                  placeholder="blur"
                 />
                 <span className="shadow-card absolute left-2.5 top-2.5 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-soft">
                   {c.category}
@@ -107,7 +49,7 @@ export function FeaturedProviders() {
               <div className="flex flex-1 flex-col p-2 pt-3">
                 <p className="font-display text-lg text-ink">{c.name}</p>
                 <div className="mt-1 flex items-center gap-2">
-                  <Stars count={c.rating} />
+                  <Stars count={Math.round(Number(c.rating)) || 0} />
                   <p className="flex items-center gap-1 text-xs text-ink-soft">
                     <MapPin className="h-3 w-3" strokeWidth={1.75} />
                     {c.area}

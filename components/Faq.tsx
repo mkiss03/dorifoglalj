@@ -5,40 +5,33 @@ import { Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { clsx } from "clsx";
 import { Container } from "./ui/Container";
-import { faqItems } from "@/lib/faq";
+import type { SiteContent } from "@/lib/content/types";
 
-export function Faq() {
-  const [open, setOpen] = useState<number | null>(0);
+export function Faq({ content }: { content: SiteContent["faq"] }) {
+  const [open, setOpen] = useState<string | null>(content.items[0]?.id ?? null);
 
   return (
     <section id="gyik" className="scroll-mt-16 bg-paper-alt py-14 lg:scroll-mt-20 lg:py-20">
       <Container className="grid gap-8 lg:grid-cols-[0.9fr_1.3fr] lg:gap-12">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">
-            Gyakori kérdések
-          </p>
-          <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
-            Amit még jó tudni
-          </h2>
-          <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-soft">
-            Nem találtad meg amit kerestél? Írj nekünk, és szívesen segítünk
-            eligazodni.
-          </p>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
+          <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
+          <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-soft">{content.intro}</p>
           <a
             href="#kapcsolat"
             className="mt-6 inline-flex items-center rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors duration-200 hover:bg-ink/90"
           >
-            Kapcsolatfelvétel
+            {content.contact_button_label}
           </a>
         </div>
 
         <div className="shadow-sheet divide-y divide-line/70 rounded-3xl bg-white px-5 sm:px-8">
-          {faqItems.map((item, i) => {
-            const isOpen = open === i;
+          {content.items.map((item, i) => {
+            const isOpen = open === item.id;
             return (
-              <div key={item.question}>
+              <div key={item.id}>
                 <button
-                  onClick={() => setOpen(isOpen ? null : i)}
+                  onClick={() => setOpen(isOpen ? null : item.id)}
                   className="flex w-full items-center justify-between gap-4 py-5 text-left"
                   aria-expanded={isOpen}
                 >

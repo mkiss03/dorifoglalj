@@ -19,6 +19,10 @@ export type Category = {
   items: string[];
 };
 
+/** Ikon-lookup slug szerint — kliens-komponensekben ezt kell importálni,
+ * NEM a `Category.icon`-t Server Componentből propként átadni: a LucideIcon
+ * függvényreferencia nem szerializálható a server→client határon át. */
+
 export const categories: Category[] = [
   {
     slug: "haj",
@@ -108,3 +112,7 @@ export const categories: Category[] = [
     items: ["Szemöldök", "Ajak", "Szemhéj"],
   },
 ];
+
+export const categoryIconBySlug: Record<string, LucideIcon> = Object.fromEntries(
+  categories.map((c) => [c.slug, c.icon])
+);

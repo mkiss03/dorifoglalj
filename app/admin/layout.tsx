@@ -37,10 +37,13 @@ export default async function AdminLayout({
         </Container>
       </header>
 
-      <Container className="flex flex-col gap-6 py-8 lg:flex-row lg:gap-10 lg:py-14">
+      {/* Nincs Container/max-w-korlát: az admin terület (kifejezetten a
+          szerkesztő élő előnézete) a teljes szélességből profitál, ezért
+          itt nem a marketing-oldalas max-w-7xl mintát követjük. */}
+      <div className="px-4 py-6 lg:px-8 lg:py-8">
         <AdminNav />
-        <main className="min-w-0 flex-1">{children}</main>
-      </Container>
+        <main className="mt-6">{children}</main>
+      </div>
     </div>
   );
 }

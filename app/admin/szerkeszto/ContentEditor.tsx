@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { SchemaForm, SectionJumpNav } from "@/components/admin/SchemaForm";
 import { MarketingPreview } from "@/components/admin/MarketingPreview";
+import { DevicePreview } from "@/components/admin/DevicePreview";
 import { saveSiteContentAction, type SaveContentState } from "./actions";
 import type { SectionId, SiteContent } from "@/lib/content/types";
 
@@ -53,14 +54,16 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
         <SectionJumpNav />
       </div>
 
-      <div className="mt-2 grid gap-6 lg:grid-cols-2 lg:items-start">
-        <div>
+      <div className="mt-2 grid gap-6 lg:grid-cols-[420px_1fr] lg:items-start">
+        <div className="min-w-0">
           <SchemaForm draft={draft} onFieldChange={handleFieldChange} />
         </div>
-        <div className="shadow-sheet rounded-3xl bg-paper-alt p-3 lg:sticky lg:top-8">
+        <div className="shadow-sheet min-w-0 rounded-3xl bg-paper-alt p-3 lg:sticky lg:top-8">
           <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-ink-soft">Élő előnézet</p>
-          <div className="max-h-[calc(100vh-10rem)] overflow-y-auto rounded-2xl bg-white">
-            <MarketingPreview content={draft} />
+          <div className="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl bg-white">
+            <DevicePreview>
+              <MarketingPreview content={draft} />
+            </DevicePreview>
           </div>
         </div>
       </div>

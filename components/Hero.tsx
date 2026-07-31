@@ -262,6 +262,7 @@ export function Hero({
               <RevealText
                 as="h1"
                 className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
+                fieldAnchor="hero.heading_segments"
                 segments={[
                   { text: segmentByid.lead ?? "" },
                   { text: segmentByid.accent ?? "", className: "text-accent-dark" },
@@ -273,7 +274,7 @@ export function Hero({
             </div>
 
             <div className="relative hidden lg:block">
-              <Collage image={content.collage_image} alt={content.collage_alt} />
+              <Collage image={content.collage_image} alt={content.collage_alt} fieldAnchor="hero.collage_image" />
             </div>
           </div>
 

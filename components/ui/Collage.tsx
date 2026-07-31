@@ -6,11 +6,15 @@ export function Collage({
   alt,
   letter = "I",
   className,
+  fieldAnchor,
 }: {
   image: string;
   alt: string;
   letter?: string;
   className?: string;
+  /** Admin-szerkesztő: pontos ugrás a hozzá tartozó kép-mezőre kattintáskor,
+   * ahelyett hogy csak a szekció tetejére esne vissza. */
+  fieldAnchor?: string;
 }) {
   return (
     <div className={clsx("relative", className)}>
@@ -23,7 +27,10 @@ export function Collage({
 
       <div aria-hidden className="absolute right-2 top-8 h-64 w-52 rounded-2xl bg-panel" />
 
-      <div className="relative ml-10 mt-14 h-80 w-64 overflow-hidden rounded-2xl shadow-card">
+      <div
+        className="relative ml-10 mt-14 h-80 w-64 overflow-hidden rounded-2xl shadow-card"
+        data-field-anchor={fieldAnchor}
+      >
         <Image src={image} alt={alt} fill sizes="256px" className="photo-collage object-cover" />
       </div>
 

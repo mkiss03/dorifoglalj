@@ -60,6 +60,11 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
       e.preventDefault();
     }
 
+    // 1) Pontos szöveg-egyezés — ez a legpontosabb, ezért ez nyer akkor is,
+    // ha a kattintott elem egy szélesebb data-field-anchor-ral rendelkező
+    // dobozon (pl. egy kép-kártyán) belül van, de a kattintás egy konkrét,
+    // külön mezőhöz tartozó szövegen történt (pl. a kártya neve a fotója
+    // felett/mellett).
     let el: HTMLElement | null = target;
     for (let depth = 0; el && depth < MAX_WALK_DEPTH; depth++, el = el.parentElement) {
       const text = el.textContent?.trim();
@@ -72,6 +77,17 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
       }
     }
 
+    // 2) Explicit anchor — képeknél és a szavankénti reveal-animációval
+    // renderelt Hero-főcímnél, ahol nincs egyetlen elem sem, aminek a
+    // szövege pontosan egyezne egy mezővel.
+    const explicitEl = target.closest("[data-field-anchor]");
+    const explicitAnchor = explicitEl?.getAttribute("data-field-anchor");
+    if (explicitAnchor) {
+      jumpToDomId(domId(explicitAnchor));
+      return;
+    }
+
+    // 3) Szekció-szintű esés vissza — mindig működik.
     const sectionEl = target.closest("[data-preview-section]");
     const sectionId = sectionEl?.getAttribute("data-preview-section");
     if (sectionId) {

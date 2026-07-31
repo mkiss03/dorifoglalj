@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Container } from "./ui/Container";
 import { categoryIconBySlug } from "@/lib/categories";
+import { itemAnchor } from "@/lib/content/anchors";
 import type { SiteContent } from "@/lib/content/types";
 import type { ResolvedCategory } from "@/lib/content/resolveCategories";
 
@@ -34,6 +35,7 @@ export function Categories({
                 key={c.slug}
                 href={`#${c.slug}`}
                 className="group relative aspect-[4/5] overflow-hidden rounded-2xl shadow-card"
+                data-field-anchor={itemAnchor("categories.items", c.slug, "photo")}
               >
                 <Image
                   src={c.photo!}

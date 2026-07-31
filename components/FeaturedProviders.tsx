@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { MapPin, Star, ArrowUpRight } from "lucide-react";
 import { Container } from "./ui/Container";
+import { itemAnchor } from "@/lib/content/anchors";
 import type { SiteContent } from "@/lib/content/types";
 
 function Stars({ count }: { count: number }) {
@@ -33,6 +34,7 @@ export function FeaturedProviders({ content }: { content: SiteContent["featuredp
               key={c.id}
               href="#kereses"
               className="shadow-card group flex flex-col rounded-2xl bg-white p-3 transition-all duration-200 hover:-translate-y-1"
+              data-field-anchor={itemAnchor("featuredproviders.cards", c.id, "image")}
             >
               <div className="relative h-36 w-full overflow-hidden rounded-xl">
                 <Image

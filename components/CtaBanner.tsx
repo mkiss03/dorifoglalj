@@ -31,7 +31,7 @@ export function CtaBanner({ content }: { content: SiteContent["ctabanner"] }) {
           </div>
 
           <div className="relative hidden lg:block">
-            <Collage image={content.image} alt={content.image_alt} letter="F" />
+            <Collage image={content.image} alt={content.image_alt} letter="F" fieldAnchor="ctabanner.image" />
           </div>
         </div>
       </Container>

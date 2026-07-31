@@ -60,10 +60,15 @@ export function RevealText({
   segments,
   as = "h1",
   className,
+  fieldAnchor,
 }: {
   segments: Segment[];
   as?: keyof typeof tags;
   className?: string;
+  /** Admin-szerkesztő: az élő előnézet kattintás-feloldója ezt keresi
+   * elsőként — a szavankénti reveal-animáció miatt a szöveg szétdarabolva
+   * jelenik meg a DOM-ban, így a normál szöveg-egyezés itt nem működne. */
+  fieldAnchor?: string;
 }) {
   const Tag = tags[as];
   const tokens = segmentsToWords(segments);
@@ -71,6 +76,7 @@ export function RevealText({
   return (
     <Tag
       className={clsx("overflow-hidden", className)}
+      data-field-anchor={fieldAnchor}
       variants={container}
       initial="hidden"
       whileInView="show"

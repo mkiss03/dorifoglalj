@@ -11,10 +11,13 @@
 --
 -- BOOTSTRAP (kézi, egyszeri lépés): Dóri a meglévő /regisztracio
 -- folyamattal hoz létre fiókot (emiatt kap egy — nem használt —
--- providers sort is, ez ártalmatlan mellékhatás). Utána a Supabase
--- SQL Editorban futtatva:
+-- providers sort is, ez ártalmatlan mellékhatás, a /dashboard automatikusan
+-- átirányítja innentől a saját admin felületére). Utána a Supabase SQL
+-- Editorban futtatva:
 --   insert into public.admins (user_id)
---   values ('<Dóri auth.users.id-je>');
+--   select id from auth.users where email = '<Dóri email címe>';
+-- Ezután Dóri a /admin/bejelentkezes oldalon léphet be — ez a hivatalos,
+-- dedikált admin belépési pont (nem szerepel semmilyen nyilvános menüben).
 -- ============================================================
 
 create table if not exists public.admins (

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
-import { uploadSiteImageAction } from "@/app/admin/szerkeszto/actions";
+import { uploadSiteImageAction } from "@/app/admin/(gated)/szerkeszto/actions";
 
 export function ImageField({
   label,

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getUser, createClient } from "@/lib/supabase/server";
+import { getUser, createClient, isAdmin } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/Container";
 import { SUPPORT_EMAIL } from "@/lib/contact";
@@ -14,6 +14,11 @@ export default async function DashboardLayout({
 }>) {
   const user = await getUser();
   if (!user) redirect("/bejelentkezes");
+
+  // Az admin fióknak is van (nem használt) providers sora a regisztrációs
+  // trigger miatt — ne lássa a "jóváhagyásra vár" dashboardot, irányítsuk a
+  // saját, admin-jogosultsághoz tartozó felületére.
+  if (await isAdmin()) redirect("/admin/szerkeszto");
 
   const supabase = await createClient();
   const { data: provider } = await supabase

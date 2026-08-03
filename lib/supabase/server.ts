@@ -35,3 +35,14 @@ export const getUser = cache(async () => {
   } = await supabase.auth.getUser();
   return user;
 });
+
+/** Admin-e a bejelentkezett felhasználó (public.admins tábla, is_admin()
+ * RPC-n keresztül) — minden admin-route-gate és bejelentkezés utáni
+ * átirányítás ezt hívja, hogy egy helyen legyen a döntés. */
+export const isAdmin = cache(async () => {
+  const user = await getUser();
+  if (!user) return false;
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("is_admin");
+  return Boolean(data);
+});

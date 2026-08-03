@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, isAdmin } from "@/lib/supabase/server";
 
 export type SignInState = {
   status: "idle" | "error";
@@ -26,5 +26,7 @@ export async function signInAction(
     return { status: "error", message: "Hibás e-mail cím vagy jelszó." };
   }
 
-  redirect("/dashboard");
+  // Admin fiókkal bejelentkezve egyenesen a szerkesztőbe — nincs szükség
+  // arra, hogy a szolgáltatói dashboardról kézzel navigáljon oda.
+  redirect((await isAdmin()) ? "/admin/szerkeszto" : "/dashboard");
 }

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getUser, createClient } from "@/lib/supabase/server";
+import { getUser, isAdmin } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/Container";
 import { signOutAction } from "@/app/auth/actions";
@@ -12,11 +12,8 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
   const user = await getUser();
-  if (!user) redirect("/bejelentkezes");
-
-  const supabase = await createClient();
-  const { data: isAdmin } = await supabase.rpc("is_admin");
-  if (!isAdmin) redirect("/");
+  if (!user) redirect("/admin/bejelentkezes");
+  if (!(await isAdmin())) redirect("/dashboard");
 
   return (
     <div className="min-h-screen bg-paper">

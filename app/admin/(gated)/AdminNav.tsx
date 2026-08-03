@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PenSquare, type LucideIcon } from "lucide-react";
+import { PenSquare, Users, type LucideIcon } from "lucide-react";
 
 const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin/szerkeszto", label: "Oldal-szerkesztő", icon: PenSquare },
+  { href: "/admin/szolgaltatok", label: "Szolgáltatók", icon: Users },
 ];
 
 export function AdminNav() {

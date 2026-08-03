@@ -142,3 +142,22 @@ export type CreateHoldResult =
       ok: false;
       error: "provider_not_found" | "service_not_found" | "in_past" | "outside_hours" | "slot_taken";
     };
+
+/** Az `admin_list_providers` RPC egy sora — a jóváhagyó panel listájához. */
+export type AdminProviderRow = {
+  id: string;
+  business_name: string;
+  email: string;
+  phone: string | null;
+  category: string | null;
+  city: string | null;
+  status: ProviderStatus;
+  booking_enabled: boolean;
+  created_at: string;
+  approved_at: string | null;
+};
+
+/** Az `admin_set_provider_status` RPC visszatérési alakja. */
+export type AdminSetProviderStatusResult =
+  | { ok: true }
+  | { ok: false; error: "not_admin" | "invalid_status" | "provider_not_found" };

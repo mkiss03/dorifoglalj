@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
 import { Container } from "./ui/Container";
 import { featuredCities, cities } from "@/lib/cities";
@@ -16,14 +17,14 @@ export function BrowseByCity({ content }: { content: SiteContent["browsebycity"]
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{content.featured_label}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             {featuredCities.map((city) => (
-              <a
+              <Link
                 key={city}
-                href="#kereses"
+                href={`/kereses?city=${encodeURIComponent(city)}`}
                 className="shadow-card flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-display text-lg text-ink transition-all duration-200 hover:-translate-y-0.5"
               >
                 <MapPin className="h-4 w-4 text-ink" strokeWidth={1.75} />
                 {city}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -35,13 +36,13 @@ export function BrowseByCity({ content }: { content: SiteContent["browsebycity"]
           </summary>
           <div className="mt-6 columns-2 gap-x-8 sm:columns-3 lg:columns-4">
             {cities.map((city) => (
-              <a
+              <Link
                 key={city}
-                href="#kereses"
+                href={`/kereses?city=${encodeURIComponent(city)}`}
                 className="block border-b border-line/70 py-2 text-[15px] text-ink-soft transition-colors duration-200 hover:text-ink"
               >
                 {city}
-              </a>
+              </Link>
             ))}
           </div>
         </details>

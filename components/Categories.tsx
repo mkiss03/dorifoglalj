@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { Container } from "./ui/Container";
 import { categoryIconBySlug } from "@/lib/categories";
@@ -31,9 +32,9 @@ export function Categories({
         {featured.length > 0 && (
           <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
             {featured.map((c) => (
-              <a
+              <Link
                 key={c.slug}
-                href={`#${c.slug}`}
+                href={`/kereses?category=${c.slug}`}
                 className="group relative aspect-[4/5] overflow-hidden rounded-2xl shadow-card"
                 data-field-anchor={itemAnchor("categories.items", c.slug, "photo")}
               >
@@ -49,7 +50,7 @@ export function Categories({
                   <p className="font-display text-xl text-paper">{c.name}</p>
                   <p className="mt-0.5 text-xs text-paper/70">{c.items.slice(0, 2).join(" · ")}</p>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         )}
@@ -58,16 +59,16 @@ export function Categories({
           {rest.map((c) => {
             const Icon = categoryIconBySlug[c.slug];
             return (
-              <a
+              <Link
                 key={c.slug}
-                href={`#${c.slug}`}
+                href={`/kereses?category=${c.slug}`}
                 className="shadow-card group flex items-center gap-2.5 rounded-full bg-white py-2 pl-2 pr-4 transition-all duration-200 hover:-translate-y-0.5"
               >
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-panel text-ink transition-colors duration-200 group-hover:bg-line">
                   <Icon className="h-4 w-4" strokeWidth={1.75} />
                 </span>
                 <span className="text-sm font-semibold text-ink">{c.name}</span>
-              </a>
+              </Link>
             );
           })}
         </div>

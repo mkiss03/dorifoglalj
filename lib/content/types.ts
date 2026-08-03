@@ -80,6 +80,7 @@ export type SiteContent = {
   howitworks: {
     eyebrow: string;
     heading: string;
+    disclaimer: string;
     steps: { id: string; title: string; text: string }[];
     mock_results: { id: string; name: string; area: string }[];
     mock_booking_service_day: string;
@@ -112,7 +113,6 @@ export type SiteContent = {
     benefits: { id: string; label: string }[];
     cta_label: string;
     mock_date_label: string;
-    mock_staff: { id: string; initials: string; name: string }[];
     mock_bookings: { id: string; name: string; service: string }[];
     mock_facebook_note: string;
   };
@@ -149,8 +149,6 @@ export type SiteContent = {
   footer: {
     tagline: string;
     columns: { id: string; title: string; links: { id: string; label: string; href: string }[] }[];
-    newsletter_heading: string;
-    newsletter_subtext: string;
     copyright_suffix: string;
     bottom_note: string;
     facebook_url: string;

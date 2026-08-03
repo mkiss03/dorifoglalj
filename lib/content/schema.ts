@@ -1,5 +1,6 @@
 import { categories } from "@/lib/categories";
 import { faqItems } from "@/lib/faq";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 import type { ContentEntry } from "./types";
 
 const CATEGORY_PHOTOS: Record<string, string> = {
@@ -28,9 +29,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     default: [
       { id: "nl-1", label: "Szolgáltatók keresése", href: "/kereses" },
       { id: "nl-2", label: "Szolgáltatóknak", href: "#szolgaltatoknak" },
-      { id: "nl-3", label: "Árlista", href: "#arlista" },
-      { id: "nl-4", label: "Blog", href: "#blog" },
-      { id: "nl-5", label: "Kapcsolat", href: "#kapcsolat" },
+      { id: "nl-5", label: "Kapcsolat", href: `mailto:${SUPPORT_EMAIL}` },
     ],
   },
   { key: "header.categories_menu_label", section: "header", label: "„Kategóriák” menügomb", kind: "text", default: "Kategóriák" },
@@ -74,7 +73,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { key: "label", label: "Leírás", kind: "text" },
     ],
     default: [
-      { id: "categories", value: "10", label: "fő kategória, 50+ szolgáltatástípus" },
+      { id: "categories", value: "10", label: "fő kategória, 46+ szolgáltatástípus" },
       { id: "free", value: "0 Ft", label: "regisztrációs és foglalási díj" },
       { id: "hours", value: "0–24", label: "non-stop online időpontfoglalás" },
       { id: "sync", value: "1 naptár", label: "web és Facebook szinkronban" },
@@ -116,6 +115,13 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   // ------------------------------------------------------------ howitworks
   { key: "howitworks.eyebrow", section: "howitworks", label: "Felirat a cím felett", kind: "text", default: "Egyszerű folyamat" },
   { key: "howitworks.heading", section: "howitworks", label: "Címsor", kind: "text", default: "Hogyan működik?" },
+  {
+    key: "howitworks.disclaimer",
+    section: "howitworks",
+    label: "Kis megjegyzés a képernyők mellett",
+    kind: "text",
+    default: "Illusztráció — mintaadatokkal.",
+  },
   {
     key: "howitworks.steps",
     section: "howitworks",
@@ -179,9 +185,9 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     itemLabel: "Pont",
     default: [
       "Foglalás 0–24 órában, pár kattintással",
-      "Azonnali visszaigazolás e-mailben",
+      "Azonnali visszaigazolás a képernyőn",
       "Mindig aktuális, valós szabad időpontok",
-      "Automatikus emlékeztető az időpont előtt",
+      "Egy kattintással a saját naptáradba mentheted",
     ],
   },
 
@@ -235,16 +241,20 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { key: "text", label: "Leírás", kind: "textarea" },
     ],
     default: [
-      { id: "p1", title: "A vendéglistád a tiéd.", text: "Bármikor exportálod — nincs bezárva egy platformba." },
+      {
+        id: "p1",
+        title: "Foglalás percek alatt, telefonálás nélkül.",
+        text: "A vendégeid regisztráció nélkül, közvetlenül a saját foglalási oldaladon foglalhatnak időpontot.",
+      },
       {
         id: "p2",
-        title: "Naptár, emlékeztetők, nyilatkozatok — egy helyen.",
-        text: "Automatikus SMS/e-mail emlékeztető, digitális beleegyező nyilatkozat, napi bevétel-kimutatás.",
+        title: "Mindig naprakész naptár.",
+        text: "A szabad időpontjaid automatikusan frissülnek a nyitvatartásod és a meglévő foglalásaid alapján — dupla foglalás nincs.",
       },
       {
         id: "p3",
-        title: "Facebook- és Instagram-oldaladról direkt foglalás.",
-        text: "Egyetlen naptárt kezelsz — ugyanaz szinkronban fut a közösségi oldaladon és egy beágyazható widgetben is, ha saját honlapod van.",
+        title: "Egy link, amit bárhol megoszthatsz.",
+        text: "A foglalási oldalad linkjét kiteheted a Facebook- vagy Instagram-oldaladra is, és QR-kóddal is megoszthatod.",
       },
     ],
   },
@@ -258,34 +268,17 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     fields: [{ key: "label", label: "Szöveg", kind: "text" }],
     default: [
       { id: "profile", label: "Saját adatlap és bemutatkozás" },
-      { id: "gallery", label: "Referencia munkák galériája" },
+      { id: "gallery", label: "Logó és borítókép" },
       { id: "tag", label: "Szolgáltatások és árlista" },
-      { id: "calendar", label: "Szabad időpontok kezelése" },
-      { id: "bell", label: "Automatikus visszaigazolás" },
-      { id: "chart", label: "Bevétel-kimutatás" },
-      { id: "repeat", label: "Visszatérő időpontok" },
-      { id: "filecheck", label: "Digitális nyilatkozatok" },
+      { id: "calendar", label: "Nyitvatartás és szünet (puffer) kezelése" },
+      { id: "bell", label: "Azonnali, automatikus visszaigazolás" },
+      { id: "chart", label: "Manuális/telefonos foglalás felvétele" },
+      { id: "repeat", label: "Megosztható link és QR-kód" },
+      { id: "filecheck", label: "Naptár-szinkron (.ics feed)" },
     ],
   },
   { key: "forproviders.cta_label", section: "forproviders", label: "CTA gomb szövege", kind: "text", default: "Csatlakozom szolgáltatóként" },
   { key: "forproviders.mock_date_label", section: "forproviders", label: "Minta-naptár dátuma", kind: "text", default: "Kedd, november 17." },
-  {
-    key: "forproviders.mock_staff",
-    section: "forproviders",
-    label: "Minta-naptár munkatársai",
-    kind: "list",
-    mode: "fixed",
-    itemLabel: "Munkatárs",
-    fields: [
-      { key: "initials", label: "Monogram", kind: "text" },
-      { key: "name", label: "Név", kind: "text" },
-    ],
-    default: [
-      { id: "staff-0", initials: "AK", name: "Anna" },
-      { id: "staff-1", initials: "RT", name: "Réka" },
-      { id: "staff-2", initials: "ZP", name: "Zsófi" },
-    ],
-  },
   {
     key: "forproviders.mock_bookings",
     section: "forproviders",
@@ -300,18 +293,15 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     default: [
       { id: "b1", name: "Kiss Anna", service: "Gél lakk" },
       { id: "b2", name: "Tóth Réka", service: "Manikűr" },
-      { id: "b3", name: "Nagy Éva", service: "Műköröm" },
-      { id: "b4", name: "Papp Zsófi", service: "Vágás" },
-      { id: "b5", name: "Kovács Lili", service: "Festés" },
-      { id: "b6", name: "Szabó Kata", service: "Arckezelés" },
+      { id: "b3", name: "Papp Zsófi", service: "Vágás" },
     ],
   },
   {
     key: "forproviders.mock_facebook_note",
     section: "forproviders",
-    label: "Facebook-szinkron megjegyzés",
+    label: "Facebook-megosztás megjegyzés",
     kind: "text",
-    default: "Ugyanez a naptár jelenik meg a Facebook-oldaladon is.",
+    default: "Ezt a linket oszd meg a Facebook-oldaladon is.",
   },
 
   // ---------------------------------------------------------------- ctabanner
@@ -458,7 +448,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         title: "Vendégeknek",
         links: [
           { id: "l-1", label: "Szolgáltatók keresése", href: "/kereses" },
-          { id: "l-2", label: "Hogyan működik", href: "#kategoriak" },
+          { id: "l-2", label: "Hogyan működik", href: "#hogyan-mukodik" },
           { id: "l-3", label: "Kategóriák", href: "#kategoriak" },
           { id: "l-4", label: "Gyakori kérdések", href: "#gyik" },
         ],
@@ -468,7 +458,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         title: "Szolgáltatóknak",
         links: [
           { id: "l-5", label: "Csatlakozom szolgáltatóként", href: "#szolgaltatoknak" },
-          { id: "l-6", label: "Árlista", href: "#arlista" },
           { id: "l-7", label: "Funkciók", href: "#szolgaltatoknak" },
         ],
       },
@@ -476,15 +465,13 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         id: "col-3",
         title: "Jogi információk",
         links: [
-          { id: "l-8", label: "Adatkezelési tájékoztató", href: "#" },
-          { id: "l-9", label: "Általános Szerződési Feltételek", href: "#" },
-          { id: "l-10", label: "Impresszum", href: "#" },
+          { id: "l-8", label: "Adatkezelési tájékoztató", href: "/adatkezeles" },
+          { id: "l-9", label: "Általános Szerződési Feltételek", href: "/aszf" },
+          { id: "l-10", label: "Impresszum", href: "/impresszum" },
         ],
       },
     ],
   },
-  { key: "footer.newsletter_heading", section: "footer", label: "Hírlevél-blokk címe", kind: "text", default: "Iratkozz fel hírlevelünkre" },
-  { key: "footer.newsletter_subtext", section: "footer", label: "Hírlevél-blokk szövege", kind: "textarea", default: "Új funkciók és szolgáltatók — ritkán, csak ha érdemes." },
   { key: "footer.copyright_suffix", section: "footer", label: "Copyright-sor (az évszám automatikus)", kind: "text", default: "IttFoglalj.hu — Minden jog fenntartva." },
   { key: "footer.bottom_note", section: "footer", label: "Alsó sor jobb oldali szövege", kind: "text", default: "Készült Magyarországon" },
   { key: "footer.facebook_url", section: "footer", label: "Facebook link", kind: "text", default: "#" },

@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { Container } from "./ui/Container";
 import { Logo } from "./Logo";
 import { FacebookGlyph, InstagramGlyph } from "./icons/BrandIcons";
 import { featuredCities } from "@/lib/cities";
 import type { SiteContent } from "@/lib/content/types";
 import type { ResolvedCategory } from "@/lib/content/resolveCategories";
+
+/** "#" a séma default helyőrzője, amíg nincs valódi social link megadva a
+ * szerkesztőben — addig inkább ne jelenjen meg egy sehova sem mutató ikon. */
+function isRealUrl(url: string) {
+  return url.trim().length > 0 && url.trim() !== "#";
+}
 
 export function Footer({
   content,
@@ -16,6 +21,8 @@ export function Footer({
   content: SiteContent["footer"];
   categories: ResolvedCategory[];
 }) {
+  const hasSocial = isRealUrl(content.facebook_url) || isRealUrl(content.instagram_url);
+
   return (
     <footer className="bg-paper pt-14 pb-10">
       <Container>
@@ -28,7 +35,7 @@ export function Footer({
               {categories.map((c) => (
                 <Link
                   key={c.slug}
-                  href={`#${c.slug}`}
+                  href={`/kereses?category=${c.slug}`}
                   className="shadow-card rounded-full bg-paper-alt px-3 py-1.5 text-xs font-medium text-ink-soft transition-all duration-200 hover:-translate-y-0.5 hover:text-ink"
                 >
                   {c.name}
@@ -44,7 +51,7 @@ export function Footer({
               {featuredCities.map((city) => (
                 <Link
                   key={city}
-                  href="#kereses"
+                  href={`/kereses?city=${encodeURIComponent(city)}`}
                   className="shadow-card rounded-full bg-paper-alt px-3 py-1.5 text-xs font-medium text-ink-soft transition-all duration-200 hover:-translate-y-0.5 hover:text-ink"
                 >
                   {city}
@@ -54,28 +61,38 @@ export function Footer({
           </div>
         </div>
 
-        <div className="mt-8 grid gap-12 lg:grid-cols-[1.2fr_2fr_1.1fr]">
+        <div className="mt-8 grid gap-12 lg:grid-cols-[1fr_2fr]">
           <div>
             <Link href="/">
               <Logo className="text-lg" />
             </Link>
             <p className="mt-4 max-w-[26ch] text-sm italic text-ink-soft">{content.tagline}</p>
-            <div className="mt-6 flex gap-2">
-              <a
-                href={content.facebook_url}
-                aria-label="Facebook"
-                className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
-              >
-                <FacebookGlyph className="h-4 w-4" />
-              </a>
-              <a
-                href={content.instagram_url}
-                aria-label="Instagram"
-                className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
-              >
-                <InstagramGlyph className="h-4 w-4" />
-              </a>
-            </div>
+            {hasSocial && (
+              <div className="mt-6 flex gap-2">
+                {isRealUrl(content.facebook_url) && (
+                  <a
+                    href={content.facebook_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook"
+                    className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
+                  >
+                    <FacebookGlyph className="h-4 w-4" />
+                  </a>
+                )}
+                {isRealUrl(content.instagram_url) && (
+                  <a
+                    href={content.instagram_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                    className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
+                  >
+                    <InstagramGlyph className="h-4 w-4" />
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
@@ -98,27 +115,6 @@ export function Footer({
                 </ul>
               </div>
             ))}
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft/70">
-              {content.newsletter_heading}
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">{content.newsletter_subtext}</p>
-            <form className="shadow-card mt-4 flex items-center gap-2 rounded-full bg-paper-alt p-1.5 pl-4">
-              <input
-                type="email"
-                placeholder="E-mail címed"
-                className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-soft/60"
-              />
-              <button
-                type="submit"
-                aria-label="Feliratkozás"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-paper transition-colors hover:bg-ink/90"
-              >
-                <ArrowRight className="h-4 w-4" strokeWidth={2} />
-              </button>
-            </form>
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { clsx } from "clsx";
 import { Container } from "./ui/Container";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 import type { SiteContent } from "@/lib/content/types";
 
 export function Faq({ content }: { content: SiteContent["faq"] }) {
@@ -18,7 +19,7 @@ export function Faq({ content }: { content: SiteContent["faq"] }) {
           <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
           <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-soft">{content.intro}</p>
           <a
-            href="#kapcsolat"
+            href={`mailto:${SUPPORT_EMAIL}`}
             className="mt-6 inline-flex items-center rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors duration-200 hover:bg-ink/90"
           >
             {content.contact_button_label}

@@ -90,10 +90,15 @@ function StepMock({ index, content }: { index: number; content: SiteContent["how
 
 export function HowItWorks({ content }: { content: SiteContent["howitworks"] }) {
   return (
-    <section className="bg-paper py-14 lg:py-20">
+    <section id="hogyan-mukodik" className="scroll-mt-16 bg-paper py-14 lg:scroll-mt-20 lg:py-20">
       <Container>
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
-        <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
+            <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
+          </div>
+          <p className="text-xs italic text-ink-soft">{content.disclaimer}</p>
+        </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-3">
           {content.steps.map((s, i) => {

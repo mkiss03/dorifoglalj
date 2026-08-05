@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getUser, isAdmin } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/Container";
 import { SignInForm } from "./SignInForm";
 
 export default async function BejelentkezesPage() {
   const user = await getUser();
-  if (user) redirect((await isAdmin()) ? "/admin/szerkeszto" : "/dashboard");
+  if (user) redirect("/dashboard");
 
   return (
     <section className="flex min-h-screen items-center bg-paper py-14">

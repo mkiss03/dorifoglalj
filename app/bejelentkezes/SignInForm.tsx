@@ -8,8 +8,12 @@ const initialState: SignInState = { status: "idle" };
 const inputClass =
   "w-full rounded-2xl bg-paper-alt px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-soft/60 focus:ring-2 focus:ring-accent-light";
 
-export function SignInForm() {
-  const [state, formAction, pending] = useActionState(signInAction, initialState);
+/** `action` opcionálisan felülírható — az admin belépő oldal (lásd
+ * app/admin/bejelentkezes/page.tsx) egy másik server actiont ad át, ami
+ * ugyanazt a hitelesítést végzi, csak sikeres belépés után máshova
+ * irányít (is_admin()-tól függően). */
+export function SignInForm({ action = signInAction }: { action?: typeof signInAction }) {
+  const [state, formAction, pending] = useActionState(action, initialState);
 
   return (
     <form action={formAction} className="mt-6 space-y-4">

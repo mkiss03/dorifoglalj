@@ -4,6 +4,7 @@ import { getUser, isAdmin } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/Container";
 import { SignInForm } from "@/app/bejelentkezes/SignInForm";
+import { adminSignInAction } from "./actions";
 
 export default async function AdminBejelentkezesPage() {
   const user = await getUser();
@@ -22,7 +23,7 @@ export default async function AdminBejelentkezesPage() {
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
             Ugyanazzal a fiókkal jelentkezz be, amit az admin jogosultsághoz beállítottunk.
           </p>
-          <SignInForm />
+          <SignInForm action={adminSignInAction} />
         </div>
       </Container>
     </section>

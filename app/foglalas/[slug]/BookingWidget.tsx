@@ -17,6 +17,7 @@ const HOLD_ERROR_MESSAGES: Record<string, string> = {
   service_not_found: "Ez a szolgáltatás nem található.",
   in_past: "Ez az időpont már elmúlt — válassz másikat.",
   outside_hours: "Ez az időpont már nem elérhető — válassz másikat.",
+  slot_blocked: "Ez az időpont már nem elérhető — válassz másikat.",
   slot_taken: "Ezt az időpontot időközben lefoglalták — válassz másikat.",
 };
 

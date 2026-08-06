@@ -5,6 +5,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { categories } from "@/lib/categories";
 import { cities } from "@/lib/cities";
 import { PROVIDER_TAGS, type CreateBookingResult, type ProviderTag } from "@/lib/supabase/types";
+import { sendCancellationEmail } from "@/lib/email/sendCancellationEmail";
 
 export type ProfileState = {
   status: "idle" | "error" | "success";
@@ -290,6 +291,111 @@ export async function updateAvailabilityAction(
   return { status: "success", message: "Nyitvatartás mentve." };
 }
 
+export type BlockState =
+  | { status: "idle" }
+  | { status: "error"; message: string }
+  | { status: "success"; message: string };
+
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + m;
+}
+
+/** Egy ISO timestamp budapesti helyi dátuma ("YYYY-MM-DD") és a napon belüli perce. */
+function budapestDateTimeParts(iso: string): { date: string; minutes: number } {
+  const d = new Date(iso);
+  const date = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Budapest",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
+  const time = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Budapest",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(d);
+  const [h, m] = time.split(":").map(Number);
+  return { date, minutes: h * 60 + m };
+}
+
+export async function addBlockAction(_prevState: BlockState, formData: FormData): Promise<BlockState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const blockDate = String(formData.get("block_date") ?? "");
+  const allDay = formData.get("all_day") === "on";
+  const startTime = String(formData.get("start_time") ?? "");
+  const endTime = String(formData.get("end_time") ?? "");
+  const note = String(formData.get("note") ?? "").trim();
+
+  if (!blockDate || !/^\d{4}-\d{2}-\d{2}$/.test(blockDate)) {
+    return { status: "error", message: "Add meg a dátumot." };
+  }
+  if (!allDay && (!startTime || !endTime || startTime >= endTime)) {
+    return { status: "error", message: "A záró időpontnak a kezdő után kell lennie." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("provider_blocks").insert({
+    provider_id: user.id,
+    block_date: blockDate,
+    start_time: allDay ? null : startTime,
+    end_time: allDay ? null : endTime,
+    note: note || null,
+  });
+
+  if (error) {
+    return { status: "error", message: "Hiba történt a mentés során." };
+  }
+
+  // Tájékoztató figyelmeztetés, ha a kizárás átfed egy már visszaigazolt
+  // foglalással — nem blokkoljuk, csak jelezzük, hogy egyeztetni kell.
+  const blockStartMin = allDay ? 0 : toMinutes(startTime);
+  const blockEndMin = allDay ? 24 * 60 : toMinutes(endTime);
+  const windowStart = new Date(`${blockDate}T00:00:00Z`);
+  windowStart.setUTCDate(windowStart.getUTCDate() - 1);
+  const windowEnd = new Date(`${blockDate}T00:00:00Z`);
+  windowEnd.setUTCDate(windowEnd.getUTCDate() + 2);
+
+  const { data: bookings } = await supabase
+    .from("bookings")
+    .select("starts_at, ends_at")
+    .eq("provider_id", user.id)
+    .eq("status", "confirmed")
+    .gte("starts_at", windowStart.toISOString())
+    .lt("starts_at", windowEnd.toISOString());
+
+  const hasOverlap = (bookings ?? []).some((b) => {
+    const s = budapestDateTimeParts(b.starts_at);
+    const e = budapestDateTimeParts(b.ends_at);
+    if (s.date !== blockDate) return false;
+    return s.minutes < blockEndMin && e.minutes > blockStartMin;
+  });
+
+  revalidatePath("/dashboard", "layout");
+  return {
+    status: "success",
+    message: hasOverlap
+      ? "Kizárás mentve. Figyelem: erre az időszakra már van visszaigazolt foglalásod — érdemes egyeztetni a vendéggel."
+      : "Kizárás mentve.",
+  };
+}
+
+export async function deleteBlockAction(formData: FormData) {
+  const user = await getUser();
+  if (!user) return;
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const supabase = await createClient();
+  await supabase.from("provider_blocks").delete().eq("id", id).eq("provider_id", user.id);
+
+  revalidatePath("/dashboard", "layout");
+}
+
 export type BufferState = {
   status: "idle" | "error" | "success";
   message?: string;
@@ -362,17 +468,83 @@ export async function updateBookingLinkAction(
   return { status: "success", message: "Mentve." };
 }
 
-export async function cancelBookingAction(formData: FormData) {
+export type CancelBookingState =
+  | { status: "idle" }
+  | { status: "error"; message: string }
+  | { status: "success"; message: string };
+
+export async function cancelBookingAction(
+  _prevState: CancelBookingState,
+  formData: FormData
+): Promise<CancelBookingState> {
   const user = await getUser();
-  if (!user) return;
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
 
   const id = String(formData.get("id") ?? "");
-  if (!id) return;
+  const reason = String(formData.get("reason") ?? "").trim();
+  if (!id) return { status: "error", message: "Hiányzó foglalás." };
 
   const supabase = await createClient();
-  await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id).eq("provider_id", user.id);
+
+  const { data: booking, error: fetchError } = await supabase
+    .from("bookings")
+    .select("id, customer_name, customer_email, service_name, starts_at, status")
+    .eq("id", id)
+    .eq("provider_id", user.id)
+    .single();
+
+  if (fetchError || !booking) {
+    return { status: "error", message: "A foglalás nem található." };
+  }
+  if (booking.status === "cancelled") {
+    return { status: "error", message: "Ez a foglalás már le van mondva." };
+  }
+
+  const { error: updateError } = await supabase
+    .from("bookings")
+    .update({ status: "cancelled" })
+    .eq("id", id)
+    .eq("provider_id", user.id);
+
+  if (updateError) {
+    return { status: "error", message: "Hiba történt a lemondás során." };
+  }
 
   revalidatePath("/dashboard", "layout");
+
+  if (!booking.customer_email) {
+    return {
+      status: "success",
+      message: "Foglalás lemondva. A vendégnek nincs email címe rögzítve — érdemes telefonon is értesíteni.",
+    };
+  }
+
+  const { data: provider } = await supabase
+    .from("providers")
+    .select("business_name, phone")
+    .eq("id", user.id)
+    .single();
+
+  const emailResult = await sendCancellationEmail({
+    to: booking.customer_email,
+    customerName: booking.customer_name,
+    providerName: provider?.business_name ?? "a szolgáltató",
+    providerPhone: provider?.phone ?? null,
+    serviceName: booking.service_name,
+    startsAt: booking.starts_at,
+    reason: reason || null,
+  });
+
+  if (!emailResult.ok) {
+    const detail =
+      emailResult.error === "missing_api_key" ? "az email-küldés nincs beállítva" : "az email küldése nem sikerült";
+    return {
+      status: "success",
+      message: `Foglalás lemondva. Az értesítő emailt nem sikerült elküldeni (${detail}) — érdemes telefonon is szólni a vendégnek.`,
+    };
+  }
+
+  return { status: "success", message: "Foglalás lemondva, a vendég emailben értesítve." };
 }
 
 export type ManualBookingState =
@@ -386,6 +558,7 @@ const MANUAL_BOOKING_ERROR_MESSAGES: Record<string, string> = {
   service_not_found: "Érvénytelen szolgáltatás.",
   in_past: "Múltbeli időpontra nem lehet foglalni.",
   outside_hours: "Ez az időpont kívül esik a nyitvatartáson.",
+  slot_blocked: "Ez az időpont ki van zárva (lásd a Nyitvatartás oldal kivételei között).",
   slot_taken: "Ezt az időpontot időközben lefoglalták.",
 };
 

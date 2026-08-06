@@ -15,6 +15,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   service_not_found: "Ez a szolgáltatás nem található.",
   in_past: "Ez az időpont már elmúlt — válassz másikat.",
   outside_hours: "Ez az időpont már nem elérhető — válassz másikat.",
+  slot_blocked: "Ez az időpont már nem elérhető — válassz másikat.",
   slot_taken: "Sajnos ezt az időpontot közben lefoglalták — válassz másikat.",
 };
 

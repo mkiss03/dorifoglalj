@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { MiniCalendar } from "@/components/ui/MiniCalendar";
-import { cancelBookingAction } from "./actions";
+import { CancelBookingModal } from "./CancelBookingModal";
 import type { Availability, Booking } from "@/lib/supabase/types";
 
 const PX_PER_HOUR = 64;
@@ -49,6 +49,7 @@ export function BookingsSection({
   availability: Availability[];
 }) {
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
+  const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
 
   const dayBookings = useMemo(
     () => bookings.filter((b) => sameDay(new Date(b.starts_at), selectedDate)),
@@ -122,26 +123,25 @@ export function BookingsSection({
                 const start = decimalHour(b.starts_at);
                 const end = decimalHour(b.ends_at);
                 return (
-                  <form
+                  <div
                     key={b.id}
-                    action={cancelBookingAction}
                     className="shadow-card absolute inset-x-1 overflow-hidden rounded-xl border border-accent-dark/20 bg-accent-light/30 px-2.5 py-1.5 text-[11px] leading-tight"
                     style={{ top: (start - dayStart) * PX_PER_HOUR, height: Math.max((end - start) * PX_PER_HOUR, 30) }}
                   >
-                    <input type="hidden" name="id" value={b.id} />
                     <p className="truncate pr-4 font-semibold text-ink">{b.customer_name}</p>
                     <p className="truncate pr-4 text-ink-soft">
                       {b.service_name} · {formatTime(b.starts_at)}
                     </p>
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={() => setCancelTarget(b)}
                       aria-label="Lemondás"
                       title="Lemondás"
                       className="absolute right-1.5 top-1.5 text-ink-soft/60 transition-colors hover:text-accent-dark"
                     >
                       <X className="h-3.5 w-3.5" strokeWidth={2.5} />
                     </button>
-                  </form>
+                  </div>
                 );
               })}
             </div>
@@ -152,6 +152,8 @@ export function BookingsSection({
           )}
         </div>
       </div>
+
+      {cancelTarget && <CancelBookingModal booking={cancelTarget} onClose={() => setCancelTarget(null)} />}
     </div>
   );
 }

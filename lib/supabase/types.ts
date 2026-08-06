@@ -74,6 +74,19 @@ export type Availability = {
   created_at: string;
 };
 
+/** Eseti (nem ismétlődő) kizárás a heti nyitvatartáson belül — pl. "kedden
+ * 8-9 között el kell mennem valahova". `start_time`/`end_time` null = egész
+ * napos kizárás. */
+export type ProviderBlock = {
+  id: string;
+  provider_id: string;
+  block_date: string;
+  start_time: string | null;
+  end_time: string | null;
+  note: string | null;
+  created_at: string;
+};
+
 export type Booking = {
   id: string;
   provider_id: string;
@@ -132,7 +145,14 @@ export type CreateBookingResult =
   | { ok: true; booking_id: string; service_name: string; starts_at: string; ends_at: string }
   | {
       ok: false;
-      error: "missing_fields" | "provider_not_found" | "service_not_found" | "in_past" | "outside_hours" | "slot_taken";
+      error:
+        | "missing_fields"
+        | "provider_not_found"
+        | "service_not_found"
+        | "in_past"
+        | "outside_hours"
+        | "slot_blocked"
+        | "slot_taken";
     };
 
 /** A `create_hold` RPC visszatérési alakja — rövid életű zárolás egy sávra. */
@@ -140,7 +160,7 @@ export type CreateHoldResult =
   | { ok: true; hold_token: string; expires_at: string; ends_at: string }
   | {
       ok: false;
-      error: "provider_not_found" | "service_not_found" | "in_past" | "outside_hours" | "slot_taken";
+      error: "provider_not_found" | "service_not_found" | "in_past" | "outside_hours" | "slot_blocked" | "slot_taken";
     };
 
 /** Az `admin_list_providers` RPC egy sora — a jóváhagyó panel listájához. */

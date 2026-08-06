@@ -89,13 +89,18 @@ Egyirányú, feliratkozásos `.ics` feed (`app/api/ics/[token]/route.ts`) — a 
 | `v0.2.0` | Foglalási rendszer: nyitvatartás, publikus foglalási oldal, `.ics` szinkron |
 | `v0.3.0` | Irányítópult-átalakítás: Apple-stílusú menük, bővített profil (logó/borítókép, közösségi linkek), szolgáltatás description/active, foglalási link megosztás (QR, Facebook) |
 | `v0.4.0` | Szünet (puffer) két időpont között + időpont-zárolás (hold) versenyhelyzet ellen |
+| `v0.5.0` | Eseti (nem ismétlődő) nyitvatartás-kizárások (`provider_blocks`) + strukturált lemondás-kezelés Resend-alapú email-értesítéssel |
 
 ## Amit tudatosan később hagytunk
 
 - Valós idejű, **kétirányú** Google/Apple naptár-szinkron (OAuth-app kellene hozzá — külön, nagyobb projekt).
 - Több munkatárs / több oszlopos naptár egy szolgáltatónál.
-- Vendég-oldali e-mail értesítések (visszaigazoló/emlékeztető) — saját SMTP/Resend kellene, a Supabase beépített e-mailje csak auth-ra való.
+- Vendég-oldali visszaigazoló/emlékeztető e-mailek (csak a szolgáltató általi *lemondás* értesít emailben, ld. lent) — ehhez a Supabase beépített e-mailje nem elég, csak auth-ra való.
 - Fizetés/előleg, vendég-oldali átfoglalás/lemondás.
+
+## Lemondás-értesítő email (Resend)
+
+Ha a szolgáltató a `/dashboard` naptárban lemond egy foglalást, a rendszer — ha a vendégnek van rögzített email címe — automatikus értesítőt küld neki a Resend API-n keresztül (`lib/email/sendCancellationEmail.ts`). Ehhez a `RESEND_API_KEY` környezeti változó beállítása **és** egy verifikált küldő domain szükséges a Resend fiókban (ld. `.env.local.example`); enélkül a lemondás önmagában továbbra is működik, csak email nem megy ki — ekkor a felület jelzi, hogy érdemes telefonon is értesíteni a vendéget.
 
 ## Fejlesztői környezet
 
@@ -111,6 +116,8 @@ Szükséges `.env.local` (ld. `.env.local.example`):
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
 ```
 
 Supabase oldalon a `supabase/schema*.sql` fájlokat kell egyszer, sorrendben (schema → v2 → v3 → v4) lefuttatni az SQL Editorban. Új service-role kulcs vagy egyéb env-változó nem szükséges — minden anon-oldali hozzáférés a fent leírt RPC-ken keresztül, biztonságosan történik.

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { MiniCalendar } from "@/components/ui/MiniCalendar";
 import { CancelBookingModal } from "./CancelBookingModal";
-import type { Availability, Booking } from "@/lib/supabase/types";
+import type { Availability, Booking, StaffMember } from "@/lib/supabase/types";
 
 const PX_PER_HOUR = 72;
 const DEFAULT_START = 8;
@@ -49,13 +49,19 @@ function formatTime(iso: string) {
   );
 }
 
+const MIN_COLUMN_WIDTH = 200;
+
 export function BookingsSection({
   bookings,
   availability,
+  staff,
 }: {
   bookings: Booking[];
   availability: Availability[];
+  staff: StaffMember[];
 }) {
+  const columns = staff.length > 1 ? staff : null;
+
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
   const [nowHour, setNowHour] = useState<number | null>(null);
@@ -138,13 +144,31 @@ export function BookingsSection({
           <MiniCalendar selected={selectedDate} onSelect={setSelectedDate} />
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 overflow-x-auto">
+          {columns && (
+            <div className="flex" style={{ minWidth: columns.length * MIN_COLUMN_WIDTH + 44 }}>
+              <div style={{ width: 44 }} className="shrink-0" />
+              {columns.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex-1 truncate px-2 pb-2 text-center text-xs font-semibold text-ink"
+                  style={{ minWidth: MIN_COLUMN_WIDTH }}
+                >
+                  {s.name}
+                </div>
+              ))}
+            </div>
+          )}
+
           <div
             ref={scrollRef}
-            className="overflow-y-auto overflow-x-auto overscroll-contain [scrollbar-color:var(--color-line)_transparent] [scrollbar-width:thin]"
+            className="overflow-y-auto overscroll-contain [scrollbar-color:var(--color-line)_transparent] [scrollbar-width:thin]"
             style={{ maxHeight: Math.min(gridHeight, MAX_TIMELINE_HEIGHT) }}
           >
-            <div className="relative flex" style={{ height: gridHeight }}>
+            <div
+              className="relative flex"
+              style={{ height: gridHeight, minWidth: columns ? columns.length * MIN_COLUMN_WIDTH + 44 : undefined }}
+            >
               <div style={{ width: 44 }} className="relative shrink-0">
                 {hours.map((h) => (
                   <span
@@ -156,60 +180,70 @@ export function BookingsSection({
                   </span>
                 ))}
               </div>
-              <div className="relative flex-1 border-l border-line">
-                {halfHours.map((h) => (
+
+              {(columns ?? [null]).map((s) => {
+                const columnBookings = s ? dayBookings.filter((b) => b.staff_id === s.id) : dayBookings;
+                return (
                   <div
-                    key={h}
-                    className="absolute inset-x-0 border-t border-dashed border-line/40"
-                    style={{ top: (h - dayStart) * PX_PER_HOUR }}
-                  />
-                ))}
-                {hours.map((h) => (
-                  <div
-                    key={h}
-                    className="absolute inset-x-0 border-t border-line/70"
-                    style={{ top: (h - dayStart) * PX_PER_HOUR }}
-                  />
-                ))}
-                {isToday && nowHour !== null && nowHour >= dayStart && nowHour <= dayEnd && (
-                  <div
-                    className="pointer-events-none absolute inset-x-0 z-10 flex items-center"
-                    style={{ top: (nowHour - dayStart) * PX_PER_HOUR }}
+                    key={s?.id ?? "solo"}
+                    className="relative flex-1 border-l border-line"
+                    style={{ minWidth: columns ? MIN_COLUMN_WIDTH : undefined }}
                   >
-                    <span className="-ml-1 h-2 w-2 shrink-0 rounded-full bg-accent-dark" />
-                    <span className="h-px flex-1 bg-accent-dark" />
-                  </div>
-                )}
-                {dayBookings.map((b) => {
-                  const start = decimalHour(b.starts_at);
-                  const end = decimalHour(b.ends_at);
-                  return (
-                    <div
-                      key={b.id}
-                      title={`${b.customer_name} · ${formatTime(b.starts_at)}–${formatTime(b.ends_at)}`}
-                      className="shadow-card absolute inset-x-1 overflow-hidden rounded-xl border border-accent-dark/20 bg-accent-light/30 px-2.5 py-1.5 text-[11px] leading-tight transition-shadow hover:shadow-md"
-                      style={{
-                        top: (start - dayStart) * PX_PER_HOUR,
-                        height: Math.max((end - start) * PX_PER_HOUR, 30),
-                      }}
-                    >
-                      <p className="truncate pr-4 font-semibold text-ink">{b.customer_name}</p>
-                      <p className="truncate pr-4 text-ink-soft">
-                        {b.service_name} · {formatTime(b.starts_at)}–{formatTime(b.ends_at)}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setCancelTarget(b)}
-                        aria-label="Lemondás"
-                        title="Lemondás"
-                        className="absolute right-1.5 top-1.5 text-ink-soft/60 transition-colors hover:text-accent-dark"
+                    {halfHours.map((h) => (
+                      <div
+                        key={h}
+                        className="absolute inset-x-0 border-t border-dashed border-line/40"
+                        style={{ top: (h - dayStart) * PX_PER_HOUR }}
+                      />
+                    ))}
+                    {hours.map((h) => (
+                      <div
+                        key={h}
+                        className="absolute inset-x-0 border-t border-line/70"
+                        style={{ top: (h - dayStart) * PX_PER_HOUR }}
+                      />
+                    ))}
+                    {isToday && nowHour !== null && nowHour >= dayStart && nowHour <= dayEnd && (
+                      <div
+                        className="pointer-events-none absolute inset-x-0 z-10 flex items-center"
+                        style={{ top: (nowHour - dayStart) * PX_PER_HOUR }}
                       >
-                        <X className="h-3.5 w-3.5" strokeWidth={2.5} />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+                        <span className="-ml-1 h-2 w-2 shrink-0 rounded-full bg-accent-dark" />
+                        <span className="h-px flex-1 bg-accent-dark" />
+                      </div>
+                    )}
+                    {columnBookings.map((b) => {
+                      const start = decimalHour(b.starts_at);
+                      const end = decimalHour(b.ends_at);
+                      return (
+                        <div
+                          key={b.id}
+                          title={`${b.customer_name} · ${formatTime(b.starts_at)}–${formatTime(b.ends_at)}`}
+                          className="shadow-card absolute inset-x-1 overflow-hidden rounded-xl border border-accent-dark/20 bg-accent-light/30 px-2.5 py-1.5 text-[11px] leading-tight transition-shadow hover:shadow-md"
+                          style={{
+                            top: (start - dayStart) * PX_PER_HOUR,
+                            height: Math.max((end - start) * PX_PER_HOUR, 30),
+                          }}
+                        >
+                          <p className="truncate pr-4 font-semibold text-ink">{b.customer_name}</p>
+                          <p className="truncate pr-4 text-ink-soft">
+                            {b.service_name} · {formatTime(b.starts_at)}–{formatTime(b.ends_at)}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setCancelTarget(b)}
+                            aria-label="Lemondás"
+                            title="Lemondás"
+                            className="absolute right-1.5 top-1.5 text-ink-soft/60 transition-colors hover:text-accent-dark"
+                          >
+                            <X className="h-3.5 w-3.5" strokeWidth={2.5} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
             </div>
           </div>
 

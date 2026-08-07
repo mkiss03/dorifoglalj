@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getUser, createClient } from "@/lib/supabase/server";
-import type { Availability, Booking, Provider, ProviderService } from "@/lib/supabase/types";
+import type { Availability, Booking, Provider, ProviderService, StaffMember } from "@/lib/supabase/types";
 import { BookingsSection } from "./BookingsSection";
 import { ManualBookingPanel } from "./ManualBookingPanel";
+import { getStaffWithServices } from "./staffData";
 
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -17,23 +18,26 @@ export default async function DashboardOverviewPage() {
   const in7Days = new Date(startOfToday);
   in7Days.setDate(in7Days.getDate() + 7);
 
-  const [{ data: provider }, { data: services }, { data: availability }, { data: bookings }] = await Promise.all([
-    supabase.from("providers").select("*").eq("id", user!.id).single(),
-    supabase.from("provider_services").select("*").eq("provider_id", user!.id).order("created_at"),
-    supabase.from("provider_availability").select("*").eq("provider_id", user!.id).order("weekday"),
-    supabase
-      .from("bookings")
-      .select("*")
-      .eq("provider_id", user!.id)
-      .eq("status", "confirmed")
-      .gte("starts_at", startOfToday.toISOString())
-      .order("starts_at"),
-  ]);
+  const [{ data: provider }, { data: services }, staff, { data: availability }, { data: bookings }] =
+    await Promise.all([
+      supabase.from("providers").select("*").eq("id", user!.id).single(),
+      supabase.from("provider_services").select("*").eq("provider_id", user!.id).order("created_at"),
+      getStaffWithServices(supabase, user!.id),
+      supabase.from("provider_availability").select("*").eq("provider_id", user!.id).order("weekday"),
+      supabase
+        .from("bookings")
+        .select("*")
+        .eq("provider_id", user!.id)
+        .eq("status", "confirmed")
+        .gte("starts_at", startOfToday.toISOString())
+        .order("starts_at"),
+    ]);
 
   const typedProvider = provider as Provider | null;
   const typedServices = (services ?? []) as ProviderService[];
   const typedAvailability = (availability ?? []) as Availability[];
   const typedBookings = (bookings ?? []) as Booking[];
+  const staffList: StaffMember[] = staff;
 
   const todayCount = typedBookings.filter((b) => sameDay(new Date(b.starts_at), startOfToday)).length;
   const weekCount = typedBookings.filter((b) => new Date(b.starts_at) < in7Days).length;
@@ -76,11 +80,11 @@ export default async function DashboardOverviewPage() {
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-xl text-ink">Naptár</h2>
-        <ManualBookingPanel services={typedServices} />
+        <ManualBookingPanel services={typedServices} staff={staff} />
       </div>
 
       <div className="mt-3">
-        <BookingsSection bookings={typedBookings} availability={typedAvailability} />
+        <BookingsSection bookings={typedBookings} availability={typedAvailability} staff={staffList} />
       </div>
     </section>
   );

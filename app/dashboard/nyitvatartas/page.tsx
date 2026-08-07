@@ -1,14 +1,14 @@
 import { getUser, createClient } from "@/lib/supabase/server";
-import type { Availability, Provider, ProviderBlock } from "@/lib/supabase/types";
-import { AvailabilitySection } from "../AvailabilitySection";
+import type { Availability, Provider, ProviderBlock, StaffMember } from "@/lib/supabase/types";
+import { StaffScheduleTabs } from "../StaffScheduleTabs";
 import { BufferSettingsCard } from "../BufferSettingsCard";
-import { BlocksSection } from "../BlocksSection";
 
 export default async function DashboardAvailabilityPage() {
   const user = await getUser();
   const supabase = await createClient();
   const today = new Date().toISOString().slice(0, 10);
-  const [{ data: availability }, { data: provider }, { data: blocks }] = await Promise.all([
+  const [{ data: staff }, { data: availability }, { data: provider }, { data: blocks }] = await Promise.all([
+    supabase.from("staff_members").select("*").eq("provider_id", user!.id).order("created_at"),
     supabase.from("provider_availability").select("*").eq("provider_id", user!.id).order("weekday"),
     supabase.from("providers").select("buffer_minutes").eq("id", user!.id).single(),
     supabase
@@ -27,12 +27,14 @@ export default async function DashboardAvailabilityPage() {
       </p>
 
       <div className="mt-6">
-        <AvailabilitySection availability={(availability ?? []) as Availability[]} />
+        <StaffScheduleTabs
+          staff={(staff ?? []) as StaffMember[]}
+          availability={(availability ?? []) as Availability[]}
+          blocks={(blocks ?? []) as ProviderBlock[]}
+        />
       </div>
 
       <BufferSettingsCard bufferMinutes={(provider as Pick<Provider, "buffer_minutes"> | null)?.buffer_minutes ?? 0} />
-
-      <BlocksSection blocks={(blocks ?? []) as ProviderBlock[]} />
     </section>
   );
 }

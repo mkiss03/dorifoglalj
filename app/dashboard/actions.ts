@@ -89,7 +89,7 @@ async function uploadProviderMedia(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   file: File,
-  kind: "logo" | "cover"
+  pathSuffix: string
 ): Promise<{ error?: string; url?: string }> {
   if (!file.type.startsWith("image/")) {
     return { error: "Csak kép tölthető fel (PNG, JPG vagy WebP)." };
@@ -98,7 +98,7 @@ async function uploadProviderMedia(
     return { error: "A kép mérete legfeljebb 5 MB lehet." };
   }
 
-  const path = `${userId}/${kind}`;
+  const path = `${userId}/${pathSuffix}`;
   const { error: uploadError } = await supabase.storage
     .from(MEDIA_BUCKET)
     .upload(path, file, { upsert: true, contentType: file.type });
@@ -254,7 +254,10 @@ export async function updateAvailabilityAction(
   const user = await getUser();
   if (!user) return { status: "error", message: "Nincs bejelentkezve." };
 
-  const rows: { provider_id: string; weekday: number; start_time: string; end_time: string }[] = [];
+  const staffId = String(formData.get("staff_id") ?? "");
+  if (!staffId) return { status: "error", message: "Hiányzó munkatárs." };
+
+  const rows: { provider_id: string; staff_id: string; weekday: number; start_time: string; end_time: string }[] = [];
 
   for (let weekday = 1; weekday <= 7; weekday++) {
     const enabled = formData.get(`day_${weekday}_enabled`) === "on";
@@ -265,17 +268,20 @@ export async function updateAvailabilityAction(
     if (!start || !end || start >= end) {
       return { status: "error", message: "A záró időpontnak minden napon a nyitó után kell lennie." };
     }
-    rows.push({ provider_id: user.id, weekday, start_time: start, end_time: end });
+    rows.push({ provider_id: user.id, staff_id: staffId, weekday, start_time: start, end_time: end });
   }
 
   const supabase = await createClient();
 
   // Teljes csere: a nyitvatartásnak nincs a UI-n stabil azonosítója
   // naponta — egyszerűbb és biztonságosabb törölni, majd újra beszúrni.
+  // Kizárólag a kiválasztott munkatárs sorait érinti — a többi
+  // munkatárs nyitvatartása nem törlődik.
   const { error: deleteError } = await supabase
     .from("provider_availability")
     .delete()
-    .eq("provider_id", user.id);
+    .eq("provider_id", user.id)
+    .eq("staff_id", staffId);
   if (deleteError) {
     return { status: "error", message: "Hiba történt a mentés során." };
   }
@@ -329,6 +335,8 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   const startTime = String(formData.get("start_time") ?? "");
   const endTime = String(formData.get("end_time") ?? "");
   const note = String(formData.get("note") ?? "").trim();
+  const allStaff = formData.get("all_staff") === "on";
+  const staffId = String(formData.get("staff_id") ?? "");
 
   if (!blockDate || !/^\d{4}-\d{2}-\d{2}$/.test(blockDate)) {
     return { status: "error", message: "Add meg a dátumot." };
@@ -336,22 +344,45 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   if (!allDay && (!startTime || !endTime || startTime >= endTime)) {
     return { status: "error", message: "A záró időpontnak a kezdő után kell lennie." };
   }
+  if (!allStaff && !staffId) {
+    return { status: "error", message: "Hiányzó munkatárs." };
+  }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("provider_blocks").insert({
-    provider_id: user.id,
-    block_date: blockDate,
-    start_time: allDay ? null : startTime,
-    end_time: allDay ? null : endTime,
-    note: note || null,
-  });
+
+  let staffIds: string[];
+  if (allStaff) {
+    const { data: staff } = await supabase
+      .from("staff_members")
+      .select("id")
+      .eq("provider_id", user.id)
+      .eq("active", true);
+    staffIds = (staff ?? []).map((s) => s.id);
+    if (staffIds.length === 0) {
+      return { status: "error", message: "Nincs aktív munkatárs." };
+    }
+  } else {
+    staffIds = [staffId];
+  }
+
+  const { error } = await supabase.from("provider_blocks").insert(
+    staffIds.map((sid) => ({
+      provider_id: user.id,
+      staff_id: sid,
+      block_date: blockDate,
+      start_time: allDay ? null : startTime,
+      end_time: allDay ? null : endTime,
+      note: note || null,
+    }))
+  );
 
   if (error) {
     return { status: "error", message: "Hiba történt a mentés során." };
   }
 
   // Tájékoztató figyelmeztetés, ha a kizárás átfed egy már visszaigazolt
-  // foglalással — nem blokkoljuk, csak jelezzük, hogy egyeztetni kell.
+  // foglalással (bármelyik érintett munkatársnál) — nem blokkoljuk, csak
+  // jelezzük, hogy egyeztetni kell.
   const blockStartMin = allDay ? 0 : toMinutes(startTime);
   const blockEndMin = allDay ? 24 * 60 : toMinutes(endTime);
   const windowStart = new Date(`${blockDate}T00:00:00Z`);
@@ -362,7 +393,7 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   const { data: bookings } = await supabase
     .from("bookings")
     .select("starts_at, ends_at")
-    .eq("provider_id", user.id)
+    .in("staff_id", staffIds)
     .eq("status", "confirmed")
     .gte("starts_at", windowStart.toISOString())
     .lt("starts_at", windowEnd.toISOString());
@@ -378,7 +409,7 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   return {
     status: "success",
     message: hasOverlap
-      ? "Kizárás mentve. Figyelem: erre az időszakra már van visszaigazolt foglalásod — érdemes egyeztetni a vendéggel."
+      ? "Kizárás mentve. Figyelem: erre az időszakra már van visszaigazolt foglalás — érdemes egyeztetni a vendéggel."
       : "Kizárás mentve.",
   };
 }
@@ -556,6 +587,8 @@ const MANUAL_BOOKING_ERROR_MESSAGES: Record<string, string> = {
   missing_fields: "A név és telefonszám megadása kötelező.",
   provider_not_found: "Nincs bejelentkezve.",
   service_not_found: "Érvénytelen szolgáltatás.",
+  staff_not_found: "Érvénytelen munkatárs.",
+  staff_not_eligible: "Ez a munkatárs nem végzi ezt a szolgáltatást.",
   in_past: "Múltbeli időpontra nem lehet foglalni.",
   outside_hours: "Ez az időpont kívül esik a nyitvatartáson.",
   slot_blocked: "Ez az időpont ki van zárva (lásd a Nyitvatartás oldal kivételei között).",
@@ -570,18 +603,20 @@ export async function createManualBookingAction(
   if (!user) return { status: "error", message: "Nincs bejelentkezve." };
 
   const serviceId = String(formData.get("service_id") ?? "");
+  const staffId = String(formData.get("staff_id") ?? "");
   const startsAt = String(formData.get("starts_at") ?? "");
   const customerName = String(formData.get("customer_name") ?? "").trim();
   const customerPhone = String(formData.get("customer_phone") ?? "").trim();
   const customerEmail = String(formData.get("customer_email") ?? "").trim();
 
-  if (!serviceId || !startsAt) {
-    return { status: "error", message: "Válassz szolgáltatást és időpontot." };
+  if (!serviceId || !staffId || !startsAt) {
+    return { status: "error", message: "Válassz munkatársat, szolgáltatást és időpontot." };
   }
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_manual_booking", {
     p_service_id: serviceId,
+    p_staff_id: staffId,
     p_starts_at: startsAt,
     p_customer_name: customerName,
     p_customer_phone: customerPhone,
@@ -599,4 +634,159 @@ export async function createManualBookingAction(
 
   revalidatePath("/dashboard", "layout");
   return { status: "success", message: "Foglalás felvéve." };
+}
+
+export type StaffState =
+  | { status: "idle" }
+  | { status: "error"; message: string }
+  | { status: "success"; message: string };
+
+export async function addStaffAction(_prevState: StaffState, formData: FormData): Promise<StaffState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const name = String(formData.get("name") ?? "").trim();
+  const specialty = String(formData.get("specialty") ?? "").trim();
+  const serviceIds = formData.getAll("service_ids").map(String).filter(Boolean);
+
+  if (!name) {
+    return { status: "error", message: "A név megadása kötelező." };
+  }
+
+  const supabase = await createClient();
+  const { data: staff, error } = await supabase
+    .from("staff_members")
+    .insert({ provider_id: user.id, name, specialty: specialty || null })
+    .select("id")
+    .single();
+
+  if (error || !staff) {
+    return { status: "error", message: "Hiba történt a mentés során." };
+  }
+
+  if (serviceIds.length > 0) {
+    const { error: linkError } = await supabase
+      .from("staff_services")
+      .insert(serviceIds.map((serviceId) => ({ staff_id: staff.id, service_id: serviceId, provider_id: user.id })));
+    if (linkError) {
+      return { status: "error", message: "A munkatárs mentve, de a szolgáltatások hozzárendelése nem sikerült." };
+    }
+  }
+
+  revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Munkatárs hozzáadva." };
+}
+
+export async function updateStaffAction(_prevState: StaffState, formData: FormData): Promise<StaffState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const specialty = String(formData.get("specialty") ?? "").trim();
+  const active = formData.get("active") === "on";
+  const serviceIds = formData.getAll("service_ids").map(String).filter(Boolean);
+
+  if (!id || !name) {
+    return { status: "error", message: "A név megadása kötelező." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("staff_members")
+    .update({ name, specialty: specialty || null, active })
+    .eq("id", id)
+    .eq("provider_id", user.id);
+
+  if (error) {
+    return { status: "error", message: "Hiba történt a mentés során." };
+  }
+
+  // Teljes csere a hozzárendelt szolgáltatásoknál — egyszerűbb, mint diffelni.
+  const { error: deleteError } = await supabase
+    .from("staff_services")
+    .delete()
+    .eq("staff_id", id)
+    .eq("provider_id", user.id);
+  if (deleteError) {
+    return { status: "error", message: "Hiba történt a szolgáltatások mentése során." };
+  }
+
+  if (serviceIds.length > 0) {
+    const { error: insertError } = await supabase
+      .from("staff_services")
+      .insert(serviceIds.map((serviceId) => ({ staff_id: id, service_id: serviceId, provider_id: user.id })));
+    if (insertError) {
+      return { status: "error", message: "Hiba történt a szolgáltatások mentése során." };
+    }
+  }
+
+  revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Mentve." };
+}
+
+export async function deleteStaffAction(_prevState: StaffState, formData: FormData): Promise<StaffState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { status: "error", message: "Hiányzó munkatárs." };
+
+  const supabase = await createClient();
+
+  const { count: totalStaff } = await supabase
+    .from("staff_members")
+    .select("id", { count: "exact", head: true })
+    .eq("provider_id", user.id);
+
+  if ((totalStaff ?? 0) <= 1) {
+    return { status: "error", message: "Legalább egy munkatársnak lennie kell — inaktiváld törlés helyett." };
+  }
+
+  const { count: bookingCount } = await supabase
+    .from("bookings")
+    .select("id", { count: "exact", head: true })
+    .eq("staff_id", id)
+    .eq("provider_id", user.id);
+
+  if ((bookingCount ?? 0) > 0) {
+    return {
+      status: "error",
+      message: "Ennek a munkatársnak már volt foglalása — törlés helyett inaktiváld.",
+    };
+  }
+
+  const { error } = await supabase.from("staff_members").delete().eq("id", id).eq("provider_id", user.id);
+  if (error) {
+    return { status: "error", message: "Hiba történt a törlés során." };
+  }
+
+  revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Munkatárs törölve." };
+}
+
+export async function updateStaffPhotoAction(_prevState: MediaState, formData: FormData): Promise<MediaState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const staffId = String(formData.get("staff_id") ?? "");
+  const file = formData.get("photo");
+  if (!staffId) return { status: "error", message: "Hiányzó munkatárs." };
+  if (!(file instanceof File) || file.size === 0) {
+    return { status: "error", message: "Válassz egy képet." };
+  }
+
+  const supabase = await createClient();
+  const { error, url } = await uploadProviderMedia(supabase, user.id, file, `staff/${staffId}`);
+  if (error || !url) return { status: "error", message: error ?? "Hiba történt a feltöltés során." };
+
+  const { error: dbError } = await supabase
+    .from("staff_members")
+    .update({ photo_url: url })
+    .eq("id", staffId)
+    .eq("provider_id", user.id);
+  if (dbError) return { status: "error", message: "Hiba történt a mentés során." };
+
+  revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Fotó frissítve." };
 }

@@ -18,9 +18,18 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function BlocksSection({ blocks }: { blocks: ProviderBlock[] }) {
+export function BlocksSection({
+  blocks,
+  staffId,
+  allowAllStaff,
+}: {
+  blocks: ProviderBlock[];
+  staffId: string;
+  allowAllStaff: boolean;
+}) {
   const [state, formAction, pending] = useActionState(addBlockAction, initialState);
   const [allDay, setAllDay] = useState(false);
+  const [allStaff, setAllStaff] = useState(false);
 
   const sorted = [...blocks].sort((a, b) => a.block_date.localeCompare(b.block_date));
 
@@ -69,6 +78,7 @@ export function BlocksSection({ blocks }: { blocks: ProviderBlock[] }) {
       {sorted.length === 0 && <p className="mt-4 text-sm text-ink-soft">Jelenleg nincs eseti kizárásod.</p>}
 
       <form action={formAction} className="mt-5 flex flex-wrap items-end gap-3 border-t border-line pt-5">
+        <input type="hidden" name="staff_id" value={staffId} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-ink-soft">Dátum</label>
           <input
@@ -90,6 +100,19 @@ export function BlocksSection({ blocks }: { blocks: ProviderBlock[] }) {
           />
           Egész nap
         </label>
+
+        {allowAllStaff && (
+          <label className="flex items-center gap-2 pb-2.5 text-sm font-medium text-ink">
+            <input
+              type="checkbox"
+              name="all_staff"
+              checked={allStaff}
+              onChange={(e) => setAllStaff(e.target.checked)}
+              className="h-4 w-4 accent-accent-dark"
+            />
+            Minden munkatársra
+          </label>
+        )}
 
         {!allDay && (
           <>

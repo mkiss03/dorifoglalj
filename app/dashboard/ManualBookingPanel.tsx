@@ -5,7 +5,7 @@ import { Plus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { MiniCalendar } from "@/components/ui/MiniCalendar";
 import { createManualBookingAction, type ManualBookingState } from "./actions";
-import type { ProviderService } from "@/lib/supabase/types";
+import type { ProviderService, StaffMemberWithServices } from "@/lib/supabase/types";
 
 const initialState: ManualBookingState = { status: "idle" };
 
@@ -28,8 +28,17 @@ function toDateParam(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function ManualBookingForm({ services, onDone }: { services: ProviderService[]; onDone: () => void }) {
+function ManualBookingForm({
+  services,
+  staff,
+  onDone,
+}: {
+  services: ProviderService[];
+  staff: StaffMemberWithServices[];
+  onDone: () => void;
+}) {
   const [serviceId, setServiceId] = useState<string | null>(services[0]?.id ?? null);
+  const [staffId, setStaffId] = useState<string | null>(null);
   const [date, setDate] = useState<Date>(() => new Date());
   const [slots, setSlots] = useState<string[]>([]);
   const [slotsKey, setSlotsKey] = useState<string | null>(null);
@@ -46,16 +55,21 @@ function ManualBookingForm({ services, onDone }: { services: ProviderService[]; 
     if (state.status === "success") onDone();
   }
 
-  const requestKey = serviceId ? `${serviceId}|${toDateParam(date)}` : null;
+  const eligibleStaff = serviceId ? staff.filter((s) => s.active && s.service_ids.includes(serviceId)) : [];
+  // Ha csak egy munkatárs végzi a kiválasztott szolgáltatást, csendben őt
+  // választjuk — a választó csak akkor jelenik meg, ha valódi döntés van.
+  const effectiveStaffId = staffId ?? (eligibleStaff.length === 1 ? eligibleStaff[0].id : null);
+
+  const requestKey = serviceId && effectiveStaffId ? `${serviceId}|${effectiveStaffId}|${toDateParam(date)}` : null;
   const loadingSlots = requestKey !== null && requestKey !== slotsKey;
 
   useEffect(() => {
-    if (!serviceId) return;
+    if (!serviceId || !effectiveStaffId) return;
     let cancelled = false;
-    const key = `${serviceId}|${toDateParam(date)}`;
+    const key = `${serviceId}|${effectiveStaffId}|${toDateParam(date)}`;
     const supabase = createClient();
     supabase
-      .rpc("get_own_available_slots", { p_service_id: serviceId, p_date: toDateParam(date) })
+      .rpc("get_own_available_slots", { p_service_id: serviceId, p_staff_id: effectiveStaffId, p_date: toDateParam(date) })
       .then(({ data, error }) => {
         if (cancelled) return;
         setSlots(error || !data ? [] : (data as string[]));
@@ -64,9 +78,10 @@ function ManualBookingForm({ services, onDone }: { services: ProviderService[]; 
     return () => {
       cancelled = true;
     };
-  }, [serviceId, date]);
+  }, [serviceId, effectiveStaffId, date]);
 
   const selectedService = services.find((s) => s.id === serviceId) ?? null;
+  const selectedStaff = staff.find((s) => s.id === effectiveStaffId) ?? null;
 
   return (
     <div className="shadow-card mt-3 rounded-2xl bg-paper-alt/60 p-4">
@@ -78,6 +93,7 @@ function ManualBookingForm({ services, onDone }: { services: ProviderService[]; 
             type="button"
             onClick={() => {
               setServiceId(s.id);
+              setStaffId(null);
               setSelectedSlot(null);
             }}
             className={
@@ -90,7 +106,37 @@ function ManualBookingForm({ services, onDone }: { services: ProviderService[]; 
         ))}
       </div>
 
-      {serviceId && (
+      {serviceId && eligibleStaff.length === 0 && (
+        <p className="mt-3 text-sm text-ink-soft">
+          Ehhez a szolgáltatáshoz jelenleg nincs hozzárendelt munkatárs — rendeld hozzá a Csapat fülön.
+        </p>
+      )}
+
+      {serviceId && eligibleStaff.length > 1 && (
+        <div className="mt-4 border-t border-line pt-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Munkatárs</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {eligibleStaff.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => {
+                  setStaffId(s.id);
+                  setSelectedSlot(null);
+                }}
+                className={
+                  "rounded-full px-3.5 py-2 text-sm font-medium transition-colors " +
+                  (effectiveStaffId === s.id ? "bg-ink text-paper" : "bg-white text-ink hover:bg-panel")
+                }
+              >
+                {s.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {serviceId && effectiveStaffId && (
         <div className="mt-4 grid gap-4 border-t border-line pt-4 sm:grid-cols-[auto_1fr]">
           <MiniCalendar
             selected={date}
@@ -125,9 +171,10 @@ function ManualBookingForm({ services, onDone }: { services: ProviderService[]; 
         </div>
       )}
 
-      {selectedSlot && selectedService && (
+      {selectedSlot && selectedService && selectedStaff && (
         <form action={formAction} className="mt-4 space-y-2 border-t border-line pt-4">
           <input type="hidden" name="service_id" value={selectedService.id} />
+          <input type="hidden" name="staff_id" value={selectedStaff.id} />
           <input type="hidden" name="starts_at" value={selectedSlot} />
 
           <div className="flex flex-wrap gap-2">
@@ -151,7 +198,13 @@ function ManualBookingForm({ services, onDone }: { services: ProviderService[]; 
   );
 }
 
-export function ManualBookingPanel({ services }: { services: ProviderService[] }) {
+export function ManualBookingPanel({
+  services,
+  staff,
+}: {
+  services: ProviderService[];
+  staff: StaffMemberWithServices[];
+}) {
   const [open, setOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const activeServices = services.filter((s) => s.active);
@@ -177,6 +230,7 @@ export function ManualBookingPanel({ services }: { services: ProviderService[] }
         <ManualBookingForm
           key={formKey}
           services={activeServices}
+          staff={staff}
           onDone={() => {
             setOpen(false);
             setFormKey((k) => k + 1);

@@ -90,6 +90,7 @@ Egyirányú, feliratkozásos `.ics` feed (`app/api/ics/[token]/route.ts`) — a 
 | `v0.3.0` | Irányítópult-átalakítás: Apple-stílusú menük, bővített profil (logó/borítókép, közösségi linkek), szolgáltatás description/active, foglalási link megosztás (QR, Facebook) |
 | `v0.4.0` | Szünet (puffer) két időpont között + időpont-zárolás (hold) versenyhelyzet ellen |
 | `v0.5.0` | Eseti (nem ismétlődő) nyitvatartás-kizárások (`provider_blocks`) + strukturált lemondás-kezelés Resend-alapú email-értesítéssel |
+| `v0.6.0` | Interaktív megyés térkép a "Böngéssz település szerint" szekcióban; munkatársak (staff) egy profilon belül — saját nyitvatartás/naptár dolgozónként, staff-választó a foglalási flow-ban |
 
 ## Amit tudatosan később hagytunk
 

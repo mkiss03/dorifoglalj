@@ -15,6 +15,8 @@ const inputClass =
 const HOLD_ERROR_MESSAGES: Record<string, string> = {
   provider_not_found: "Ez a foglalási oldal jelenleg nem elérhető.",
   service_not_found: "Ez a szolgáltatás nem található.",
+  staff_not_found: "Ez a munkatárs nem érhető el.",
+  staff_not_eligible: "Ez a munkatárs nem végzi ezt a szolgáltatást.",
   in_past: "Ez az időpont már elmúlt — válassz másikat.",
   outside_hours: "Ez az időpont már nem elérhető — válassz másikat.",
   slot_blocked: "Ez az időpont már nem elérhető — válassz másikat.",
@@ -127,6 +129,7 @@ function BookingConfirmation({
 
 export function BookingWidget({ provider }: { provider: PublicProvider }) {
   const [serviceId, setServiceId] = useState<string | null>(provider.services[0]?.id ?? null);
+  const [staffId, setStaffId] = useState<string | null>(null);
   const [date, setDate] = useState<Date>(() => new Date());
   const [slots, setSlots] = useState<string[]>([]);
   // A `slotsKey`-hez tartozik a `slots` tartalma. Amíg a jelenlegi kérés
@@ -146,21 +149,36 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
 
   const [state, formAction, pending] = useActionState(createBookingAction, initialState);
 
-  const requestKey = serviceId ? `${serviceId}|${toDateParam(date)}` : null;
+  const selectedService = useMemo(
+    () => provider.services.find((s) => s.id === serviceId) ?? null,
+    [provider.services, serviceId]
+  );
+  // Csak azok a munkatársak, akik a kiválasztott szolgáltatást végzik.
+  // Ha pontosan 1 ilyen van, csendben őt választjuk — a választó csak
+  // akkor jelenik meg, ha valódi döntés van (több jogosult munkatárs).
+  const eligibleStaff = useMemo(
+    () => (selectedService ? provider.staff.filter((s) => selectedService.staff_ids.includes(s.id)) : []),
+    [provider.staff, selectedService]
+  );
+  const effectiveStaffId = staffId ?? (eligibleStaff.length === 1 ? eligibleStaff[0].id : null);
+
+  const requestKey =
+    serviceId && effectiveStaffId ? `${serviceId}|${effectiveStaffId}|${toDateParam(date)}` : null;
   const loadingSlots = requestKey !== null && requestKey !== slotsKey;
 
   useEffect(() => {
-    // Ha nincs kiválasztott szolgáltatás, a szabad-időpont blokk (lentebb)
-    // amúgy sincs kirenderelve — nincs mit lekérni.
-    if (!serviceId) return;
+    // Amíg nincs kiválasztott szolgáltatás ÉS munkatárs, a szabad-időpont
+    // blokk (lentebb) amúgy sincs kirenderelve — nincs mit lekérni.
+    if (!serviceId || !effectiveStaffId) return;
 
     let cancelled = false;
-    const key = `${serviceId}|${toDateParam(date)}`;
+    const key = `${serviceId}|${effectiveStaffId}|${toDateParam(date)}`;
     const supabase = createClient();
     supabase
       .rpc("get_available_slots", {
         p_slug: provider.slug,
         p_service_id: serviceId,
+        p_staff_id: effectiveStaffId,
         p_date: toDateParam(date),
       })
       .then(({ data, error }) => {
@@ -171,7 +189,7 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
     return () => {
       cancelled = true;
     };
-  }, [serviceId, date, provider.slug]);
+  }, [serviceId, effectiveStaffId, date, provider.slug]);
 
   // A korábbi zárolást mindig feloldjuk, amint másikra váltunk (vagy a
   // widget elhagyásakor) — a cleanup a `holdToken` MINDEN változásakor
@@ -191,16 +209,11 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
     return () => clearInterval(id);
   }, [holdExpiresAt]);
 
-  const selectedService = useMemo(
-    () => provider.services.find((s) => s.id === serviceId) ?? null,
-    [provider.services, serviceId]
-  );
-
   const holdRemainingMs = holdExpiresAt ? new Date(holdExpiresAt).getTime() - nowTick : 0;
   const holdExpired = holdToken !== null && holdRemainingMs <= 0;
 
   async function selectSlot(slot: string) {
-    if (!selectedService || holding) return;
+    if (!selectedService || !effectiveStaffId || holding) return;
 
     const previousToken = holdToken;
     setSelectedSlot(null);
@@ -222,6 +235,7 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
     const { data, error } = await supabase.rpc("create_hold", {
       p_slug: provider.slug,
       p_service_id: selectedService.id,
+      p_staff_id: effectiveStaffId,
       p_starts_at: slot,
     });
 
@@ -282,6 +296,7 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
               type="button"
               onClick={() => {
                 setServiceId(s.id);
+                setStaffId(null);
                 resetSelection();
               }}
               className={
@@ -298,7 +313,52 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
         </div>
       </div>
 
-      {serviceId && (
+      {serviceId && eligibleStaff.length === 0 && (
+        <p className="mt-6 border-t border-line pt-6 text-sm text-ink-soft">
+          Ehhez a szolgáltatáshoz jelenleg nincs elérhető munkatárs.
+        </p>
+      )}
+
+      {serviceId && eligibleStaff.length > 1 && (
+        <div className="mt-6 border-t border-line pt-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Munkatárs</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {eligibleStaff.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => {
+                  setStaffId(s.id);
+                  resetSelection();
+                }}
+                className={
+                  "flex items-center gap-2 rounded-2xl px-4 py-2.5 text-left transition-colors duration-200 " +
+                  (effectiveStaffId === s.id ? "bg-ink text-paper" : "bg-paper-alt text-ink hover:bg-panel")
+                }
+              >
+                {s.photo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.photo_url} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
+                ) : (
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-light text-xs font-semibold text-accent-dark">
+                    {s.name.trim().charAt(0).toUpperCase() || "?"}
+                  </span>
+                )}
+                <span>
+                  <span className="block text-sm font-medium">{s.name}</span>
+                  {s.specialty && (
+                    <span className={"block text-xs " + (effectiveStaffId === s.id ? "text-paper/70" : "text-ink-soft")}>
+                      {s.specialty}
+                    </span>
+                  )}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {serviceId && effectiveStaffId && (
         <div className="mt-6 grid gap-6 border-t border-line pt-6 sm:grid-cols-[auto_1fr]">
           <MiniCalendar
             selected={date}
@@ -338,10 +398,11 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
         </div>
       )}
 
-      {selectedSlot && selectedService && holdToken && !holdExpired && (
+      {selectedSlot && selectedService && effectiveStaffId && holdToken && !holdExpired && (
         <form action={formAction} className="mt-6 space-y-3 border-t border-line pt-6">
           <input type="hidden" name="slug" value={provider.slug} />
           <input type="hidden" name="service_id" value={selectedService.id} />
+          <input type="hidden" name="staff_id" value={effectiveStaffId} />
           <input type="hidden" name="starts_at" value={selectedSlot} />
           <input type="hidden" name="hold_token" value={holdToken} />
 

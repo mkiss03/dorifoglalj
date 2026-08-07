@@ -64,10 +64,28 @@ export type ProviderService = {
   created_at: string;
 };
 
+/** Egy szolgáltatónál dolgozó munkatárs — akkor is létezik (pontosan 1
+ * sorral), ha a szolgáltató egyszemélyes vállalkozás; ez esetben a UI
+ * mindenhol elrejti a staff-választót. Nincs saját bejelentkezése — a
+ * tulajdonos egy dashboardból kezeli. */
+export type StaffMember = {
+  id: string;
+  provider_id: string;
+  name: string;
+  specialty: string | null;
+  photo_url: string | null;
+  active: boolean;
+  created_at: string;
+};
+
+/** StaffMember + a hozzárendelt szolgáltatás-id-k listája (`staff_services` join). */
+export type StaffMemberWithServices = StaffMember & { service_ids: string[] };
+
 /** Weekday: 1 = hétfő … 7 = vasárnap (ISO), a `time` oszlopok "HH:MM:SS" formátumban jönnek vissza. */
 export type Availability = {
   id: string;
   provider_id: string;
+  staff_id: string;
   weekday: number;
   start_time: string;
   end_time: string;
@@ -80,6 +98,7 @@ export type Availability = {
 export type ProviderBlock = {
   id: string;
   provider_id: string;
+  staff_id: string;
   block_date: string;
   start_time: string | null;
   end_time: string | null;
@@ -90,6 +109,7 @@ export type ProviderBlock = {
 export type Booking = {
   id: string;
   provider_id: string;
+  staff_id: string;
   service_id: string | null;
   service_name: string;
   price_huf: number | null;
@@ -131,12 +151,22 @@ export type PublicProvider = {
   logo_url: string | null;
   cover_url: string | null;
   tags: ProviderTag[];
+  /** Csak az aktív munkatársak. Ha csak 1 elem van, a foglalási felület
+   * nem mutat staff-választót — csendben ezt az egyet használja. */
+  staff: {
+    id: string;
+    name: string;
+    specialty: string | null;
+    photo_url: string | null;
+  }[];
   services: {
     id: string;
     name: string;
     description: string | null;
     price_huf: number;
     duration_minutes: number;
+    /** Mely (aktív) munkatársak végzik ezt a szolgáltatást. */
+    staff_ids: string[];
   }[];
 };
 
@@ -149,6 +179,8 @@ export type CreateBookingResult =
         | "missing_fields"
         | "provider_not_found"
         | "service_not_found"
+        | "staff_not_found"
+        | "staff_not_eligible"
         | "in_past"
         | "outside_hours"
         | "slot_blocked"
@@ -160,7 +192,15 @@ export type CreateHoldResult =
   | { ok: true; hold_token: string; expires_at: string; ends_at: string }
   | {
       ok: false;
-      error: "provider_not_found" | "service_not_found" | "in_past" | "outside_hours" | "slot_blocked" | "slot_taken";
+      error:
+        | "provider_not_found"
+        | "service_not_found"
+        | "staff_not_found"
+        | "staff_not_eligible"
+        | "in_past"
+        | "outside_hours"
+        | "slot_blocked"
+        | "slot_taken";
     };
 
 /** Az `admin_list_providers` RPC egy sora — a jóváhagyó panel listájához. */

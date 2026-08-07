@@ -13,6 +13,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   missing_fields: "Add meg a neved és a telefonszámod.",
   provider_not_found: "Ez a foglalási oldal jelenleg nem elérhető.",
   service_not_found: "Ez a szolgáltatás nem található.",
+  staff_not_found: "Ez a munkatárs nem érhető el.",
+  staff_not_eligible: "Ez a munkatárs nem végzi ezt a szolgáltatást.",
   in_past: "Ez az időpont már elmúlt — válassz másikat.",
   outside_hours: "Ez az időpont már nem elérhető — válassz másikat.",
   slot_blocked: "Ez az időpont már nem elérhető — válassz másikat.",
@@ -25,13 +27,14 @@ export async function createBookingAction(
 ): Promise<BookingFormState> {
   const slug = String(formData.get("slug") ?? "");
   const serviceId = String(formData.get("service_id") ?? "");
+  const staffId = String(formData.get("staff_id") ?? "");
   const startsAt = String(formData.get("starts_at") ?? "");
   const holdToken = String(formData.get("hold_token") ?? "").trim();
   const name = String(formData.get("customer_name") ?? "").trim();
   const phone = String(formData.get("customer_phone") ?? "").trim();
   const email = String(formData.get("customer_email") ?? "").trim();
 
-  if (!slug || !serviceId || !startsAt) {
+  if (!slug || !serviceId || !staffId || !startsAt) {
     return { status: "error", message: "Hiányzó adatok — próbáld újra az elejétől." };
   }
   if (!name || !phone) {
@@ -42,6 +45,7 @@ export async function createBookingAction(
   const { data, error } = await supabase.rpc("create_booking", {
     p_slug: slug,
     p_service_id: serviceId,
+    p_staff_id: staffId,
     p_starts_at: startsAt,
     p_customer_name: name,
     p_customer_phone: phone,

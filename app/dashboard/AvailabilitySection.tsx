@@ -18,7 +18,7 @@ const initialState: AvailabilityState = { status: "idle" };
 
 type DayRow = { enabled: boolean; start: string; end: string };
 
-export function AvailabilitySection({ availability }: { availability: Availability[] }) {
+export function AvailabilitySection({ availability, staffId }: { availability: Availability[]; staffId: string }) {
   const [state, formAction, pending] = useActionState(updateAvailabilityAction, initialState);
   const byWeekday = new Map(availability.map((a) => [a.weekday, a]));
 
@@ -61,6 +61,7 @@ export function AvailabilitySection({ availability }: { availability: Availabili
       </div>
 
       <form action={formAction} className="mt-5 space-y-2">
+        <input type="hidden" name="staff_id" value={staffId} />
         {DAYS.map((d, index) => {
           const row = rows[index];
           return (

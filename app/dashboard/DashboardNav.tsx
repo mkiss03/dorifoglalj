@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Clock, LayoutGrid, ListChecks, Share2, type LucideIcon } from "lucide-react";
+import { Building2, Clock, LayoutGrid, ListChecks, Share2, Users, type LucideIcon } from "lucide-react";
 
 const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/dashboard", label: "Áttekintés", icon: LayoutGrid },
   { href: "/dashboard/profil", label: "Profil", icon: Building2 },
   { href: "/dashboard/szolgaltatasok", label: "Szolgáltatások", icon: ListChecks },
+  { href: "/dashboard/csapat", label: "Csapat", icon: Users },
   { href: "/dashboard/nyitvatartas", label: "Nyitvatartás", icon: Clock },
   { href: "/dashboard/megosztas", label: "Megosztás", icon: Share2 },
 ];

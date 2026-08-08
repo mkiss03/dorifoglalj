@@ -351,10 +351,8 @@ export function Hero({
                       onClick={() => toggleTag(tag)}
                       aria-pressed={active}
                       className={clsx(
-                        "rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-200",
-                        active
-                          ? "border-accent-dark bg-accent-dark text-paper"
-                          : "border-line bg-paper-alt text-ink-soft hover:bg-panel"
+                        "flex shrink-0 items-center rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200",
+                        active ? "bg-ink text-paper" : "bg-paper-alt text-ink-soft hover:bg-panel"
                       )}
                     >
                       {TAG_LABELS[tag]}
@@ -364,13 +362,8 @@ export function Hero({
               </div>
             </div>
 
-            <div className="mt-6 border-t border-line pt-6">
-              <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                Vagy válassz megyét a térképen
-              </p>
-              <div className="mt-3">
-                <HungaryMap bare onSelectCity={(name) => setCity(name)} />
-              </div>
+            <div className="mt-4">
+              <HungaryMap bare heading="Vagy válassz megyét a térképen" onSelectCity={(name) => setCity(name)} />
             </div>
           </div>
 

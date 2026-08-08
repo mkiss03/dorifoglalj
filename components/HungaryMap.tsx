@@ -16,16 +16,21 @@ function regionKindLabel(id: string) {
 export function HungaryMap({
   onSelectCity,
   bare = false,
+  heading,
 }: {
   /** Ha meg van adva, a tooltip város-sorai navigálás helyett ezt hívják
    * (a Hero beágyazott térképe így csak kitölti a Település mezőt, nem
    * ugrik el azonnal) — enélkül (BrowseByCity) a jelenlegi Link-es,
    * azonnal navigáló viselkedés marad. */
   onSelectCity?: (city: string) => void;
-  /** Ha igaz, a saját fehér kártya-keret (shadow-sheet/bg-white/padding/
-   * scroll-reveal animáció) elmarad — a Hero saját kártyájába ágyazva
-   * használjuk, nem akarunk kártyát a kártyában. */
+  /** Ha igaz, a saját kártya-keret visszafogottabb (paper-alt, nem fehér
+   * shadow-sheet) és nincs scroll-reveal animáció — egy már látható,
+   * fehér szülő-kártyába (Hero) ágyazva ez ad kontrasztot anélkül, hogy
+   * "kártyát a kártyában" hatást keltene. */
   bare?: boolean;
+  /** Opcionális cím a térkép fölött, a saját kártyáján belül — így cím+
+   * térkép egy vizuális egységként jelenik meg. */
+  heading?: string;
 } = {}) {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [pinnedId, setPinnedId] = useState<string | null>(null);
@@ -71,10 +76,14 @@ export function HungaryMap({
       whileInView={bare ? undefined : { opacity: 1, y: 0 }}
       viewport={bare ? undefined : { once: true, margin: "-60px" }}
       transition={bare ? undefined : { duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className={clsx(!bare && "shadow-sheet rounded-3xl bg-white p-4 sm:p-6")}
+      className={clsx(
+        "rounded-3xl p-4 sm:p-6",
+        bare ? "bg-paper-alt" : "shadow-sheet bg-white"
+      )}
     >
+      {heading && <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">{heading}</p>}
       <div className="overflow-x-auto">
-        <div ref={wrapperRef} className="relative mx-auto w-full min-w-[420px] max-w-2xl">
+        <div ref={wrapperRef} className="relative w-full min-w-[420px]">
           <svg
             viewBox={HUNGARY_VIEWBOX}
             className="block w-full"
@@ -102,12 +111,12 @@ export function HungaryMap({
                         togglePin(region.id);
                       }
                     }}
-                    stroke="#fff"
+                    stroke={bare ? "var(--paper-alt)" : "#fff"}
                     strokeWidth={isDisplayed ? 2 : 1.4}
                     strokeLinejoin="round"
                     className={clsx(
                       "cursor-pointer outline-none transition-[fill,stroke-width] duration-200",
-                      isDisplayed ? "fill-accent-light" : "fill-paper-alt hover:fill-accent-light"
+                      isDisplayed ? "fill-accent-light" : bare ? "fill-white hover:fill-accent-light" : "fill-paper-alt hover:fill-accent-light"
                     )}
                   />
                   {region.cities.map((city) =>

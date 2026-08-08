@@ -91,6 +91,7 @@ Egyirányú, feliratkozásos `.ics` feed (`app/api/ics/[token]/route.ts`) — a 
 | `v0.4.0` | Szünet (puffer) két időpont között + időpont-zárolás (hold) versenyhelyzet ellen |
 | `v0.5.0` | Eseti (nem ismétlődő) nyitvatartás-kizárások (`provider_blocks`) + strukturált lemondás-kezelés Resend-alapú email-értesítéssel |
 | `v0.6.0` | Interaktív megyés térkép a "Böngéssz település szerint" szekcióban; munkatársak (staff) egy profilon belül — saját nyitvatartás/naptár dolgozónként, staff-választó a foglalási flow-ban |
+| `v0.7.0` | A megyés térkép felköltözött a Hero keresőjébe (kattintással kitölti a Település mezőt); a Hero keresője kibővült működő dátum-szűrővel és Alkalom-szűrővel |
 
 ## Amit tudatosan később hagytunk
 

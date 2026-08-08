@@ -8,9 +8,10 @@ import { clsx } from "clsx";
 import { Container } from "./ui/Container";
 import { RevealText } from "./ui/RevealText";
 import { MiniCalendar } from "./ui/MiniCalendar";
-import { Collage } from "./ui/Collage";
+import { HungaryMap } from "./HungaryMap";
 import { cities } from "@/lib/cities";
 import { categoryIconBySlug } from "@/lib/categories";
+import { PROVIDER_TAGS, TAG_LABELS, type ProviderTag } from "@/lib/supabase/types";
 import type { SiteContent } from "@/lib/content/types";
 import type { ResolvedCategory } from "@/lib/content/resolveCategories";
 
@@ -20,6 +21,10 @@ const STAT_ICONS: Record<string, LucideIcon> = {
   hours: Clock3,
   sync: RefreshCcw,
 };
+
+function toDateParam(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 function useClickOutside(onOutside: () => void) {
   const ref = useRef<HTMLDivElement>(null);
@@ -94,15 +99,17 @@ function CategoryField({
 }
 
 function CityField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
   const ref = useClickOutside(() => setOpen(false));
 
+  // Kontrollált mező (nincs saját lokális `query`) — enélkül egy külső
+  // állapotváltozás (pl. a térkép kattintása) nem tudna látszani a
+  // mezőben, csak a submitnál elküldött értékben.
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = value.trim().toLowerCase();
     const list = q ? cities.filter((c) => c.toLowerCase().includes(q)) : cities;
     return list.slice(0, 6);
-  }, [query]);
+  }, [value]);
 
   return (
     <div ref={ref} className="relative flex-1">
@@ -111,9 +118,8 @@ function CityField({ value, onChange }: { value: string; onChange: (v: string) =
           Település
         </label>
         <input
-          value={query}
+          value={value}
           onChange={(e) => {
-            setQuery(e.target.value);
             onChange(e.target.value);
             setOpen(true);
           }}
@@ -136,7 +142,6 @@ function CityField({ value, onChange }: { value: string; onChange: (v: string) =
                 type="button"
                 key={c}
                 onClick={() => {
-                  setQuery(c);
                   onChange(c);
                   setOpen(false);
                 }}
@@ -153,11 +158,26 @@ function CityField({ value, onChange }: { value: string; onChange: (v: string) =
   );
 }
 
-function DateField() {
+function DateField({ onChange }: { onChange: (v: string) => void }) {
   const [mode, setMode] = useState<"today" | "tomorrow" | "custom">("today");
   const [customDate, setCustomDate] = useState<Date | null>(null);
   const [open, setOpen] = useState(false);
   const ref = useClickOutside(() => setOpen(false));
+
+  // A választott mód/dátum ISO ("YYYY-MM-DD") stringgé alakítva mindig
+  // felmegy a szülőbe — korábban ez a mező pusztán vizuális volt, a
+  // submit sosem olvasta ki.
+  useEffect(() => {
+    if (mode === "today") {
+      onChange(toDateParam(new Date()));
+    } else if (mode === "tomorrow") {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      onChange(toDateParam(d));
+    } else if (mode === "custom" && customDate) {
+      onChange(toDateParam(customDate));
+    }
+  }, [mode, customDate, onChange]);
 
   const customLabel = customDate
     ? customDate.toLocaleDateString("hu-HU", { month: "short", day: "numeric" })
@@ -236,6 +256,12 @@ export function Hero({
   const router = useRouter();
   const [category, setCategory] = useState(categories[1]?.name ?? categories[0]?.name ?? "");
   const [city, setCity] = useState("");
+  const [date, setDate] = useState(() => toDateParam(new Date()));
+  const [tags, setTags] = useState<ProviderTag[]>([]);
+
+  function toggleTag(tag: ProviderTag) {
+    setTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -243,6 +269,8 @@ export function Hero({
     const categorySlug = categories.find((c) => c.name === category)?.slug;
     if (categorySlug) params.set("category", categorySlug);
     if (city.trim()) params.set("city", city.trim());
+    if (date) params.set("date", date);
+    for (const tag of tags) params.append("tags", tag);
     router.push(`/kereses${params.toString() ? `?${params.toString()}` : ""}`);
   }
 
@@ -255,27 +283,21 @@ export function Hero({
     >
       <Container>
         <div className="shadow-sheet relative rounded-3xl bg-white p-5 lg:p-12">
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
 
-              <RevealText
-                as="h1"
-                className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
-                fieldAnchor="hero.heading_segments"
-                segments={[
-                  { text: segmentByid.lead ?? "" },
-                  { text: segmentByid.accent ?? "", className: "text-accent-dark" },
-                  { text: segmentByid.tail ?? "" },
-                ]}
-              />
+            <RevealText
+              as="h1"
+              className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
+              fieldAnchor="hero.heading_segments"
+              segments={[
+                { text: segmentByid.lead ?? "" },
+                { text: segmentByid.accent ?? "", className: "text-accent-dark" },
+                { text: segmentByid.tail ?? "" },
+              ]}
+            />
 
-              <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
-            </div>
-
-            <div className="relative hidden lg:block">
-              <Collage image={content.collage_image} alt={content.collage_alt} fieldAnchor="hero.collage_image" />
-            </div>
+            <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
           </div>
 
           <div className="relative z-10 mt-6 lg:mt-10">
@@ -283,7 +305,7 @@ export function Hero({
               <div className="flex flex-col divide-y divide-line sm:flex-row sm:divide-x sm:divide-y-0">
                 <CategoryField value={category} onChange={setCategory} categories={categories} />
                 <CityField value={city} onChange={setCity} />
-                <DateField />
+                <DateField onChange={setDate} />
                 <div className="p-2 sm:flex sm:items-center">
                   <button
                     type="submit"
@@ -315,6 +337,40 @@ export function Hero({
                   </button>
                 );
               })}
+            </div>
+
+            <div className="mt-4">
+              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-soft">Alkalom</p>
+              <div className="flex flex-wrap gap-2">
+                {PROVIDER_TAGS.map((tag) => {
+                  const active = tags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      aria-pressed={active}
+                      className={clsx(
+                        "rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-200",
+                        active
+                          ? "border-accent-dark bg-accent-dark text-paper"
+                          : "border-line bg-paper-alt text-ink-soft hover:bg-panel"
+                      )}
+                    >
+                      {TAG_LABELS[tag]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-6 border-t border-line pt-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                Vagy válassz megyét a térképen
+              </p>
+              <div className="mt-3">
+                <HungaryMap bare onSelectCity={(name) => setCity(name)} />
+              </div>
             </div>
           </div>
 

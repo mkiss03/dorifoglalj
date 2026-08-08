@@ -13,7 +13,20 @@ function regionKindLabel(id: string) {
   return id === "HU-BU" ? "Főváros" : "Megye";
 }
 
-export function HungaryMap() {
+export function HungaryMap({
+  onSelectCity,
+  bare = false,
+}: {
+  /** Ha meg van adva, a tooltip város-sorai navigálás helyett ezt hívják
+   * (a Hero beágyazott térképe így csak kitölti a Település mezőt, nem
+   * ugrik el azonnal) — enélkül (BrowseByCity) a jelenlegi Link-es,
+   * azonnal navigáló viselkedés marad. */
+  onSelectCity?: (city: string) => void;
+  /** Ha igaz, a saját fehér kártya-keret (shadow-sheet/bg-white/padding/
+   * scroll-reveal animáció) elmarad — a Hero saját kártyájába ágyazva
+   * használjuk, nem akarunk kártyát a kártyában. */
+  bare?: boolean;
+} = {}) {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [pinnedId, setPinnedId] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -54,11 +67,11 @@ export function HungaryMap() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="shadow-sheet rounded-3xl bg-white p-4 sm:p-6"
+      initial={bare ? false : { opacity: 0, y: 16 }}
+      whileInView={bare ? undefined : { opacity: 1, y: 0 }}
+      viewport={bare ? undefined : { once: true, margin: "-60px" }}
+      transition={bare ? undefined : { duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className={clsx(!bare && "shadow-sheet rounded-3xl bg-white p-4 sm:p-6")}
     >
       <div className="overflow-x-auto">
         <div ref={wrapperRef} className="relative mx-auto w-full min-w-[420px] max-w-2xl">
@@ -142,17 +155,36 @@ export function HungaryMap() {
                   {displayed.id !== "HU-BU" && <> · {displayed.title}</>}
                 </p>
                 <ul className="mt-1">
-                  {displayed.cities.map((city) => (
-                    <li key={city.name}>
-                      <Link
-                        href={`/kereses?city=${encodeURIComponent(city.name)}`}
-                        className="pointer-events-auto flex items-center gap-1.5 rounded-lg px-1.5 py-1 text-sm font-semibold text-ink transition-colors hover:bg-accent-light hover:text-accent-dark"
-                      >
+                  {displayed.cities.map((city) => {
+                    const linkClassName =
+                      "pointer-events-auto flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-sm font-semibold text-ink transition-colors hover:bg-accent-light hover:text-accent-dark";
+                    const inner = (
+                      <>
                         <MapPin className="h-3.5 w-3.5 shrink-0 text-accent-dark" strokeWidth={2} />
                         {city.name}
-                      </Link>
-                    </li>
-                  ))}
+                      </>
+                    );
+                    return (
+                      <li key={city.name}>
+                        {onSelectCity ? (
+                          <button
+                            type="button"
+                            className={linkClassName}
+                            onClick={() => {
+                              onSelectCity(city.name);
+                              setPinnedId(null);
+                            }}
+                          >
+                            {inner}
+                          </button>
+                        ) : (
+                          <Link href={`/kereses?city=${encodeURIComponent(city.name)}`} className={linkClassName}>
+                            {inner}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </motion.div>
             )}

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
 import { Container } from "./ui/Container";
-import { HungaryMap } from "./HungaryMap";
 import { featuredCities, cities } from "@/lib/cities";
 import type { SiteContent } from "@/lib/content/types";
 
@@ -28,10 +27,6 @@ export function BrowseByCity({ content }: { content: SiteContent["browsebycity"]
               </Link>
             ))}
           </div>
-        </div>
-
-        <div className="mt-8">
-          <HungaryMap />
         </div>
 
         <details className="group mt-8">

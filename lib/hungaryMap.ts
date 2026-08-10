@@ -139,7 +139,7 @@ export const HUNGARY_REGIONS: MapRegion[] = [
     anchorX: 308.04,
     anchorY: 81.37,
     cities: [
-      { name: "Salgótarján", markerX: 300.00, markerY: 58.00, enclaveD: null, isApprox: true },
+      { name: "Salgótarján", markerX: 315.00, markerY: 59.00, enclaveD: null, isApprox: true },
     ],
   },
   {

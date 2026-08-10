@@ -145,11 +145,20 @@ export function HungaryMap({
                   {region.cities.map((city) => {
                     const isCityActive = isDisplayed || city.name === selectedCity;
                     return city.enclaveD ? (
+                      // Az enclave-alakzat egy tényleges lyuk a megye path-jában
+                      // (ellentétes körüljárású subpath, nonzero fill-rule) — enélkül
+                      // a kézmutató itt a semmit találná el, kiesne a hoverből, és a
+                      // megye kiemelése villogna (ez okozta a "kiugró térkép" hibát).
                       <path
                         key={city.name}
                         d={city.enclaveD}
-                        pointerEvents="none"
-                        className={clsx("transition-colors duration-200", isCityActive ? "fill-accent-dark" : "fill-ink/25")}
+                        onMouseEnter={() => setHoverId(region.id)}
+                        onMouseLeave={() => setHoverId(null)}
+                        onClick={() => handleRegionClick(region)}
+                        className={clsx(
+                          "cursor-pointer transition-colors duration-200",
+                          isCityActive ? "fill-accent-dark" : "fill-ink/25"
+                        )}
                       />
                     ) : (
                       <circle
@@ -177,9 +186,15 @@ export function HungaryMap({
                 style={{
                   left: `${anchorXPct}%`,
                   top: `${anchorYPct}%`,
-                  transform: `translate(${alignX === "left" ? "0%" : alignX === "right" ? "-100%" : "-50%"}, ${
-                    alignY === "above" ? "calc(-100% - 10px)" : "10px"
-                  })`,
+                  // Az x/y-t (nem sima transform stringet) a motion maga
+                  // komponálja össze a scale-lel — egy kézzel írt
+                  // style.transform-ot felülírna minden animációs frame-en,
+                  // emiatt az above/below igazítás soha nem érvényesült
+                  // ténylegesen, és a tooltip mindig jobbra-lefelé lógott ki
+                  // a horgonypontból (ez okozta, hogy alsó megyéknél, pl.
+                  // Baranyánál, a tooltip kilógott a térkép-kártya aljából).
+                  x: alignX === "left" ? "0%" : alignX === "right" ? "-100%" : "-50%",
+                  y: alignY === "above" ? "calc(-100% - 10px)" : "10px",
                 }}
                 className="shadow-card pointer-events-none absolute z-10 min-w-[9.5rem] rounded-2xl border border-line bg-white px-3 py-2.5"
               >

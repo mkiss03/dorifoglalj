@@ -11,7 +11,7 @@ import { MiniCalendar } from "./ui/MiniCalendar";
 import { HungaryMap } from "./HungaryMap";
 import { cities } from "@/lib/cities";
 import { categoryIconBySlug } from "@/lib/categories";
-import { PROVIDER_TAGS, TAG_LABELS, type ProviderTag } from "@/lib/supabase/types";
+import { PROVIDER_TAGS, TAG_LABELS, type CountyCityCount, type ProviderTag } from "@/lib/supabase/types";
 import type { SiteContent } from "@/lib/content/types";
 import type { ResolvedCategory } from "@/lib/content/resolveCategories";
 
@@ -265,9 +265,11 @@ function DateField({ onChange }: { onChange: (v: string) => void }) {
 export function Hero({
   content,
   categories,
+  countyCities,
 }: {
   content: SiteContent["hero"];
   categories: ResolvedCategory[];
+  countyCities: CountyCityCount[];
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -405,6 +407,7 @@ export function Hero({
                 heading="Vagy válassz megyét a térképen"
                 selectedCity={city}
                 onSelectCity={handleMapSelectCity}
+                countyCities={countyCities}
               />
             </div>
           </div>

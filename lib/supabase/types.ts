@@ -34,6 +34,10 @@ export type Provider = {
   business_name: string;
   category: string | null;
   city: string | null;
+  /** A megye HUNGARY_REGIONS-beli id-je (pl. "HU-BA") — a szolgáltató
+   * választja ki regisztrációkor, mert szabad szöveges város-mezőből nem
+   * lehetne megbízhatóan visszakövetkeztetni. */
+  county: string | null;
   address: string | null;
   phone: string | null;
   description: string | null;
@@ -133,6 +137,14 @@ export type SearchProvider = {
   logo_url: string | null;
   cover_url: string | null;
   tags: ProviderTag[];
+};
+
+/** A `list_active_cities_by_county` RPC visszatérési sorai — a HungaryMap
+ * dinamikus, megyénkénti város-popupjának adatforrása. */
+export type CountyCityCount = {
+  county: string;
+  city: string;
+  provider_count: number;
 };
 
 /** A `get_public_provider` RPC visszatérési alakja — csak publikus mezők. */

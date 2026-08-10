@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { updateProfileAction, type ProfileState } from "./actions";
 import { categories } from "@/lib/categories";
 import { cities } from "@/lib/cities";
+import { HUNGARY_REGIONS } from "@/lib/hungaryMap";
 import { PROVIDER_TAGS, TAG_LABELS, type Provider } from "@/lib/supabase/types";
 
 const initialState: ProfileState = { status: "idle" };
@@ -54,15 +55,35 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
           <label htmlFor="city" className={labelClass}>
             Település
           </label>
-          <select id="city" name="city" defaultValue={provider?.city ?? ""} className={inputClass}>
-            <option value="">Válassz…</option>
+          <input
+            id="city"
+            name="city"
+            type="text"
+            list="city-suggestions"
+            defaultValue={provider?.city ?? ""}
+            className={inputClass}
+            placeholder="Írd be a településed"
+          />
+          <datalist id="city-suggestions">
             {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
+              <option key={city} value={city} />
             ))}
-          </select>
+          </datalist>
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="county" className={labelClass}>
+          Megye
+        </label>
+        <select id="county" name="county" defaultValue={provider?.county ?? ""} className={inputClass}>
+          <option value="">Válassz…</option>
+          {HUNGARY_REGIONS.map((region) => (
+            <option key={region.id} value={region.id}>
+              {region.title}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

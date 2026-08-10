@@ -18,6 +18,7 @@ export function HungaryMap({
   bare = false,
   heading,
   selectedCity,
+  countyCities,
 }: {
   /** Ha meg van adva, a tooltip város-sorai navigálás helyett ezt hívják
    * (a Hero beágyazott térképe így csak kitölti a Település mezőt, nem
@@ -37,22 +38,54 @@ export function HungaryMap({
    * hoverre/pinre, hogy a térkép és a mező ténylegesen egy rendszernek
    * hasson. */
   selectedCity?: string;
+  /** Megyénkénti, aktív szolgáltatókkal rendelkező városok (a
+   * `list_active_cities_by_county` RPC-ből) — ha van rá adat, a tooltip
+   * ebből építi a város-listát a statikus, csak megyeszékhelyeket
+   * tartalmazó `region.cities` helyett. A térkép pöttyei/enclave-alakzatai
+   * ettől függetlenül csak az ismert megyeszékhelyeket rajzolják ki, mert
+   * más településhez nincs koordinátánk. */
+  countyCities?: { county: string; city: string; provider_count: number }[];
 } = {}) {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [pinnedId, setPinnedId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const displayedId = pinnedId ?? hoverId;
   const displayed = HUNGARY_REGIONS.find((r) => r.id === displayedId) ?? null;
+
+  // A "kibontva" állapotot vissza kell állítani, ha másik megyére vált a
+  // tooltip — render közben igazítjuk (React "adjusting state when a prop
+  // changes" mintája), nem effektben, hogy ne legyen extra render/villanás.
+  const [prevDisplayedId, setPrevDisplayedId] = useState(displayedId);
+  if (displayedId !== prevDisplayedId) {
+    setPrevDisplayedId(displayedId);
+    setExpanded(false);
+  }
+
+  function citiesForRegion(regionId: string): string[] {
+    const dynamic = (countyCities ?? [])
+      .filter((c) => c.county === regionId)
+      .sort((a, b) => b.provider_count - a.provider_count)
+      .map((c) => c.city);
+    if (dynamic.length > 0) return dynamic;
+    // Nincs még aktív szolgáltató ebben a megyében — a statikus
+    // megyeszékhely-listára esünk vissza, hogy a popup ne legyen üres.
+    return HUNGARY_REGIONS.find((r) => r.id === regionId)?.cities.map((c) => c.name) ?? [];
+  }
+
   const selectedRegionId = selectedCity
-    ? (HUNGARY_REGIONS.find((r) => r.cities.some((c) => c.name === selectedCity))?.id ?? null)
+    ? ((countyCities ?? []).find((c) => c.city === selectedCity)?.county ??
+      HUNGARY_REGIONS.find((r) => r.cities.some((c) => c.name === selectedCity))?.id ??
+      null)
     : null;
 
   function handleRegionClick(region: (typeof HUNGARY_REGIONS)[number]) {
     // Egyvárosos megyénél nincs valódi választás — egy kattintás elég,
     // nem kell a tooltip-en belüli város-gombra is kattintani.
-    if (onSelectCity && region.cities.length === 1) {
-      onSelectCity(region.cities[0].name);
+    const regionCities = citiesForRegion(region.id);
+    if (onSelectCity && regionCities.length === 1) {
+      onSelectCity(regionCities[0]);
       setPinnedId(null);
       return;
     }
@@ -120,7 +153,7 @@ export function HungaryMap({
                     d={region.d}
                     tabIndex={0}
                     role="button"
-                    aria-label={`${region.title}: ${region.cities.map((c) => c.name).join(", ")}`}
+                    aria-label={`${region.title}: ${citiesForRegion(region.id).join(", ")}`}
                     aria-expanded={isDisplayed}
                     aria-pressed={isSelected}
                     onMouseEnter={() => setHoverId(region.id)}
@@ -202,38 +235,66 @@ export function HungaryMap({
                   {regionKindLabel(displayed.id)}
                   {displayed.id !== "HU-BU" && <> · {displayed.title}</>}
                 </p>
-                <ul className="mt-1">
-                  {displayed.cities.map((city) => {
-                    const linkClassName =
-                      "pointer-events-auto flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-sm font-semibold text-ink transition-colors hover:bg-accent-light hover:text-accent-dark";
-                    const inner = (
-                      <>
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-accent-dark" strokeWidth={2} />
-                        {city.name}
-                      </>
-                    );
-                    return (
-                      <li key={city.name}>
-                        {onSelectCity ? (
+                {(() => {
+                  const allCityNames = citiesForRegion(displayed.id);
+                  const VISIBLE_CAP = 6;
+                  const visibleCityNames = expanded ? allCityNames : allCityNames.slice(0, VISIBLE_CAP);
+                  const hiddenCount = allCityNames.length - visibleCityNames.length;
+                  const linkClassName =
+                    "pointer-events-auto flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-sm font-semibold text-ink transition-colors hover:bg-accent-light hover:text-accent-dark";
+                  return (
+                    <ul className={clsx("mt-1", expanded && "max-h-56 overflow-y-auto")}>
+                      {visibleCityNames.map((cityName) => {
+                        const inner = (
+                          <>
+                            <MapPin className="h-3.5 w-3.5 shrink-0 text-accent-dark" strokeWidth={2} />
+                            {cityName}
+                          </>
+                        );
+                        return (
+                          <li key={cityName}>
+                            {onSelectCity ? (
+                              <button
+                                type="button"
+                                className={linkClassName}
+                                onClick={() => {
+                                  onSelectCity(cityName);
+                                  setPinnedId(null);
+                                }}
+                              >
+                                {inner}
+                              </button>
+                            ) : (
+                              <Link href={`/kereses?city=${encodeURIComponent(cityName)}`} className={linkClassName}>
+                                {inner}
+                              </Link>
+                            )}
+                          </li>
+                        );
+                      })}
+                      {hiddenCount > 0 && (
+                        <li>
                           <button
                             type="button"
-                            className={linkClassName}
+                            className="pointer-events-auto w-full rounded-lg px-1.5 py-1 text-left text-xs font-semibold text-accent-dark transition-colors hover:bg-accent-light"
                             onClick={() => {
-                              onSelectCity(city.name);
-                              setPinnedId(null);
+                              // A kibontás megnöveli a tooltip magasságát, ami
+                              // (az "above" igazításnál a saját magasságtól
+                              // függő y-eltolás miatt) elmozdítja a dobozt —
+                              // enélkül az egér a régi helyén egy másik megye
+                              // fölött maradhatna, és a tooltip átugorna oda.
+                              // A rögzítés (pin) ezt zárja ki.
+                              setPinnedId(displayed.id);
+                              setExpanded(true);
                             }}
                           >
-                            {inner}
+                            +{hiddenCount} további település
                           </button>
-                        ) : (
-                          <Link href={`/kereses?city=${encodeURIComponent(city.name)}`} className={linkClassName}>
-                            {inner}
-                          </Link>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
+                        </li>
+                      )}
+                    </ul>
+                  );
+                })()}
               </motion.div>
             )}
           </AnimatePresence>

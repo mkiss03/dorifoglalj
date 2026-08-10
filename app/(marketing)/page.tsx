@@ -10,10 +10,15 @@ import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
 import { getSiteContent } from "@/lib/content/get-site-content";
 import { resolveCategories } from "@/lib/content/resolveCategories";
+import { createClient } from "@/lib/supabase/server";
+import type { CountyCityCount } from "@/lib/supabase/types";
 
 export default async function Home() {
   const content = await getSiteContent();
   const categories = resolveCategories(content);
+
+  const supabase = await createClient();
+  const { data: countyCities } = await supabase.rpc("list_active_cities_by_county");
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -51,7 +56,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
       />
-      <Hero content={content.hero} categories={categories} />
+      <Hero content={content.hero} categories={categories} countyCities={(countyCities ?? []) as CountyCityCount[]} />
       <Categories content={content.categories} categories={categories} />
       <FeaturedProviders content={content.featuredproviders} />
       <HowItWorks content={content.howitworks} />

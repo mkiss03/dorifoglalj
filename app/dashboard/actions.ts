@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { categories } from "@/lib/categories";
-import { cities } from "@/lib/cities";
+import { HUNGARY_REGIONS } from "@/lib/hungaryMap";
 import { PROVIDER_TAGS, type CreateBookingResult, type ProviderTag } from "@/lib/supabase/types";
 import { sendCancellationEmail } from "@/lib/email/sendCancellationEmail";
 
@@ -13,7 +13,11 @@ export type ProfileState = {
 };
 
 const categorySlugs = new Set(categories.map((c) => c.slug));
-const cityNames = new Set(cities);
+const countyIds = new Set(HUNGARY_REGIONS.map((r) => r.id));
+// Nincs többé fix városlista-allowlist — bármilyen magyar település
+// megadható, csak formai szemét ellen véd (hossz, nyilvánvalóan hibás
+// karakterek). A térkép megyéhez kötéséhez emiatt kell külön a `county`.
+const CITY_PATTERN = /^[\p{L}0-9\s.'-]{2,80}$/u;
 
 function normalizeUrl(value: string): string | null {
   const trimmed = value.trim();
@@ -30,7 +34,8 @@ export async function updateProfileAction(
 
   const businessName = String(formData.get("business_name") ?? "").trim();
   const category = String(formData.get("category") ?? "");
-  const city = String(formData.get("city") ?? "");
+  const city = String(formData.get("city") ?? "").trim();
+  const county = String(formData.get("county") ?? "");
   const address = String(formData.get("address") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -45,8 +50,11 @@ export async function updateProfileAction(
   if (category && !categorySlugs.has(category)) {
     return { status: "error", message: "Érvénytelen kategória." };
   }
-  if (city && !cityNames.has(city)) {
+  if (city && !CITY_PATTERN.test(city)) {
     return { status: "error", message: "Érvénytelen település." };
+  }
+  if (city && !countyIds.has(county)) {
+    return { status: "error", message: "Válaszd ki a megyét is." };
   }
   if (tags.length === 0) {
     return { status: "error", message: "Válassz legalább egy alkalmat, amire vállalsz munkát." };
@@ -59,6 +67,7 @@ export async function updateProfileAction(
       business_name: businessName,
       category: category || null,
       city: city || null,
+      county: city ? county : null,
       address: address || null,
       phone: phone || null,
       description: description || null,

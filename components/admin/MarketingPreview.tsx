@@ -36,7 +36,7 @@ export function MarketingPreview({ content }: { content: SiteContent }) {
       </Section>
       <main>
         <Section id="hero">
-          <Hero content={content.hero} categories={resolvedCategories} />
+          <Hero content={content.hero} categories={resolvedCategories} countyCities={[]} />
         </Section>
         <Section id="categories">
           <Categories content={content.categories} categories={resolvedCategories} />

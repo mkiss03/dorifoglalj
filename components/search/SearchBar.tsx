@@ -140,17 +140,20 @@ function CityField({ value, onChange }: { value: string; onChange: (v: string) =
 }
 
 export function SearchBar({
+  initialQuery,
   initialCategory,
   initialCity,
   initialDate,
   initialTags,
 }: {
+  initialQuery: string;
   initialCategory: string;
   initialCity: string;
   initialDate: string;
   initialTags: ProviderTag[];
 }) {
   const router = useRouter();
+  const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
   const [city, setCity] = useState(initialCity);
   const [date, setDate] = useState(initialDate);
@@ -163,6 +166,7 @@ export function SearchBar({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
     if (category) params.set("category", category);
     if (city.trim()) params.set("city", city.trim());
     if (date) params.set("date", date);
@@ -172,6 +176,16 @@ export function SearchBar({
 
   return (
     <form onSubmit={handleSubmit} className="shadow-sheet rounded-3xl bg-white p-5 lg:p-6">
+      <div className="mb-4 flex items-center gap-3 rounded-2xl bg-paper-alt px-5 py-3">
+        <Search className="h-5 w-5 shrink-0 text-ink-soft" strokeWidth={2} />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Mit keresel? pl. mandula köröm, balayage, gél lakk…"
+          className="w-full bg-transparent text-base font-medium text-ink outline-none placeholder:text-ink-soft/50"
+        />
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <CategoryField value={category} onChange={setCategory} />
         <CityField value={city} onChange={setCity} />

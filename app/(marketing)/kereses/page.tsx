@@ -11,6 +11,7 @@ type SearchParams = {
   city?: string;
   date?: string;
   tags?: string | string[];
+  q?: string;
 };
 
 function normalizeTags(raw: string | string[] | undefined): ProviderTag[] {
@@ -91,6 +92,7 @@ export default async function KeresesPage({
   const category = sp.category?.trim() || "";
   const city = sp.city?.trim() || "";
   const date = sp.date?.trim() || "";
+  const query = sp.q?.trim() || "";
   const selectedTags = normalizeTags(sp.tags);
 
   const supabase = await createClient();
@@ -99,6 +101,7 @@ export default async function KeresesPage({
     p_city: city || null,
     p_date: date || null,
     p_tags: selectedTags.length > 0 ? selectedTags : null,
+    p_query: query || null,
   });
 
   const results = (data ?? []) as SearchProvider[];
@@ -111,11 +114,17 @@ export default async function KeresesPage({
           Találd meg a tökéletes szolgáltatót
         </h1>
         <p className="mt-2 max-w-xl text-[15px] text-ink-soft">
-          Szűrj kategória, település, dátum vagy alkalom szerint — regisztráció nélkül, azonnal foglalhatsz.
+          Keress kulcsszóra (pl. mandula köröm), vagy szűrj kategória, település, dátum és alkalom szerint.
         </p>
 
         <div className="mt-8">
-          <SearchBar initialCategory={category} initialCity={city} initialDate={date} initialTags={selectedTags} />
+          <SearchBar
+            initialQuery={query}
+            initialCategory={category}
+            initialCity={city}
+            initialDate={date}
+            initialTags={selectedTags}
+          />
         </div>
 
         <div className="mt-10">

@@ -17,6 +17,7 @@ export function HungaryMap({
   onSelectCity,
   bare = false,
   heading,
+  selectedCity,
 }: {
   /** Ha meg van adva, a tooltip város-sorai navigálás helyett ezt hívják
    * (a Hero beágyazott térképe így csak kitölti a Település mezőt, nem
@@ -31,6 +32,11 @@ export function HungaryMap({
   /** Opcionális cím a térkép fölött, a saját kártyáján belül — így cím+
    * térkép egy vizuális egységként jelenik meg. */
   heading?: string;
+  /** A jelenleg kiválasztott város (pl. egy külső Település mező
+   * állapota) — a hozzá tartozó megye TARTÓSAN kiemelve marad, nem csak
+   * hoverre/pinre, hogy a térkép és a mező ténylegesen egy rendszernek
+   * hasson. */
+  selectedCity?: string;
 } = {}) {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [pinnedId, setPinnedId] = useState<string | null>(null);
@@ -38,6 +44,20 @@ export function HungaryMap({
 
   const displayedId = pinnedId ?? hoverId;
   const displayed = HUNGARY_REGIONS.find((r) => r.id === displayedId) ?? null;
+  const selectedRegionId = selectedCity
+    ? (HUNGARY_REGIONS.find((r) => r.cities.some((c) => c.name === selectedCity))?.id ?? null)
+    : null;
+
+  function handleRegionClick(region: (typeof HUNGARY_REGIONS)[number]) {
+    // Egyvárosos megyénél nincs valódi választás — egy kattintás elég,
+    // nem kell a tooltip-en belüli város-gombra is kattintani.
+    if (onSelectCity && region.cities.length === 1) {
+      onSelectCity(region.cities[0].name);
+      setPinnedId(null);
+      return;
+    }
+    togglePin(region.id);
+  }
 
   // Kattintás a térképen kívülre / Escape zárja a rögzített tooltipet —
   // ez teszi lehetővé, hogy érintőképernyőn is használható legyen (nincs
@@ -92,6 +112,8 @@ export function HungaryMap({
           >
             {HUNGARY_REGIONS.map((region) => {
               const isDisplayed = region.id === displayedId;
+              const isSelected = region.id === selectedRegionId;
+              const isActive = isDisplayed || isSelected;
               return (
                 <g key={region.id}>
                   <path
@@ -100,32 +122,34 @@ export function HungaryMap({
                     role="button"
                     aria-label={`${region.title}: ${region.cities.map((c) => c.name).join(", ")}`}
                     aria-expanded={isDisplayed}
+                    aria-pressed={isSelected}
                     onMouseEnter={() => setHoverId(region.id)}
                     onMouseLeave={() => setHoverId(null)}
                     onFocus={() => setHoverId(region.id)}
                     onBlur={() => setHoverId(null)}
-                    onClick={() => togglePin(region.id)}
+                    onClick={() => handleRegionClick(region)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        togglePin(region.id);
+                        handleRegionClick(region);
                       }
                     }}
                     stroke={bare ? "var(--paper-alt)" : "#fff"}
-                    strokeWidth={isDisplayed ? 2 : 1.4}
+                    strokeWidth={isActive ? 2 : 1.4}
                     strokeLinejoin="round"
                     className={clsx(
                       "cursor-pointer outline-none transition-[fill,stroke-width] duration-200",
-                      isDisplayed ? "fill-accent-light" : bare ? "fill-white hover:fill-accent-light" : "fill-paper-alt hover:fill-accent-light"
+                      isActive ? "fill-accent-light" : bare ? "fill-white hover:fill-accent-light" : "fill-paper-alt hover:fill-accent-light"
                     )}
                   />
-                  {region.cities.map((city) =>
-                    city.enclaveD ? (
+                  {region.cities.map((city) => {
+                    const isCityActive = isDisplayed || city.name === selectedCity;
+                    return city.enclaveD ? (
                       <path
                         key={city.name}
                         d={city.enclaveD}
                         pointerEvents="none"
-                        className={clsx("transition-colors duration-200", isDisplayed ? "fill-accent-dark" : "fill-ink/25")}
+                        className={clsx("transition-colors duration-200", isCityActive ? "fill-accent-dark" : "fill-ink/25")}
                       />
                     ) : (
                       <circle
@@ -134,10 +158,10 @@ export function HungaryMap({
                         cy={city.markerY}
                         r={3}
                         pointerEvents="none"
-                        className={clsx("transition-colors duration-200", isDisplayed ? "fill-accent-dark" : "fill-ink/25")}
+                        className={clsx("transition-colors duration-200", isCityActive ? "fill-accent-dark" : "fill-ink/25")}
                       />
-                    )
-                  )}
+                    );
+                  })}
                 </g>
               );
             })}

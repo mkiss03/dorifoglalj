@@ -98,7 +98,18 @@ function CategoryField({
   );
 }
 
-function CityField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function CityField({
+  value,
+  onChange,
+  highlighted,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  /** Rövid ideig igaz, miután a térképről (nem gépeléssel) érkezett a
+   * változás — így akkor is nyilvánvaló a térkép↔mező szinkron, ha a
+   * mező épp nem esik a látótérbe (mobilon a térkép lejjebb van). */
+  highlighted?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useClickOutside(() => setOpen(false));
 
@@ -113,7 +124,12 @@ function CityField({ value, onChange }: { value: string; onChange: (v: string) =
 
   return (
     <div ref={ref} className="relative flex-1">
-      <div className="px-5 py-3">
+      <div
+        className={clsx(
+          "rounded-xl px-5 py-3 transition-shadow duration-300",
+          highlighted && "ring-2 ring-accent-dark ring-inset"
+        )}
+      >
         <label className="block text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
           Település
         </label>
@@ -254,8 +270,10 @@ export function Hero({
   categories: ResolvedCategory[];
 }) {
   const router = useRouter();
+  const [query, setQuery] = useState("");
   const [category, setCategory] = useState(categories[1]?.name ?? categories[0]?.name ?? "");
   const [city, setCity] = useState("");
+  const [cityJustPicked, setCityJustPicked] = useState(false);
   const [date, setDate] = useState(() => toDateParam(new Date()));
   const [tags, setTags] = useState<ProviderTag[]>([]);
 
@@ -263,9 +281,18 @@ export function Hero({
     setTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   }
 
+  // A térképről (nem gépeléssel) érkező városválasztás — ez tölti a mezőt
+  // ÉS villantja meg röviden, hogy a szinkron nyilvánvaló legyen.
+  function handleMapSelectCity(name: string) {
+    setCity(name);
+    setCityJustPicked(true);
+    window.setTimeout(() => setCityJustPicked(false), 1200);
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
     const categorySlug = categories.find((c) => c.name === category)?.slug;
     if (categorySlug) params.set("category", categorySlug);
     if (city.trim()) params.set("city", city.trim());
@@ -302,9 +329,19 @@ export function Hero({
 
           <div className="relative z-10 mt-6 lg:mt-10">
             <form onSubmit={handleSubmit} className="shadow-card rounded-2xl bg-white">
+              <div className="flex items-center gap-3 border-b border-line px-5 py-4">
+                <Search className="h-5 w-5 shrink-0 text-ink-soft" strokeWidth={2} />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Mit keresel? pl. mandula köröm, balayage, gél lakk…"
+                  className="w-full bg-transparent text-base font-medium text-ink outline-none placeholder:text-ink-soft/50"
+                />
+              </div>
+
               <div className="flex flex-col divide-y divide-line sm:flex-row sm:divide-x sm:divide-y-0">
                 <CategoryField value={category} onChange={setCategory} categories={categories} />
-                <CityField value={city} onChange={setCity} />
+                <CityField value={city} onChange={setCity} highlighted={cityJustPicked} />
                 <DateField onChange={setDate} />
                 <div className="p-2 sm:flex sm:items-center">
                   <button
@@ -363,7 +400,12 @@ export function Hero({
             </div>
 
             <div className="mt-4">
-              <HungaryMap bare heading="Vagy válassz megyét a térképen" onSelectCity={(name) => setCity(name)} />
+              <HungaryMap
+                bare
+                heading="Vagy válassz megyét a térképen"
+                selectedCity={city}
+                onSelectCity={handleMapSelectCity}
+              />
             </div>
           </div>
 

@@ -79,11 +79,8 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { id: "sync", value: "1 naptár", label: "web és Facebook szinkronban" },
     ],
   },
-  // A Hero mostantól a térképet mutatja a kép helyén (lásd components/Hero.tsx) —
-  // ez a két mező emiatt jelenleg sehol nem jelenik meg, de a séma-stabilitás
-  // (és egy esetleges jövőbeli visszaállítás) miatt megmaradt.
-  { key: "hero.collage_image", section: "hero", label: "Kép a főcím mellett (jelenleg nem használt)", kind: "image", default: "/images/hair-styling.jpg" },
-  { key: "hero.collage_alt", section: "hero", label: "Kép leírása (alt szöveg, jelenleg nem használt)", kind: "text", default: "Fodrász munka közben, meleg fényben" },
+  { key: "hero.collage_image", section: "hero", label: "Kép a főcím mellett", kind: "image", default: "/images/hair-styling.jpg" },
+  { key: "hero.collage_alt", section: "hero", label: "Kép leírása (alt szöveg)", kind: "text", default: "Fodrász munka közben, meleg fényben" },
 
   // ------------------------------------------------------------ categories
   { key: "categories.eyebrow", section: "categories", label: "Felirat a cím felett", kind: "text", default: "Kategóriák" },

@@ -1,17 +1,26 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronDown, MapPin, Search, LayoutGrid, Wallet, Clock3, RefreshCcw, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { ChevronDown, MapPin, Search, X, LayoutGrid, Wallet, Clock3, RefreshCcw, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { clsx } from "clsx";
 import { Container } from "./ui/Container";
 import { RevealText } from "./ui/RevealText";
 import { MiniCalendar } from "./ui/MiniCalendar";
+import { Collage } from "./ui/Collage";
 import { HungaryMap } from "./HungaryMap";
+import { ProviderCard } from "./search/ProviderCard";
 import { cities } from "@/lib/cities";
 import { categoryIconBySlug } from "@/lib/categories";
-import { PROVIDER_TAGS, TAG_LABELS, type CountyCityCount, type ProviderTag } from "@/lib/supabase/types";
+import { createClient } from "@/lib/supabase/client";
+import {
+  PROVIDER_TAGS,
+  TAG_LABELS,
+  type CountyCityCount,
+  type ProviderTag,
+  type SearchProvider,
+} from "@/lib/supabase/types";
 import type { SiteContent } from "@/lib/content/types";
 import type { ResolvedCategory } from "@/lib/content/resolveCategories";
 
@@ -262,6 +271,77 @@ function DateField({ onChange }: { onChange: (v: string) => void }) {
   );
 }
 
+const RESULTS_VISIBLE_CAP = 6;
+
+function ResultsPanel({
+  searching,
+  error,
+  results,
+  viewAllHref,
+  onClose,
+}: {
+  searching: boolean;
+  error: boolean;
+  results: SearchProvider[];
+  viewAllHref: string;
+  onClose: () => void;
+}) {
+  const visibleResults = results.slice(0, RESULTS_VISIBLE_CAP);
+  const hiddenCount = results.length - visibleResults.length;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.15 }}
+      className="shadow-card absolute left-0 right-0 top-full z-20 mt-3 max-h-[70vh] overflow-y-auto rounded-2xl border border-line bg-white p-5"
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-sm font-semibold text-ink">
+          {searching ? "Keresés…" : error ? "Hiba történt" : `${results.length} találat`}
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Találatok bezárása"
+          className="rounded-full p-1.5 text-ink-soft transition-colors hover:bg-paper-alt hover:text-ink"
+        >
+          <X className="h-4 w-4" strokeWidth={2} />
+        </button>
+      </div>
+
+      {searching ? (
+        <p className="py-6 text-center text-sm text-ink-soft">Keresés folyamatban…</p>
+      ) : error ? (
+        <p className="py-6 text-center text-sm text-ink-soft">
+          Hiba történt a keresés során — próbáld újra.
+        </p>
+      ) : results.length === 0 ? (
+        <p className="py-6 text-center text-sm text-ink-soft">
+          Nincs találat a megadott feltételekkel — próbálj tágabb keresést.
+        </p>
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleResults.map((p) => (
+              <ProviderCard key={p.id} provider={p} />
+            ))}
+          </div>
+          {hiddenCount > 0 && (
+            <Link
+              href={viewAllHref}
+              className="mt-4 flex items-center justify-center gap-1.5 rounded-xl bg-paper-alt py-3 text-sm font-semibold text-accent-dark transition-colors hover:bg-panel"
+            >
+              Mind a {results.length} találat megtekintése →
+            </Link>
+          )}
+        </>
+      )}
+    </motion.div>
+  );
+}
+
 export function Hero({
   content,
   categories,
@@ -271,13 +351,29 @@ export function Hero({
   categories: ResolvedCategory[];
   countyCities: CountyCityCount[];
 }) {
-  const router = useRouter();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(categories[1]?.name ?? categories[0]?.name ?? "");
   const [city, setCity] = useState("");
   const [cityJustPicked, setCityJustPicked] = useState(false);
   const [date, setDate] = useState(() => toDateParam(new Date()));
   const [tags, setTags] = useState<ProviderTag[]>([]);
+
+  const [results, setResults] = useState<SearchProvider[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState(false);
+  const [resultsOpen, setResultsOpen] = useState(false);
+  const searchAreaRef = useClickOutside(() => setResultsOpen(false));
+
+  // Escape zárja a találati panelt — ugyanaz a minta, mint a HungaryMap
+  // rögzített tooltipjénél.
+  useEffect(() => {
+    if (!resultsOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setResultsOpen(false);
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [resultsOpen]);
 
   function toggleTag(tag: ProviderTag) {
     setTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -291,8 +387,9 @@ export function Hero({
     window.setTimeout(() => setCityJustPicked(false), 1200);
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  // A /kereses-hez tartozó paraméterek — a "Mind a N találat" linkhez kell,
+  // a teljes, dedikált oldalra mutatva ugyanazokkal a szűrőkkel.
+  function buildSearchParams() {
     const params = new URLSearchParams();
     if (query.trim()) params.set("q", query.trim());
     const categorySlug = categories.find((c) => c.name === category)?.slug;
@@ -300,10 +397,38 @@ export function Hero({
     if (city.trim()) params.set("city", city.trim());
     if (date) params.set("date", date);
     for (const tag of tags) params.append("tags", tag);
-    router.push(`/kereses${params.toString() ? `?${params.toString()}` : ""}`);
+    return params;
+  }
+
+  // Nem navigálunk el a /kereses oldalra — a találatok itt, a főoldalon,
+  // egy lebegő panelben jelennek meg (kliens-oldali RPC-hívással), hogy a
+  // lejjebb lévő szekciók ne csússzanak el. A /kereses oldal a "Mind a N
+  // találat" linken keresztül továbbra is elérhető, megosztható marad.
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setResultsOpen(true);
+    setSearching(true);
+    setSearchError(false);
+    const categorySlug = categories.find((c) => c.name === category)?.slug ?? null;
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("search_providers", {
+      p_category: categorySlug,
+      p_city: city.trim() || null,
+      p_date: date || null,
+      p_tags: tags.length > 0 ? tags : null,
+      p_query: query.trim() || null,
+    });
+    setSearching(false);
+    if (error) {
+      setSearchError(true);
+      return;
+    }
+    setResults((data ?? []) as SearchProvider[]);
   }
 
   const segmentByid = Object.fromEntries(content.heading_segments.map((s) => [s.id, s.text]));
+  const searchParamsString = buildSearchParams().toString();
+  const viewAllHref = `/kereses${searchParamsString ? `?${searchParamsString}` : ""}`;
 
   return (
     <section
@@ -312,50 +437,70 @@ export function Hero({
     >
       <Container>
         <div className="shadow-sheet relative rounded-3xl bg-white p-5 lg:p-12">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
 
-            <RevealText
-              as="h1"
-              className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
-              fieldAnchor="hero.heading_segments"
-              segments={[
-                { text: segmentByid.lead ?? "" },
-                { text: segmentByid.accent ?? "", className: "text-accent-dark" },
-                { text: segmentByid.tail ?? "" },
-              ]}
-            />
+              <RevealText
+                as="h1"
+                className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
+                fieldAnchor="hero.heading_segments"
+                segments={[
+                  { text: segmentByid.lead ?? "" },
+                  { text: segmentByid.accent ?? "", className: "text-accent-dark" },
+                  { text: segmentByid.tail ?? "" },
+                ]}
+              />
 
-            <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
+              <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
+            </div>
+
+            <div className="relative hidden lg:block">
+              <Collage image={content.collage_image} alt={content.collage_alt} fieldAnchor="hero.collage_image" />
+            </div>
           </div>
 
           <div className="relative z-10 mt-6 lg:mt-10">
-            <form onSubmit={handleSubmit} className="shadow-card rounded-2xl bg-white">
-              <div className="flex items-center gap-3 border-b border-line px-5 py-4">
-                <Search className="h-5 w-5 shrink-0 text-ink-soft" strokeWidth={2} />
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Mit keresel? pl. mandula köröm, balayage, gél lakk…"
-                  className="w-full bg-transparent text-base font-medium text-ink outline-none placeholder:text-ink-soft/50"
-                />
-              </div>
-
-              <div className="flex flex-col divide-y divide-line sm:flex-row sm:divide-x sm:divide-y-0">
-                <CategoryField value={category} onChange={setCategory} categories={categories} />
-                <CityField value={city} onChange={setCity} highlighted={cityJustPicked} />
-                <DateField onChange={setDate} />
-                <div className="p-2 sm:flex sm:items-center">
-                  <button
-                    type="submit"
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90 sm:w-auto"
-                  >
-                    <Search className="h-4 w-4" strokeWidth={2} />
-                    {content.search_button_label}
-                  </button>
+            <div ref={searchAreaRef} className="relative">
+              <form onSubmit={handleSubmit} className="shadow-card rounded-2xl bg-white">
+                <div className="flex items-center gap-3 border-b border-line px-5 py-4">
+                  <Search className="h-5 w-5 shrink-0 text-ink-soft" strokeWidth={2} />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Mit keresel? pl. mandula köröm, balayage, gél lakk…"
+                    className="w-full bg-transparent text-base font-medium text-ink outline-none placeholder:text-ink-soft/50"
+                  />
                 </div>
-              </div>
-            </form>
+
+                <div className="flex flex-col divide-y divide-line sm:flex-row sm:divide-x sm:divide-y-0">
+                  <CategoryField value={category} onChange={setCategory} categories={categories} />
+                  <CityField value={city} onChange={setCity} highlighted={cityJustPicked} />
+                  <DateField onChange={setDate} />
+                  <div className="p-2 sm:flex sm:items-center">
+                    <button
+                      type="submit"
+                      className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90 sm:w-auto"
+                    >
+                      <Search className="h-4 w-4" strokeWidth={2} />
+                      {content.search_button_label}
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <AnimatePresence>
+                {resultsOpen && (
+                  <ResultsPanel
+                    searching={searching}
+                    error={searchError}
+                    results={results}
+                    viewAllHref={viewAllHref}
+                    onClose={() => setResultsOpen(false)}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
 
             <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mt-4">
               {categories.map((c) => {

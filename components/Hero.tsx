@@ -315,11 +315,11 @@ function ResultsPanel({
         <p className="py-6 text-center text-sm text-ink-soft">Keresés folyamatban…</p>
       ) : error ? (
         <p className="py-6 text-center text-sm text-ink-soft">
-          Hiba történt a keresés során — próbáld újra.
+          Hiba történt a keresés során, próbáld újra.
         </p>
       ) : results.length === 0 ? (
         <p className="py-6 text-center text-sm text-ink-soft">
-          Nincs találat a megadott feltételekkel — próbálj tágabb keresést.
+          Nincs találat a megadott feltételekkel, próbálj tágabb keresést.
         </p>
       ) : (
         <>

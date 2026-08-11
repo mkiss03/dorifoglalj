@@ -42,7 +42,7 @@ export function MarketingPreview({ content }: { content: SiteContent }) {
           <Categories content={content.categories} categories={resolvedCategories} />
         </Section>
         <Section id="featuredproviders">
-          <FeaturedProviders content={content.featuredproviders} />
+          <FeaturedProviders content={content.featuredproviders} providers={[]} />
         </Section>
         <Section id="howitworks">
           <HowItWorks content={content.howitworks} />

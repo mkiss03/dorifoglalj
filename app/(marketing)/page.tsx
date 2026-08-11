@@ -10,9 +10,14 @@ import { Faq } from "@/components/Faq";
 import { getSiteContent } from "@/lib/content/get-site-content";
 import { resolveCategories } from "@/lib/content/resolveCategories";
 import { getCountyCities } from "@/lib/supabase/countyCities";
+import { getFeaturedProviders } from "@/lib/supabase/featuredProviders";
 
 export default async function Home() {
-  const [content, countyCities] = await Promise.all([getSiteContent(), getCountyCities()]);
+  const [content, countyCities, featuredProviders] = await Promise.all([
+    getSiteContent(),
+    getCountyCities(),
+    getFeaturedProviders(),
+  ]);
   const categories = resolveCategories(content);
 
   const faqJsonLd = {
@@ -53,7 +58,9 @@ export default async function Home() {
       />
       <Hero content={content.hero} categories={categories} countyCities={countyCities} />
       <Categories content={content.categories} categories={categories} />
-      <FeaturedProviders content={content.featuredproviders} />
+      {featuredProviders.length > 0 && (
+        <FeaturedProviders content={content.featuredproviders} providers={featuredProviders} />
+      )}
       <HowItWorks content={content.howitworks} />
       <Comparison content={content.comparison} />
       <WhyUs content={content.whyus} />

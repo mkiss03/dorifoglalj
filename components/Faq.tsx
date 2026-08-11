@@ -5,11 +5,12 @@ import { Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { clsx } from "clsx";
 import { Container } from "./ui/Container";
-import { SUPPORT_EMAIL } from "@/lib/contact";
+import { ContactModal } from "./ContactModal";
 import type { SiteContent } from "@/lib/content/types";
 
 export function Faq({ content }: { content: SiteContent["faq"] }) {
   const [open, setOpen] = useState<string | null>(content.items[0]?.id ?? null);
+  const [contactOpen, setContactOpen] = useState(false);
 
   return (
     <section id="gyik" className="scroll-mt-16 bg-paper-alt py-14 lg:scroll-mt-20 lg:py-20">
@@ -18,12 +19,13 @@ export function Faq({ content }: { content: SiteContent["faq"] }) {
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
           <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
           <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-soft">{content.intro}</p>
-          <a
-            href={`mailto:${SUPPORT_EMAIL}`}
+          <button
+            type="button"
+            onClick={() => setContactOpen(true)}
             className="mt-6 inline-flex items-center rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors duration-200 hover:bg-ink/90"
           >
             {content.contact_button_label}
-          </a>
+          </button>
         </div>
 
         <div className="shadow-sheet divide-y divide-line/70 rounded-3xl bg-white px-5 sm:px-8">
@@ -73,6 +75,7 @@ export function Faq({ content }: { content: SiteContent["faq"] }) {
           })}
         </div>
       </Container>
+      {contactOpen && <ContactModal onClose={() => setContactOpen(false)} />}
     </section>
   );
 }

@@ -69,7 +69,7 @@ export default async function KeresesPage({
         <div className="mt-10">
           {results.length === 0 ? (
             <p className="shadow-card rounded-2xl bg-white p-10 text-center text-[15px] text-ink-soft">
-              Nincs találat a megadott feltételekkel — próbálj tágabb keresést.
+              Nincs találat a megadott feltételekkel, próbálj tágabb keresést.
             </p>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

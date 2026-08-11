@@ -135,17 +135,6 @@ export type SiteContent = {
   featuredproviders: {
     eyebrow: string;
     heading: string;
-    disclaimer: string;
-    cards: {
-      id: string;
-      name: string;
-      category: string;
-      area: string;
-      rating: string;
-      tags: string[];
-      slots: string[];
-      image: string;
-    }[];
   };
   footer: {
     tagline: string;

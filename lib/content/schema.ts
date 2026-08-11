@@ -1,6 +1,5 @@
 import { categories } from "@/lib/categories";
 import { faqItems } from "@/lib/faq";
-import { SUPPORT_EMAIL } from "@/lib/contact";
 import type { ContentEntry } from "./types";
 
 const CATEGORY_PHOTOS: Record<string, string> = {
@@ -29,7 +28,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     default: [
       { id: "nl-1", label: "Szolgáltatók keresése", href: "/kereses" },
       { id: "nl-2", label: "Szolgáltatóknak", href: "#szolgaltatoknak" },
-      { id: "nl-5", label: "Kapcsolat", href: `mailto:${SUPPORT_EMAIL}` },
+      { id: "nl-5", label: "Kapcsolat", href: "#gyik" },
     ],
   },
   { key: "header.categories_menu_label", section: "header", label: "„Kategóriák” menügomb", kind: "text", default: "Kategóriák" },
@@ -47,7 +46,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     itemLabel: "Szövegrész",
     fields: [{ key: "text", label: "Szöveg", kind: "text" }],
     default: [
-      { id: "lead", text: "Fodrász, körmös, kozmetikus — időpont " },
+      { id: "lead", text: "Fodrász, körmös, kozmetikus: időpont " },
       { id: "accent", text: "30 másodperc alatt," },
       { id: "tail", text: " telefon nélkül." },
     ],
@@ -58,7 +57,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Bevezető szöveg",
     kind: "textarea",
     default:
-      "Az IttFoglalj.hu összeköti a vendégeket és a szépségipari szolgáltatókat — böngéssz kategória vagy település szerint, nézd meg a valós szabad időpontokat, és foglalj regisztráció nélkül.",
+      "Az IttFoglalj.hu összeköti a vendégeket a szépségipari szolgáltatókkal. Böngéssz kategória vagy település szerint, nézd meg a valós szabad időpontokat, és regisztráció nélkül foglalj.",
   },
   { key: "hero.search_button_label", section: "hero", label: "Keresés gomb szövege", kind: "text", default: "Keresés" },
   {
@@ -90,7 +89,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     section: "categories",
     label: "Bevezető szöveg",
     kind: "textarea",
-    default: "Szépségipari szolgáltatók egy helyen — a szolgáltató oldalán pontosan látod, mire foglalsz, és jegyzetet is fűzhetsz hozzá.",
+    default: "Szépségipari szolgáltatók egy helyen: a szolgáltató oldalán pontosan látod, mire foglalsz, és jegyzetet is fűzhetsz hozzá.",
   },
   {
     key: "categories.items",
@@ -120,7 +119,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     section: "howitworks",
     label: "Kis megjegyzés a képernyők mellett",
     kind: "text",
-    default: "Illusztráció — mintaadatokkal.",
+    default: "Illusztráció, mintaadatokkal.",
   },
   {
     key: "howitworks.steps",
@@ -136,7 +135,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     default: [
       { id: "search", title: "Keresd meg", text: "Válaszd ki a számodra megfelelő szolgáltatót kategória, település vagy szolgáltatás alapján." },
       { id: "pick", title: "Válaszd ki", text: "Nézd meg a szolgáltató szabad időpontjait, szolgáltatásait és referenciáit." },
-      { id: "book", title: "Foglalj", text: "Foglalj időpontot néhány kattintással — gyorsan, egyszerűen, telefonálás nélkül." },
+      { id: "book", title: "Foglalj", text: "Foglalj időpontot néhány kattintással, telefonálás nélkül." },
     ],
   },
   {
@@ -207,7 +206,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { key: "visual", label: "Kiemelt szöveg", kind: "text" },
     ],
     default: [
-      { id: "calendar", label: "Valós szabad időpontok", text: "Amit látsz, azt foglalhatod — nincs elavult naptár.", visual: "09:00 · 11:00 · 13:30" },
+      { id: "calendar", label: "Valós szabad időpontok", text: "Amit látsz, azt foglalhatod, mert nincs elavult naptár a háttérben.", visual: "09:00 · 11:00 · 13:30" },
       { id: "click", label: "Egyszerű online foglalás", text: "Néhány kattintás, és kész is a helyed.", visual: "1 → 2 → 3 kattintás" },
       { id: "shield", label: "Megbízható szolgáltatók", text: "Valódi adatlapok, referenciákkal, árakkal.", visual: "Ellenőrzött adatlap" },
       { id: "timer", label: "Gyors, kényelmes", text: "Foglalás percek alatt, telefonálás nélkül.", visual: "Kevesebb, mint 60 mp" },
@@ -243,7 +242,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       {
         id: "p2",
         title: "Mindig naprakész naptár.",
-        text: "A szabad időpontjaid automatikusan frissülnek a nyitvatartásod és a meglévő foglalásaid alapján — dupla foglalás nincs.",
+        text: "A szabad időpontjaid automatikusan frissülnek a nyitvatartásod és a meglévő foglalásaid alapján, így dupla foglalás nem fordulhat elő.",
       },
       {
         id: "p3",
@@ -302,7 +301,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     section: "forproviders",
     label: "Kis megjegyzés a minta-naptár mellett",
     kind: "text",
-    default: "Illusztráció — mintaadatokkal.",
+    default: "Illusztráció, mintaadatokkal.",
   },
 
   // ---------------------------------------------------------------- ctabanner
@@ -316,9 +315,9 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     itemLabel: "Szövegrész",
     fields: [{ key: "text", label: "Szöveg", kind: "text" }],
     default: [
-      { id: "lead", text: "Nem csupán egy időpontfoglaló rendszer — " },
-      { id: "accent", text: "közösség" },
-      { id: "tail", text: ", ahol vendégek és szolgáltatók egymásra találnak." },
+      { id: "lead", text: "Egy hely, ahol " },
+      { id: "accent", text: "vendégek és szolgáltatók" },
+      { id: "tail", text: " egymásra találnak." },
     ],
   },
   {
@@ -326,7 +325,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     section: "ctabanner",
     label: "Bevezető szöveg",
     kind: "textarea",
-    default: "Célunk, hogy a vendégek könnyedén megtalálják a számukra legmegfelelőbb szolgáltatókat, a szolgáltatók pedig egyszerűen és hatékonyan építhessék vállalkozásukat.",
+    default: "A vendégeknek megkönnyítjük, hogy megtalálják a hozzájuk illő szolgáltatót. A szolgáltatóknak pedig egy egyszerű eszközt adunk, amivel a vállalkozásukat építhetik.",
   },
   { key: "ctabanner.cta_label", section: "ctabanner", label: "CTA gomb szövege", kind: "text", default: "Időpontot keresek" },
   { key: "ctabanner.image", section: "ctabanner", label: "Kép", kind: "image", default: "/images/salon-interior.jpg" },
@@ -352,74 +351,8 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   },
 
   // ------------------------------------------------------- featuredproviders
-  { key: "featuredproviders.eyebrow", section: "featuredproviders", label: "Felirat a cím felett", kind: "text", default: "Szolgáltatói adatlapok" },
-  { key: "featuredproviders.heading", section: "featuredproviders", label: "Címsor", kind: "text", default: "Így néz ki egy adatlap az IttFoglalj.hu-n" },
-  {
-    key: "featuredproviders.disclaimer",
-    section: "featuredproviders",
-    label: "Kis megjegyzés a kártyák mellett",
-    kind: "textarea",
-    default: "Előnézeti minta — indulás után valódi szolgáltatók adatlapjai jelennek meg itt.",
-  },
-  {
-    key: "featuredproviders.cards",
-    section: "featuredproviders",
-    label: "Minta-kártyák",
-    kind: "list",
-    mode: "free",
-    itemLabel: "Kártya",
-    fields: [
-      { key: "name", label: "Név", kind: "text" },
-      { key: "category", label: "Kategória", kind: "text" },
-      { key: "area", label: "Terület", kind: "text" },
-      { key: "rating", label: "Értékelés (1–5)", kind: "text" },
-      { key: "tags", label: "Címkék", kind: "stringlist", itemLabel: "Címke" },
-      { key: "slots", label: "Szabad időpontok", kind: "stringlist", itemLabel: "Időpont" },
-      { key: "image", label: "Kép", kind: "image" },
-    ],
-    default: [
-      {
-        id: "fp1",
-        name: "Anna Nails Studio",
-        category: "Köröm",
-        area: "Budapest, XIII. kerület",
-        rating: "5",
-        tags: ["Gél lakk", "Műköröm"],
-        slots: ["10:00", "13:30", "16:00"],
-        image: "/images/nails-closeup.jpg",
-      },
-      {
-        id: "fp2",
-        name: "Aurum Hajszalon",
-        category: "Haj",
-        area: "Budapest, VI. kerület",
-        rating: "4",
-        tags: ["Vágás", "Alkalmi frizura"],
-        slots: ["09:30", "14:00"],
-        image: "/images/hair-styling.jpg",
-      },
-      {
-        id: "fp3",
-        name: "Classic Barber Stúdió",
-        category: "Haj · Barber",
-        area: "Debrecen",
-        rating: "5",
-        tags: ["Szakállvágás", "Fazon"],
-        slots: ["11:00", "15:30", "17:00"],
-        image: "/images/barber-shave.jpg",
-      },
-      {
-        id: "fp4",
-        name: "Bella Kozmetika",
-        category: "Kozmetika",
-        area: "Szeged",
-        rating: "5",
-        tags: ["Arckezelés", "Hidratálás"],
-        slots: ["12:00", "16:30"],
-        image: "/images/facial-treatment.jpg",
-      },
-    ],
-  },
+  { key: "featuredproviders.eyebrow", section: "featuredproviders", label: "Felirat a cím felett", kind: "text", default: "Már nálunk foglalható" },
+  { key: "featuredproviders.heading", section: "featuredproviders", label: "Címsor", kind: "text", default: "Néhány szolgáltató, akihez most is időpontot foglalhatsz" },
 
   // ---------------------------------------------------------------- footer
   { key: "footer.tagline", section: "footer", label: "Mottó a logó alatt", kind: "text", default: "Ahol a szabad időpontok várnak." },
@@ -498,7 +431,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
     kind: "textarea",
     default:
-      "Ez az oldal még véglegesítés alatt áll — a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírtak a rendszer jelenlegi, tényleges működését tükrözik.",
+      "Ez az oldal még véglegesítés alatt áll: a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírtak a rendszer jelenlegi, tényleges működését tükrözik.",
   },
   {
     key: "aszf.service_body",
@@ -506,7 +439,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„A szolgáltatás” szövege",
     kind: "richtext",
     default:
-      "Az IttFoglalj.hu egy időpontfoglaló piactér, amely összeköti a szépségipari (fodrász, köröm, kozmetika, masszázs stb.) szolgáltatókat és az időpontot kereső vendégeket. A platform maga nem nyújtja a lefoglalt szolgáltatásokat — az adott foglalás teljesítéséért a kiválasztott szolgáltató felel.",
+      "Az IttFoglalj.hu egy időpontfoglaló piactér, amely összeköti a szépségipari (fodrász, köröm, kozmetika, masszázs stb.) szolgáltatókat és az időpontot kereső vendégeket. A platform maga nem nyújtja a lefoglalt szolgáltatásokat: az adott foglalás teljesítéséért a kiválasztott szolgáltató felel.",
   },
   {
     key: "aszf.guests_body",
@@ -514,7 +447,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„Vendégeknek” szövege",
     kind: "richtext",
     default:
-      "Időpontot regisztráció nélkül, ingyenesen foglalhatsz. A foglalás a szolgáltató által megadott szabad időpontok közül, a foglalás pillanatában azonnal megerősítésre kerül — külön e-mailes visszaigazolást a rendszer jelenleg nem küld, a képernyőn megjelenő visszaigazolás számít véglegesnek. Önálló, vendég-oldali módosítási vagy lemondási funkció jelenleg nincs — ehhez közvetlenül a szolgáltatót kell keresni. Ha a szolgáltató mondja le a foglalást, erről — amennyiben megadtál e-mail címet — automatikus e-mail értesítést kapsz.",
+      "Időpontot regisztráció nélkül, ingyenesen foglalhatsz. A foglalás a szolgáltató által megadott szabad időpontok közül, a foglalás pillanatában azonnal megerősítésre kerül. Külön e-mailes visszaigazolást a rendszer jelenleg nem küld, a képernyőn megjelenő visszaigazolás számít véglegesnek. Önálló, vendég-oldali módosítási vagy lemondási funkció jelenleg nincs, ehhez közvetlenül a szolgáltatót kell keresni. Ha a szolgáltató mondja le a foglalást, és megadtál e-mail címet, erről automatikus e-mail értesítést kapsz.",
   },
   {
     key: "aszf.providers_body",
@@ -522,7 +455,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„Szolgáltatóknak” szövege",
     kind: "richtext",
     default:
-      "A regisztráció és a platform használata jelenleg díjmentes. Az új szolgáltatói fiókok manuális jóváhagyáson esnek át — a regisztrációt követően a platform üzemeltetője egyezteti a részleteket, ezután aktiválja a fiókot. A jóváhagyásig a szolgáltató profilja nem jelenik meg a keresésben, és nem fogadhat foglalást.",
+      "A regisztráció és a platform használata jelenleg díjmentes. Az új szolgáltatói fiókok manuális jóváhagyáson esnek át: a regisztrációt követően a platform üzemeltetője egyezteti a részleteket, majd aktiválja a fiókot. A jóváhagyásig a szolgáltató profilja nem jelenik meg a keresésben, és nem fogadhat foglalást.",
   },
   {
     key: "aszf.liability_body",
@@ -530,7 +463,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„Felelősség” szövege",
     kind: "richtext",
     default:
-      "A platform közvetítői szerepet tölt be — a foglalt szolgáltatás minőségéért, a szolgáltató és a vendég közötti egyeztetésért, valamint az esetleges elmaradt vagy módosított időpontokért a szolgáltató felel. A platform törekszik a pontos, naprakész adatok megjelenítésére, de nem garantálja a szolgáltatók által megadott adatok teljességét vagy pontosságát.",
+      "A platform közvetítői szerepet tölt be: a foglalt szolgáltatás minőségéért, a szolgáltató és a vendég közötti egyeztetésért, valamint az esetleges elmaradt vagy módosított időpontokért a szolgáltató felel. A platform törekszik a pontos, naprakész adatok megjelenítésére, de nem garantálja a szolgáltatók által megadott adatok teljességét vagy pontosságát.",
   },
   {
     key: "aszf.modification_body",
@@ -538,7 +471,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„Módosítás” szövege",
     kind: "textarea",
     default:
-      "A jelen feltételeket a platform üzemeltetője időről időre módosíthatja — a mindenkor hatályos változat ezen az oldalon érhető el.",
+      "A jelen feltételeket a platform üzemeltetője időről időre módosíthatja, a mindenkor hatályos változat ezen az oldalon érhető el.",
   },
 
   // ------------------------------------------------------------ adatkezeles
@@ -548,7 +481,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
     kind: "textarea",
     default:
-      "Ez az oldal még véglegesítés alatt áll — a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírt adatkezelési gyakorlat magát a rendszer működését pontosan tükrözi.",
+      "Ez az oldal még véglegesítés alatt áll: a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírt adatkezelési gyakorlat magát a rendszer működését pontosan tükrözi.",
   },
   {
     key: "adatkezeles.data_categories",
@@ -575,7 +508,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       {
         id: "cookies",
         label: "Munkamenet-sütik:",
-        text: "kizárólag a bejelentkezés fenntartásához szükséges, funkcionálisan kötelező sütik — marketing- vagy követő sütiket nem használunk.",
+        text: "kizárólag a bejelentkezés fenntartásához szükséges, funkcionálisan kötelező sütik. Marketing- vagy követő sütiket nem használunk.",
       },
     ],
   },
@@ -593,7 +526,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„Kik férnek hozzá az adatokhoz” szövege",
     kind: "richtext",
     default:
-      "A foglalás adatait kizárólag az érintett szolgáltató és a platform üzemeltetője látja. Adatfeldolgozóként a Supabase, Inc. (adatbázis- és hitelesítés-szolgáltatás), a Vercel Inc. (alkalmazás-üzemeltetés) és a Resend, Inc. (foglalás-lemondásról értesítő e-mailek kiküldése) működik közre — harmadik félnek marketingcélra nem adjuk át az adataidat.",
+      "A foglalás adatait kizárólag az érintett szolgáltató és a platform üzemeltetője látja. Adatfeldolgozóként a Supabase, Inc. (adatbázis- és hitelesítés-szolgáltatás), a Vercel Inc. (alkalmazás-üzemeltetés) és a Resend, Inc. (foglalás-lemondásról értesítő e-mailek kiküldése) működik közre. Harmadik félnek marketingcélra nem adjuk át az adataidat.",
   },
   {
     key: "adatkezeles.retention_period",
@@ -625,7 +558,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
     kind: "textarea",
     default:
-      "Ez az oldal még véglegesítés alatt áll — a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve.",
+      "Ez az oldal még véglegesítés alatt áll: a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve.",
   },
   {
     key: "impresszum.hosting_body",
@@ -633,7 +566,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„Tárhelyszolgáltató” szövege",
     kind: "richtext",
     default:
-      "Supabase, Inc. (adatbázis- és tárhelyszolgáltatás) · Vercel Inc. (alkalmazás-üzemeltetés) — az oldal tényleges infrastruktúra-szolgáltatóinak pontos, aktuális elérhetőségei itt kerülnek feltüntetésre.",
+      "Supabase, Inc. (adatbázis- és tárhelyszolgáltatás) · Vercel Inc. (alkalmazás-üzemeltetés). Az oldal tényleges infrastruktúra-szolgáltatóinak pontos, aktuális elérhetőségei itt kerülnek feltüntetésre.",
   },
   {
     key: "impresszum.enforcement_body",

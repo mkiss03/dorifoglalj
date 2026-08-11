@@ -1,15 +1,44 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { SchemaForm, SectionJumpNav } from "@/components/admin/SchemaForm";
-import { MarketingPreview } from "@/components/admin/MarketingPreview";
+import {
+  SchemaForm,
+  SectionJumpNav,
+  MARKETING_SECTION_ORDER,
+  LEGAL_SECTION_ORDER,
+  ASZF_SECTION_ORDER,
+  ADATKEZELES_SECTION_ORDER,
+  IMPRESSZUM_SECTION_ORDER,
+} from "@/components/admin/SchemaForm";
+import { MarketingPreview, Section } from "@/components/admin/MarketingPreview";
 import { DevicePreview } from "@/components/admin/DevicePreview";
+import { AszfContent } from "@/components/legal/AszfContent";
+import { AdatkezelesContent } from "@/components/legal/AdatkezelesContent";
+import { ImpresszumContent } from "@/components/legal/ImpresszumContent";
 import { buildTextIndex } from "@/lib/content/reverseIndex";
 import { domId } from "@/lib/content/anchors";
 import { saveSiteContentAction, type SaveContentState } from "./actions";
 import type { SectionId, SiteContent } from "@/lib/content/types";
 
 const initialSaveState: SaveContentState = { status: "idle" };
+
+type PageId = "marketing" | "legal" | "aszf" | "adatkezeles" | "impresszum";
+
+const PAGES: { id: PageId; label: string }[] = [
+  { id: "marketing", label: "Főoldal" },
+  { id: "legal", label: "Cégadatok" },
+  { id: "aszf", label: "ÁSZF" },
+  { id: "adatkezeles", label: "Adatkezelés" },
+  { id: "impresszum", label: "Impresszum" },
+];
+
+const SECTIONS_BY_PAGE: Record<PageId, SectionId[]> = {
+  marketing: MARKETING_SECTION_ORDER,
+  legal: LEGAL_SECTION_ORDER,
+  aszf: ASZF_SECTION_ORDER,
+  adatkezeles: ADATKEZELES_SECTION_ORDER,
+  impresszum: IMPRESSZUM_SECTION_ORDER,
+};
 
 // A pontos konstansok itt kellenek, hogy a Tailwind build lássa és
 // legenerálja őket — classList.add-dal adjuk hozzá, nem className-nel.
@@ -30,6 +59,8 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
   const [draft, setDraft] = useState<SiteContent>(initialContent);
   const [pending, startTransition] = useTransition();
   const [state, setState] = useState<SaveContentState>(initialSaveState);
+  const [activePage, setActivePage] = useState<PageId>("marketing");
+  const activeSections = SECTIONS_BY_PAGE[activePage];
 
   const textIndex = useMemo(() => buildTextIndex(draft), [draft]);
 
@@ -101,7 +132,7 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
         <div>
           <h1 className="font-display text-3xl text-ink">Oldal-szerkesztő</h1>
           <p className="mt-1 text-[15px] text-ink-soft">
-            Szerkeszd a nyitóoldal szövegeit és képeit — kattints bármire jobbra, hogy a hozzá tartozó mezőre ugorj, vagy
+            Válaszd ki lent, melyik oldalt szerkeszted — kattints bármire jobbra, hogy a hozzá tartozó mezőre ugorj, vagy
             írj a bal oldali mezőkbe és nézd élőben a változást. Mentéskor azonnal élesbe kerül.
           </p>
         </div>
@@ -118,25 +149,66 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
         <p className={`mt-2 text-sm ${state.status === "error" ? "text-red-700" : "text-accent-dark"}`}>{state.message}</p>
       )}
 
+      <div className="mt-4 flex flex-wrap gap-1.5 border-b border-line pb-4">
+        {PAGES.map((page) => (
+          <button
+            key={page.id}
+            type="button"
+            onClick={() => setActivePage(page.id)}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+              activePage === page.id ? "bg-ink text-paper" : "bg-paper-alt text-ink-soft hover:bg-panel"
+            }`}
+          >
+            {page.label}
+          </button>
+        ))}
+      </div>
+
       <div className="mt-4">
-        <SectionJumpNav />
+        <SectionJumpNav sections={activeSections} />
       </div>
 
       <div className="mt-2 grid gap-6 lg:grid-cols-[420px_1fr] lg:items-start">
         <div className="min-w-0">
-          <SchemaForm draft={draft} onFieldChange={handleFieldChange} />
+          <SchemaForm draft={draft} onFieldChange={handleFieldChange} sections={activeSections} />
         </div>
         <div className="shadow-sheet min-w-0 rounded-3xl bg-paper-alt p-3 lg:sticky lg:top-8">
           <div className="mb-2 flex items-center justify-between px-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Élő előnézet</p>
             <p className="text-[11px] text-ink-soft">Kattints egy elemre a szerkesztéshez</p>
           </div>
+          {activePage === "legal" && (
+            <p className="mb-2 px-1 text-[11px] text-ink-soft">
+              Ez az adat mindhárom jogi oldalon (ÁSZF, Adatkezelés, Impresszum) megjelenik — itt az Impresszumon
+              látszik, mert az mutatja mind az 5 mezőt.
+            </p>
+          )}
           <div
             className="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl bg-white"
             onClickCapture={handlePreviewClick}
           >
             <DevicePreview>
-              <MarketingPreview content={draft} />
+              {activePage === "marketing" && <MarketingPreview content={draft} />}
+              {activePage === "legal" && (
+                <Section id="legal">
+                  <ImpresszumContent legal={draft.legal} impresszum={draft.impresszum} />
+                </Section>
+              )}
+              {activePage === "aszf" && (
+                <Section id="aszf">
+                  <AszfContent legal={draft.legal} aszf={draft.aszf} />
+                </Section>
+              )}
+              {activePage === "adatkezeles" && (
+                <Section id="adatkezeles">
+                  <AdatkezelesContent legal={draft.legal} adatkezeles={draft.adatkezeles} />
+                </Section>
+              )}
+              {activePage === "impresszum" && (
+                <Section id="impresszum">
+                  <ImpresszumContent legal={draft.legal} impresszum={draft.impresszum} />
+                </Section>
+              )}
             </DevicePreview>
           </div>
         </div>

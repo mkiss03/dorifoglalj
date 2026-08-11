@@ -4,21 +4,16 @@ import { FeaturedProviders } from "@/components/FeaturedProviders";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Comparison } from "@/components/Comparison";
 import { WhyUs } from "@/components/WhyUs";
-import { BrowseByCity } from "@/components/BrowseByCity";
 import { ForProviders } from "@/components/ForProviders";
 import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
 import { getSiteContent } from "@/lib/content/get-site-content";
 import { resolveCategories } from "@/lib/content/resolveCategories";
-import { createClient } from "@/lib/supabase/server";
-import type { CountyCityCount } from "@/lib/supabase/types";
+import { getCountyCities } from "@/lib/supabase/countyCities";
 
 export default async function Home() {
-  const content = await getSiteContent();
+  const [content, countyCities] = await Promise.all([getSiteContent(), getCountyCities()]);
   const categories = resolveCategories(content);
-
-  const supabase = await createClient();
-  const { data: countyCities } = await supabase.rpc("list_active_cities_by_county");
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -56,13 +51,12 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
       />
-      <Hero content={content.hero} categories={categories} countyCities={(countyCities ?? []) as CountyCityCount[]} />
+      <Hero content={content.hero} categories={categories} countyCities={countyCities} />
       <Categories content={content.categories} categories={categories} />
       <FeaturedProviders content={content.featuredproviders} />
       <HowItWorks content={content.howitworks} />
       <Comparison content={content.comparison} />
       <WhyUs content={content.whyus} />
-      <BrowseByCity content={content.browsebycity} />
       <ForProviders content={content.forproviders} />
       <CtaBanner content={content.ctabanner} />
       <Faq content={content.faq} />

@@ -22,8 +22,8 @@ export function HungaryMap({
 }: {
   /** Ha meg van adva, a tooltip város-sorai navigálás helyett ezt hívják
    * (a Hero beágyazott térképe így csak kitölti a Település mezőt, nem
-   * ugrik el azonnal) — enélkül (BrowseByCity) a jelenlegi Link-es,
-   * azonnal navigáló viselkedés marad. */
+   * ugrik el azonnal) — enélkül a tooltip város-sorai simán `Link`-ek,
+   * amik azonnal a /kereses oldalra navigálnak. */
   onSelectCity?: (city: string) => void;
   /** Ha igaz, a saját kártya-keret visszafogottabb (paper-alt, nem fehér
    * shadow-sheet) és nincs scroll-reveal animáció — egy már látható,

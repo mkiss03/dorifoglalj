@@ -6,7 +6,7 @@ import { domId } from "@/lib/content/anchors";
 import { SECTION_LABELS, type SectionId, type SiteContent } from "@/lib/content/types";
 import { ScalarControl, StringListField, RepeaterField, labelClass, type RepeaterItem } from "./fields";
 
-const SECTION_ORDER: SectionId[] = [
+export const MARKETING_SECTION_ORDER: SectionId[] = [
   "hero",
   "header",
   "footer",
@@ -18,9 +18,13 @@ const SECTION_ORDER: SectionId[] = [
   "howitworks",
   "forproviders",
   "featuredproviders",
-  "browsebycity",
   "mobilestickycta",
 ];
+
+export const LEGAL_SECTION_ORDER: SectionId[] = ["legal"];
+export const ASZF_SECTION_ORDER: SectionId[] = ["aszf"];
+export const ADATKEZELES_SECTION_ORDER: SectionId[] = ["adatkezeles"];
+export const IMPRESSZUM_SECTION_ORDER: SectionId[] = ["impresszum"];
 
 function entriesBySection() {
   const map = new Map<SectionId, typeof CONTENT_SCHEMA>();
@@ -34,15 +38,17 @@ function entriesBySection() {
 export function SchemaForm({
   draft,
   onFieldChange,
+  sections,
 }: {
   draft: SiteContent;
   onFieldChange: (section: SectionId, field: string, value: unknown) => void;
+  sections: SectionId[];
 }) {
   const bySection = entriesBySection();
 
   return (
     <div className="space-y-10">
-      {SECTION_ORDER.map((section) => {
+      {sections.map((section) => {
         const entries = bySection.get(section) ?? [];
         return (
           <section key={section} id={`admin-section-${section}`} className="scroll-mt-24">
@@ -100,10 +106,10 @@ export function SchemaForm({
   );
 }
 
-export function SectionJumpNav() {
+export function SectionJumpNav({ sections }: { sections: SectionId[] }) {
   return (
     <nav className="flex flex-wrap gap-1.5 pb-2">
-      {SECTION_ORDER.map((section) => (
+      {sections.map((section) => (
         <a
           key={section}
           href={`#admin-section-${section}`}

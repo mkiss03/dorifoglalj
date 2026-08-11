@@ -38,5 +38,12 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/ics|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Csak azokon az útvonalakon fut, ahol az auth-állapotnak ténylegesen
+  // jelentősége van — a marketing oldalak (főoldal, /kereses, jogi oldalak,
+  // /foglalas) sosem néznek munkamenetet, a tényleges beléptetés (redirect)
+  // pedig már úgyis a dashboard/admin layout-okban történik saját
+  // getUser()-hívással. Korábban ez MINDEN navigáción lefuttatott egy
+  // Supabase auth-kört is a marketing oldalakon — ez adta a lassú
+  // oldalváltás érzetének egyik fő okát.
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/bejelentkezes", "/regisztracio", "/auth/:path*"],
 };

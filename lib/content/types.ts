@@ -15,13 +15,16 @@ export type SectionId =
   | "howitworks"
   | "comparison"
   | "whyus"
-  | "browsebycity"
   | "forproviders"
   | "ctabanner"
   | "faq"
   | "featuredproviders"
   | "footer"
-  | "mobilestickycta";
+  | "mobilestickycta"
+  | "legal"
+  | "aszf"
+  | "adatkezeles"
+  | "impresszum";
 
 export type ContentEntry =
   | { key: string; section: SectionId; label: string; kind: ScalarKind; default: string }
@@ -44,13 +47,16 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   howitworks: "Hogyan működik",
   comparison: "A különbség",
   whyus: "Miért az IttFoglalj",
-  browsebycity: "Böngéssz település szerint",
   forproviders: "Szolgáltatóknak",
   ctabanner: "CTA banner",
   faq: "Gyakori kérdések",
   featuredproviders: "Szolgáltatói adatlap-minta",
   footer: "Lábléc",
   mobilestickycta: "Mobil alsó sáv",
+  legal: "Cégadatok",
+  aszf: "ÁSZF",
+  adatkezeles: "Adatkezelési tájékoztató",
+  impresszum: "Impresszum",
 };
 
 /** DB-ből feloldott, mindig teljesen kitöltött tartalom-fa — ezt kapják
@@ -100,12 +106,6 @@ export type SiteContent = {
     heading: string;
     points: { id: string; label: string; text: string; visual: string }[];
   };
-  browsebycity: {
-    eyebrow: string;
-    heading: string;
-    featured_label: string;
-    expand_label: string;
-  };
   forproviders: {
     eyebrow: string;
     heading: string;
@@ -115,6 +115,7 @@ export type SiteContent = {
     mock_date_label: string;
     mock_bookings: { id: string; name: string; service: string }[];
     mock_facebook_note: string;
+    mock_disclaimer: string;
   };
   ctabanner: {
     eyebrow: string;
@@ -158,5 +159,36 @@ export type SiteContent = {
   };
   mobilestickycta: {
     label: string;
+  };
+  /** A három jogi oldal közös üzemeltetői adatai — egy helyen szerkesztve,
+   * mindhárom oldal (ÁSZF, Adatkezelés, Impresszum) ezt olvassa. */
+  legal: {
+    company_name: string;
+    company_address: string;
+    tax_number: string;
+    registration_number: string;
+    registering_court: string;
+  };
+  aszf: {
+    disclaimer: string;
+    service_body: string;
+    guests_body: string;
+    providers_body: string;
+    liability_body: string;
+    modification_body: string;
+  };
+  adatkezeles: {
+    disclaimer: string;
+    data_categories: { id: string; label: string; text: string }[];
+    purpose_body: string;
+    recipients_body: string;
+    retention_period: string;
+    retention_extra_body: string;
+    rights_body: string;
+  };
+  impresszum: {
+    disclaimer: string;
+    hosting_body: string;
+    enforcement_body: string;
   };
 };

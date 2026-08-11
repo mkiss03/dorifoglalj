@@ -7,7 +7,6 @@ import { FeaturedProviders } from "@/components/FeaturedProviders";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Comparison } from "@/components/Comparison";
 import { WhyUs } from "@/components/WhyUs";
-import { BrowseByCity } from "@/components/BrowseByCity";
 import { ForProviders } from "@/components/ForProviders";
 import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
@@ -17,8 +16,9 @@ import type { SectionId, SiteContent } from "@/lib/content/types";
 
 /** A `data-preview-section` a kattintás-feloldó (ContentEditor) számára
  * jelöli, melyik szekcióhoz ugorjon a bal oldali formban, ha a kattintott
- * szövegre nincs pontos egyezés az indexben. */
-function Section({ id, children }: { id: SectionId; children: React.ReactNode }) {
+ * szövegre nincs pontos egyezés az indexben — a jogi oldalak előnézete
+ * (LegalPreview.tsx) is ezt használja. */
+export function Section({ id, children }: { id: SectionId; children: React.ReactNode }) {
   return <div data-preview-section={id}>{children}</div>;
 }
 
@@ -52,9 +52,6 @@ export function MarketingPreview({ content }: { content: SiteContent }) {
         </Section>
         <Section id="whyus">
           <WhyUs content={content.whyus} />
-        </Section>
-        <Section id="browsebycity">
-          <BrowseByCity content={content.browsebycity} />
         </Section>
         <Section id="forproviders">
           <ForProviders content={content.forproviders} />

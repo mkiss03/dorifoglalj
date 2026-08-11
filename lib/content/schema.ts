@@ -76,7 +76,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { id: "categories", value: "10", label: "fő kategória, 46+ szolgáltatástípus" },
       { id: "free", value: "0 Ft", label: "regisztrációs és foglalási díj" },
       { id: "hours", value: "0–24", label: "non-stop online időpontfoglalás" },
-      { id: "sync", value: "1 naptár", label: "web és Facebook szinkronban" },
+      { id: "sync", value: "1 naptár", label: "Google és Apple naptárral szinkronban" },
     ],
   },
   { key: "hero.collage_image", section: "hero", label: "Kép a főcím mellett", kind: "image", default: "/images/hair-styling.jpg" },
@@ -214,12 +214,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     ],
   },
 
-  // ----------------------------------------------------------- browsebycity
-  { key: "browsebycity.eyebrow", section: "browsebycity", label: "Felirat a cím felett", kind: "text", default: "Bárhol Magyarországon" },
-  { key: "browsebycity.heading", section: "browsebycity", label: "Címsor", kind: "text", default: "Böngéssz település szerint" },
-  { key: "browsebycity.featured_label", section: "browsebycity", label: "„Legnépszerűbb” felirat", kind: "text", default: "Legnépszerűbb" },
-  { key: "browsebycity.expand_label", section: "browsebycity", label: "„Összes település” gomb", kind: "text", default: "Összes település megjelenítése" },
-
   // ------------------------------------------------------------ forproviders
   { key: "forproviders.eyebrow", section: "forproviders", label: "Felirat a cím felett", kind: "text", default: "Szolgáltatóknak" },
   {
@@ -302,6 +296,13 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Facebook-megosztás megjegyzés",
     kind: "text",
     default: "Ezt a linket oszd meg a Facebook-oldaladon is.",
+  },
+  {
+    key: "forproviders.mock_disclaimer",
+    section: "forproviders",
+    label: "Kis megjegyzés a minta-naptár mellett",
+    kind: "text",
+    default: "Illusztráció — mintaadatokkal.",
   },
 
   // ---------------------------------------------------------------- ctabanner
@@ -458,7 +459,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         title: "Szolgáltatóknak",
         links: [
           { id: "l-5", label: "Csatlakozom szolgáltatóként", href: "#szolgaltatoknak" },
-          { id: "l-7", label: "Funkciók", href: "#szolgaltatoknak" },
         ],
       },
       {
@@ -481,4 +481,165 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
 
   // ------------------------------------------------------- mobilestickycta
   { key: "mobilestickycta.label", section: "mobilestickycta", label: "Gomb szövege", kind: "text", default: "Időpontot keresek" },
+
+  // ------------------------------------------------------------------ legal
+  // Az ÁSZF, az Adatkezelési tájékoztató és az Impresszum közös üzemeltetői
+  // adatai — egy helyen szerkesztve, mindhárom oldal ezt olvassa.
+  { key: "legal.company_name", section: "legal", label: "Cégnév", kind: "text", default: "[Cégnév]" },
+  { key: "legal.company_address", section: "legal", label: "Székhely", kind: "text", default: "[Székhely]" },
+  { key: "legal.tax_number", section: "legal", label: "Adószám", kind: "text", default: "[Adószám]" },
+  { key: "legal.registration_number", section: "legal", label: "Cégjegyzékszám", kind: "text", default: "[Cégjegyzékszám]" },
+  { key: "legal.registering_court", section: "legal", label: "Nyilvántartó (illetékes cégbíróság)", kind: "text", default: "[Illetékes cégbíróság]" },
+
+  // ------------------------------------------------------------------- aszf
+  {
+    key: "aszf.disclaimer",
+    section: "aszf",
+    label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
+    kind: "textarea",
+    default:
+      "Ez az oldal még véglegesítés alatt áll — a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírtak a rendszer jelenlegi, tényleges működését tükrözik.",
+  },
+  {
+    key: "aszf.service_body",
+    section: "aszf",
+    label: "„A szolgáltatás” szövege",
+    kind: "richtext",
+    default:
+      "Az IttFoglalj.hu egy időpontfoglaló piactér, amely összeköti a szépségipari (fodrász, köröm, kozmetika, masszázs stb.) szolgáltatókat és az időpontot kereső vendégeket. A platform maga nem nyújtja a lefoglalt szolgáltatásokat — az adott foglalás teljesítéséért a kiválasztott szolgáltató felel.",
+  },
+  {
+    key: "aszf.guests_body",
+    section: "aszf",
+    label: "„Vendégeknek” szövege",
+    kind: "richtext",
+    default:
+      "Időpontot regisztráció nélkül, ingyenesen foglalhatsz. A foglalás a szolgáltató által megadott szabad időpontok közül, a foglalás pillanatában azonnal megerősítésre kerül — külön e-mailes visszaigazolást a rendszer jelenleg nem küld, a képernyőn megjelenő visszaigazolás számít véglegesnek. Önálló, vendég-oldali módosítási vagy lemondási funkció jelenleg nincs — ehhez közvetlenül a szolgáltatót kell keresni. Ha a szolgáltató mondja le a foglalást, erről — amennyiben megadtál e-mail címet — automatikus e-mail értesítést kapsz.",
+  },
+  {
+    key: "aszf.providers_body",
+    section: "aszf",
+    label: "„Szolgáltatóknak” szövege",
+    kind: "richtext",
+    default:
+      "A regisztráció és a platform használata jelenleg díjmentes. Az új szolgáltatói fiókok manuális jóváhagyáson esnek át — a regisztrációt követően a platform üzemeltetője egyezteti a részleteket, ezután aktiválja a fiókot. A jóváhagyásig a szolgáltató profilja nem jelenik meg a keresésben, és nem fogadhat foglalást.",
+  },
+  {
+    key: "aszf.liability_body",
+    section: "aszf",
+    label: "„Felelősség” szövege",
+    kind: "richtext",
+    default:
+      "A platform közvetítői szerepet tölt be — a foglalt szolgáltatás minőségéért, a szolgáltató és a vendég közötti egyeztetésért, valamint az esetleges elmaradt vagy módosított időpontokért a szolgáltató felel. A platform törekszik a pontos, naprakész adatok megjelenítésére, de nem garantálja a szolgáltatók által megadott adatok teljességét vagy pontosságát.",
+  },
+  {
+    key: "aszf.modification_body",
+    section: "aszf",
+    label: "„Módosítás” szövege",
+    kind: "textarea",
+    default:
+      "A jelen feltételeket a platform üzemeltetője időről időre módosíthatja — a mindenkor hatályos változat ezen az oldalon érhető el.",
+  },
+
+  // ------------------------------------------------------------ adatkezeles
+  {
+    key: "adatkezeles.disclaimer",
+    section: "adatkezeles",
+    label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
+    kind: "textarea",
+    default:
+      "Ez az oldal még véglegesítés alatt áll — a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírt adatkezelési gyakorlat magát a rendszer működését pontosan tükrözi.",
+  },
+  {
+    key: "adatkezeles.data_categories",
+    section: "adatkezeles",
+    label: "„Milyen adatokat kezelünk” listája",
+    kind: "list",
+    mode: "fixed",
+    itemLabel: "Adatkategória",
+    fields: [
+      { key: "label", label: "Kiemelt cím", kind: "text" },
+      { key: "text", label: "Szöveg", kind: "textarea" },
+    ],
+    default: [
+      {
+        id: "guest",
+        label: "Foglaláskor (vendégként):",
+        text: "név, telefonszám, és — ha megadod — e-mail cím, a foglalás időpontja és a választott szolgáltatás. Regisztráció nem szükséges.",
+      },
+      {
+        id: "provider",
+        label: "Szolgáltatói regisztrációkor:",
+        text: "e-mail cím és jelszó (a jelszót titkosítva, a Supabase Auth kezeli), vállalkozás neve, kategória, település, cím, telefonszám, bemutatkozó szöveg, weboldal/közösségi média linkek, feltöltött logó és borítókép.",
+      },
+      {
+        id: "cookies",
+        label: "Munkamenet-sütik:",
+        text: "kizárólag a bejelentkezés fenntartásához szükséges, funkcionálisan kötelező sütik — marketing- vagy követő sütiket nem használunk.",
+      },
+    ],
+  },
+  {
+    key: "adatkezeles.purpose_body",
+    section: "adatkezeles",
+    label: "„Az adatkezelés célja és jogalapja” szövege",
+    kind: "richtext",
+    default:
+      "A foglalással kapcsolatos adatokat a szolgáltatás nyújtásához (a foglalás létrehozásához és a szolgáltató tájékoztatásához) kezeljük, jogalapja a szerződés teljesítése (GDPR 6. cikk (1) b)). A szolgáltatói fiók adatait a regisztrációval létrejövő szerződés teljesítéséhez kezeljük.",
+  },
+  {
+    key: "adatkezeles.recipients_body",
+    section: "adatkezeles",
+    label: "„Kik férnek hozzá az adatokhoz” szövege",
+    kind: "richtext",
+    default:
+      "A foglalás adatait kizárólag az érintett szolgáltató és a platform üzemeltetője látja. Adatfeldolgozóként a Supabase, Inc. (adatbázis- és hitelesítés-szolgáltatás), a Vercel Inc. (alkalmazás-üzemeltetés) és a Resend, Inc. (foglalás-lemondásról értesítő e-mailek kiküldése) működik közre — harmadik félnek marketingcélra nem adjuk át az adataidat.",
+  },
+  {
+    key: "adatkezeles.retention_period",
+    section: "adatkezeles",
+    label: "Megőrzési idő (a mondatba fűzve: „...ideig őrizzük meg”)",
+    kind: "text",
+    default: "[X]",
+  },
+  {
+    key: "adatkezeles.retention_extra_body",
+    section: "adatkezeles",
+    label: "Megőrzési idő — kiegészítő szöveg (a fiókadatokról)",
+    kind: "richtext",
+    default: "A szolgáltatói fiók adatait a fiók törléséig, illetve — ha ezt kéred — a törlési kérelem teljesítéséig kezeljük.",
+  },
+  {
+    key: "adatkezeles.rights_body",
+    section: "adatkezeles",
+    label: "„Jogaid” szövege",
+    kind: "textarea",
+    default:
+      "Bármikor kérhetsz tájékoztatást a rólad kezelt adatokról, kérheted azok helyesbítését, törlését, kezelésük korlátozását, valamint tiltakozhatsz a kezelésük ellen. Panasszal a Nemzeti Adatvédelmi és Információszabadság Hatósághoz (NAIH, naih.hu) fordulhatsz.",
+  },
+
+  // ------------------------------------------------------------- impresszum
+  {
+    key: "impresszum.disclaimer",
+    section: "impresszum",
+    label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
+    kind: "textarea",
+    default:
+      "Ez az oldal még véglegesítés alatt áll — a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve.",
+  },
+  {
+    key: "impresszum.hosting_body",
+    section: "impresszum",
+    label: "„Tárhelyszolgáltató” szövege",
+    kind: "richtext",
+    default:
+      "Supabase, Inc. (adatbázis- és tárhelyszolgáltatás) · Vercel Inc. (alkalmazás-üzemeltetés) — az oldal tényleges infrastruktúra-szolgáltatóinak pontos, aktuális elérhetőségei itt kerülnek feltüntetésre.",
+  },
+  {
+    key: "impresszum.enforcement_body",
+    section: "impresszum",
+    label: "„Jogérvényesítési lehetőségek” szövege",
+    kind: "richtext",
+    default: "Panasszal a Nemzeti Fogyasztóvédelmi Hatósághoz, illetve a lakóhely szerint illetékes békéltető testülethez fordulhatsz.",
+  },
 ];

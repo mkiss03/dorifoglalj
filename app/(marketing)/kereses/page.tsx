@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { Container } from "@/components/ui/Container";
 import { SearchBar } from "@/components/search/SearchBar";
 import { ProviderCard } from "@/components/search/ProviderCard";
@@ -31,7 +31,10 @@ export default async function KeresesPage({
   const query = sp.q?.trim() || "";
   const selectedTags = normalizeTags(sp.tags);
 
-  const supabase = await createClient();
+  // A keresési találatok publikus adatok, nincs szükség a cookie-alapú
+  // (auth-os) kliensre — ez a cookie-mentes változat nem kényszeríti ki a
+  // dinamikus renderelést feleslegesen egy auth-ellenőrzéssel.
+  const supabase = createPublicClient();
   const { data } = await supabase.rpc("search_providers", {
     p_category: category || null,
     p_city: city || null,

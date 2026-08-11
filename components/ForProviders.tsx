@@ -174,6 +174,7 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
                 </div>
               </div>
             </div>
+            <p className="mt-2 text-xs italic text-ink-soft">{content.mock_disclaimer}</p>
 
             <div className="shadow-card mt-4 flex items-center gap-3 rounded-2xl bg-white p-4 lg:absolute lg:-bottom-5 lg:-right-4 lg:mt-0 lg:w-64">
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1877F2] text-white">

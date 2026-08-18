@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v3: irányítópult-bővítés (3. teszt fázis)
+-- IdőpontNeked.hu — schema_v3: irányítópult-bővítés (3. teszt fázis)
 -- Additív a schema.sql + schema_v2.sql-hez. Egyszer lefuttatandó
 -- a Supabase SQL Editorban, miután az előző két script már lefutott.
 -- A script újrafuttatható (idempotens, ahol lehet).

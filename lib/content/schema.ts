@@ -57,7 +57,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Bevezető szöveg",
     kind: "textarea",
     default:
-      "Az IttFoglalj.hu összeköti a vendégeket a szépségipari szolgáltatókkal. Böngéssz kategória vagy település szerint, nézd meg a valós szabad időpontokat, és regisztráció nélkül foglalj.",
+      "Az IdőpontNeked.hu összeköti a vendégeket a szépségipari szolgáltatókkal. Böngéssz kategória vagy település szerint, nézd meg a valós szabad időpontokat, és regisztráció nélkül foglalj.",
   },
   { key: "hero.search_button_label", section: "hero", label: "Keresés gomb szövege", kind: "text", default: "Keresés" },
   {
@@ -175,7 +175,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       "Könnyen elfelejtett, le nem írt időpontok",
     ],
   },
-  { key: "comparison.new_way_title", section: "comparison", label: "Jobb oszlop címe", kind: "text", default: "Az IttFoglalj módszer" },
+  { key: "comparison.new_way_title", section: "comparison", label: "Jobb oszlop címe", kind: "text", default: "Az IdőpontNeked módszer" },
   {
     key: "comparison.new_way_items",
     section: "comparison",
@@ -192,7 +192,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
 
   // ----------------------------------------------------------------- whyus
   { key: "whyus.eyebrow", section: "whyus", label: "Felirat a cím felett", kind: "text", default: "Vendégeknek" },
-  { key: "whyus.heading", section: "whyus", label: "Címsor", kind: "text", default: "Miért az IttFoglalj?" },
+  { key: "whyus.heading", section: "whyus", label: "Címsor", kind: "text", default: "Miért az IdőpontNeked?" },
   {
     key: "whyus.points",
     section: "whyus",
@@ -405,7 +405,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       },
     ],
   },
-  { key: "footer.copyright_suffix", section: "footer", label: "Copyright-sor (az évszám automatikus)", kind: "text", default: "IttFoglalj.hu — Minden jog fenntartva." },
+  { key: "footer.copyright_suffix", section: "footer", label: "Copyright-sor (az évszám automatikus)", kind: "text", default: "IdőpontNeked.hu — Minden jog fenntartva." },
   { key: "footer.bottom_note", section: "footer", label: "Alsó sor jobb oldali szövege", kind: "text", default: "Készült Magyarországon" },
   { key: "footer.facebook_url", section: "footer", label: "Facebook link", kind: "text", default: "#" },
   { key: "footer.instagram_url", section: "footer", label: "Instagram link", kind: "text", default: "#" },
@@ -439,7 +439,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„A szolgáltatás” szövege",
     kind: "richtext",
     default:
-      "Az IttFoglalj.hu egy időpontfoglaló piactér, amely összeköti a szépségipari (fodrász, köröm, kozmetika, masszázs stb.) szolgáltatókat és az időpontot kereső vendégeket. A platform maga nem nyújtja a lefoglalt szolgáltatásokat: az adott foglalás teljesítéséért a kiválasztott szolgáltató felel.",
+      "Az IdőpontNeked.hu egy időpontfoglaló piactér, amely összeköti a szépségipari (fodrász, köröm, kozmetika, masszázs stb.) szolgáltatókat és az időpontot kereső vendégeket. A platform maga nem nyújtja a lefoglalt szolgáltatásokat: az adott foglalás teljesítéséért a kiválasztott szolgáltató felel.",
   },
   {
     key: "aszf.guests_body",

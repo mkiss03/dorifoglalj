@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v9: weboldal-tartalom (élő szerkesztő)
+-- IdőpontNeked.hu — schema_v9: weboldal-tartalom (élő szerkesztő)
 -- Additív a schema.sql .. schema_v8.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban, miután az előző scriptek (a schema_v8.sql
 -- admin-jogosultsága is) már lefutottak.

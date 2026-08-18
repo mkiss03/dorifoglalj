@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v6: vendég-oldali kereső
+-- IdőpontNeked.hu — schema_v6: vendég-oldali kereső
 -- Additív a schema.sql + schema_v2.sql + schema_v3.sql + schema_v4.sql
 -- + schema_v5.sql-hez. Egyszer lefuttatandó a Supabase SQL Editorban,
 -- miután az előző scriptek már lefutottak. Újrafuttatható (idempotens).

@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v7: szolgáltató jóváhagyási flow
+-- IdőpontNeked.hu — schema_v7: szolgáltató jóváhagyási flow
 -- Additív a schema.sql + schema_v2.sql + schema_v3.sql + schema_v4.sql
 -- + schema_v5.sql + schema_v6.sql-hez. Egyszer lefuttatandó a Supabase
 -- SQL Editorban, miután az előző scriptek már lefutottak.

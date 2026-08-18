@@ -46,7 +46,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   categories: "Kategóriák",
   howitworks: "Hogyan működik",
   comparison: "A különbség",
-  whyus: "Miért az IttFoglalj",
+  whyus: "Miért az IdőpontNeked",
   forproviders: "Szolgáltatóknak",
   ctabanner: "CTA banner",
   faq: "Gyakori kérdések",

@@ -30,7 +30,7 @@ export function AdatkezelesContent({
           <div>
             <h2 className="font-display text-xl text-ink">Az adatkezelő</h2>
             <p className="mt-2">
-              Az IttFoglalj.hu üzemeltetője {legal.company_name} ({legal.company_address}, adószám:{" "}
+              Az IdőpontNeked.hu üzemeltetője {legal.company_name} ({legal.company_address}, adószám:{" "}
               {legal.tax_number}, e-mail:{" "}
               <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-ink">
                 {SUPPORT_EMAIL}

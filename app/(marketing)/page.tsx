@@ -41,7 +41,7 @@ export default async function Home() {
       position: i + 1,
       name: c.name,
       serviceType: c.items.join(", "),
-      provider: { "@type": "Organization", name: "IttFoglalj.hu" },
+      provider: { "@type": "Organization", name: "IdőpontNeked.hu" },
       areaServed: "HU",
     })),
   };

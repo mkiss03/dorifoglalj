@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v12: munkatársak (staff) egy profilon belül
+-- IdőpontNeked.hu — schema_v12: munkatársak (staff) egy profilon belül
 -- Additív a schema.sql .. schema_v11.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban, miután az előző scriptek már lefutottak.
 --

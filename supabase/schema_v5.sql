@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v5: alkalom-címkék (tags)
+-- IdőpontNeked.hu — schema_v5: alkalom-címkék (tags)
 -- Additív a schema.sql + schema_v2.sql + schema_v3.sql + schema_v4.sql-hez.
 -- Egyszer lefuttatandó a Supabase SQL Editorban, miután az előző
 -- scriptek már lefutottak. A script újrafuttatható (idempotens).

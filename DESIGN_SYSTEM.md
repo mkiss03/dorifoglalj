@@ -1,4 +1,4 @@
-# IttFoglalj.hu — Design rendszer és oldalfelépítés
+# IdőpontNeked.hu — Design rendszer és oldalfelépítés
 
 > v5 — **"Confident Minimal".** A v4 "Lebegő lapok" szerkezete (lágy lekerekítés-skála, `shadow-sheet`/`shadow-card` panelek, a Collage-motívum) **változatlanul megmarad** — ez nem szerkezeti, hanem szín- és tipográfia-váltás. A meleg gold/cream/beige paletta és a Fraunces/Plus Jakarta Sans betűpár helyett: közel-fekete + fehér/szürke semlegesek + **egyetlen** telített akcentus (raspberry-korall), Archivo Black + Ubuntu betűpár. A cél: eltávolodni a "meleg krém + arany" AI-sablon hatástól egy olyan irányba, amit a kategória valós, erős szereplői (Fresha: közel-fekete + fehér + egy telített akcentus) és a 2026-os designtrendek (Digital Lavender a beauty/wellness kategóriában, Pantone Cloud Dancer törtfehér, "letisztult alap + egy nyugtató/magabiztos akcentus") is alátámasztanak.
 
@@ -6,7 +6,7 @@
 
 ## 1. Kontextus és tervezési filozófia
 
-**Mi ez:** IttFoglalj.hu — online időpontfoglaló marketplace szépségipari szolgáltatóknak (fodrász, köröm, kozmetika, smink, szempilla, szemöldök, szőrtelenítés, masszázs, testkezelés, PMU) és az őket kereső vendégeknek.
+**Mi ez:** IdőpontNeked.hu — online időpontfoglaló marketplace szépségipari szolgáltatóknak (fodrász, köröm, kozmetika, smink, szempilla, szemöldök, szőrtelenítés, masszázs, testkezelés, PMU) és az őket kereső vendégeknek.
 
 **Kivel versenyzünk:** elsődlegesen a hazai Salonic.hu-val — őket **megjelenésben és technikai kivitelezésben** kell lekörözni. Nemzetközi mérce: Fresha, Booksy.
 

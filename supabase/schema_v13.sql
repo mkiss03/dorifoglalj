@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v13: kulcsszavas keresés (search_providers bővítés)
+-- IdőpontNeked.hu — schema_v13: kulcsszavas keresés (search_providers bővítés)
 -- Additív a schema.sql .. schema_v12.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban, miután az előző scriptek már lefutottak.
 --

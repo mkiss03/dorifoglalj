@@ -156,7 +156,7 @@ export default async function BookingPage({
         <p className="mt-8 text-center text-xs text-ink-soft">
           Foglalási oldal —{" "}
           <Link href="/" className="font-semibold text-ink hover:text-accent-dark">
-            IttFoglalj.hu
+            IdőpontNeked.hu
           </Link>
         </p>
       </Container>

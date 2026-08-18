@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v10: szolgáltató-tracking/jóváhagyó panel
+-- IdőpontNeked.hu — schema_v10: szolgáltató-tracking/jóváhagyó panel
 -- (admin terület 2. üteme)
 -- Additív a schema.sql .. schema_v9.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban, miután az előző scriptek (a schema_v8.sql

@@ -73,9 +73,9 @@ function buildIcsDataUri(opts: { title: string; start: string; end: string; desc
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//IttFoglalj.hu//Booking//HU",
+    "PRODID:-//IdőpontNeked.hu//Booking//HU",
     "BEGIN:VEVENT",
-    `UID:${uid}@ittfoglalj.hu`,
+    `UID:${uid}@idopontneked.hu`,
     `DTSTAMP:${dt(new Date().toISOString())}`,
     `DTSTART:${dt(opts.start)}`,
     `DTEND:${dt(opts.end)}`,

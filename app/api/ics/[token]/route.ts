@@ -34,7 +34,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     .map((b) =>
       [
         "BEGIN:VEVENT",
-        `UID:${b.id}@ittfoglalj.hu`,
+        `UID:${b.id}@idopontneked.hu`,
         `DTSTAMP:${formatDt(b.created_at)}`,
         `DTSTART:${formatDt(b.starts_at)}`,
         `DTEND:${formatDt(b.ends_at)}`,
@@ -48,9 +48,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   const body = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//IttFoglalj.hu//Bookings//HU",
+    "PRODID:-//IdőpontNeked.hu//Bookings//HU",
     "CALSCALE:GREGORIAN",
-    "X-WR-CALNAME:IttFoglalj foglalások",
+    "X-WR-CALNAME:IdőpontNeked foglalások",
     "REFRESH-INTERVAL;VALUE=DURATION:PT1H",
     events,
     "END:VCALENDAR",

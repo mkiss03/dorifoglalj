@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v11: eseti szabad/nem-foglalható időszakok
+-- IdőpontNeked.hu — schema_v11: eseti szabad/nem-foglalható időszakok
 -- (kivételek a heti nyitvatartásban)
 -- Additív a schema.sql .. schema_v10.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban, miután az előző scriptek már lefutottak.

@@ -37,7 +37,7 @@ export async function sendCancellationEmail(
     ? `Ha kérdésed van, keresd ${params.providerName} vállalkozást telefonon: ${params.providerPhone}.`
     : `Ha kérdésed van, keresd ${params.providerName} vállalkozást.`;
 
-  const text = `Kedves ${params.customerName}!\n\nSajnálattal értesítünk, hogy a(z) ${params.providerName} lemondta a következő foglalásodat:\n\n${params.serviceName}\n${when}${reasonLine}\n\n${contactLine}\n\nÜdvözlettel,\nIttFoglalj.hu`;
+  const text = `Kedves ${params.customerName}!\n\nSajnálattal értesítünk, hogy a(z) ${params.providerName} lemondta a következő foglalásodat:\n\n${params.serviceName}\n${when}${reasonLine}\n\n${contactLine}\n\nÜdvözlettel,\nIdőpontNeked.hu`;
 
   const html = `
     <div style="font-family: sans-serif; font-size: 15px; color: #1a1a1a; line-height: 1.6;">
@@ -49,7 +49,7 @@ export async function sendCancellationEmail(
       </p>
       ${params.reason ? `<p><em>A szolgáltató üzenete:</em> ${params.reason}</p>` : ""}
       <p>${contactLine}</p>
-      <p>Üdvözlettel,<br />IttFoglalj.hu</p>
+      <p>Üdvözlettel,<br />IdőpontNeked.hu</p>
     </div>
   `;
 

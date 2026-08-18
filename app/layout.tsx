@@ -15,16 +15,16 @@ const body = Ubuntu({
 });
 
 export const metadata: Metadata = {
-  title: "IttFoglalj.hu — Ahol a szabad időpontok várnak",
+  title: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
   description:
-    "Az IttFoglalj.hu egy online időpontfoglaló platform, ahol könnyedén megtalálod a számodra megfelelő szolgáltatót, megnézheted a szabad időpontokat, és néhány kattintással lefoglalhatod a Neked megfelelő időpontot telefonálás és hosszas egyeztetés nélkül.",
+    "Az IdőpontNeked.hu egy online időpontfoglaló platform, ahol könnyedén megtalálod a számodra megfelelő szolgáltatót, megnézheted a szabad időpontokat, és néhány kattintással lefoglalhatod a Neked megfelelő időpontot telefonálás és hosszas egyeztetés nélkül.",
 };
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "IttFoglalj.hu",
-  url: "https://ittfoglalj.hu",
+  name: "IdőpontNeked.hu",
+  url: "https://idopontneked.hu",
   slogan: "Ahol a szabad időpontok várnak.",
   description:
     "Online időpontfoglaló platform szépségipari szolgáltatóknak és az őket kereső vendégeknek.",

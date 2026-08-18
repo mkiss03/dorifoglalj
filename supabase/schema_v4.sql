@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v4: szünet (puffer) + időpont-zárolás
+-- IdőpontNeked.hu — schema_v4: szünet (puffer) + időpont-zárolás
 -- Additív a schema.sql + schema_v2.sql + schema_v3.sql-hez.
 -- Egyszer lefuttatandó a Supabase SQL Editorban.
 -- A script újrafuttatható (idempotens, ahol lehet) — ha már

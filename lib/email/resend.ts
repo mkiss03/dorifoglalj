@@ -8,4 +8,4 @@ export function getResendClient(): Resend | null {
   return new Resend(apiKey);
 }
 
-export const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "IttFoglalj.hu <foglalas@ittfoglalj.hu>";
+export const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "IdőpontNeked.hu <foglalas@idopontneked.hu>";

@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v8: admin-jogosultság
+-- IdőpontNeked.hu — schema_v8: admin-jogosultság
 -- Additív a schema.sql .. schema_v7.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban, miután az előző scriptek már lefutottak.
 --

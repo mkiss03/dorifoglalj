@@ -1,4 +1,4 @@
-# IttFoglalj.hu
+# IdőpontNeked.hu
 
 Magyar időpontfoglaló piactér szépség-/wellness-szolgáltatóknak (fodrász, köröm, kozmetika, masszázs stb.). A vendégek szolgáltatót keresnek és regisztráció nélkül foglalnak; a szolgáltatók egy Apple-stílusú irányítópulton kezelik a profiljukat, szolgáltatásaikat, nyitvatartásukat és a foglalásaikat.
 

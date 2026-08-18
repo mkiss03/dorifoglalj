@@ -1,5 +1,5 @@
 -- ============================================================
--- IttFoglalj.hu — schema_v2: foglalási rendszer (2. teszt fázis)
+-- IdőpontNeked.hu — schema_v2: foglalási rendszer (2. teszt fázis)
 -- Additív a schema.sql-hez (v0.1.0). Egyszer lefuttatandó a
 -- Supabase SQL Editorban, miután a schema.sql már lefutott.
 -- A script újrafuttatható (idempotens, ahol lehet).

@@ -75,32 +75,33 @@ export async function createBookingAction(
   }
 
   if (email) {
-    // A `create_booking` RPC-nél korábban `void (async () => {...})()`
-    // mintát használtunk az email küldésére a válasz visszaadása után —
-    // ez serverless környezetben (Vercel) megbízhatatlan volt, mert a
-    // függvényfolyamat leállhat, mielőtt a háttérben induló promise
-    // ténylegesen lefutna, így az email némán elveszett. A Next.js
-    // `after()` API-ja garantálja, hogy ez a kód a válasz elküldése
-    // után is végigfusson, mielőtt a függvény ténylegesen leáll.
+    // Két korábbi hiba miatt nem ment ki ez az email:
+    // (1) `void (async () => {...})()` mintát használtunk a válasz
+    //     visszaadása után — serverless környezetben (Vercel) a
+    //     függvényfolyamat leállhat, mielőtt egy ilyen "elfelejtett"
+    //     promise lefutna. Megoldás: Next.js `after()` API, ami
+    //     garantálja a lefutást a válasz elküldése után is.
+    // (2) a szolgáltató/szolgáltatás/munkatárs adatait külön, anon
+    //     (nem bejelentkezett) kliensről próbáltuk lekérdezni a
+    //     providers/provider_services/staff_members táblákból — ezeken
+    //     RLS van, ami csak a bejelentkezett tulajdonosnak enged
+    //     olvasást, így egy vendég soha nem fért hozzá, a lekérdezések
+    //     némán üresek maradtak. Megoldás: a create_booking RPC
+    //     (SECURITY DEFINER, emelt jogosultsággal fut) már a
+    //     válaszában visszaadja ezeket az adatokat (schema_v16.sql).
     after(async () => {
       try {
-        const [{ data: provider }, { data: service }, { data: staff }] = await Promise.all([
-          supabase.from("providers").select("business_name, phone, address, city").eq("slug", slug).single(),
-          supabase.from("provider_services").select("price_huf").eq("id", serviceId).single(),
-          supabase.from("staff_members").select("name").eq("id", staffId).single(),
-        ]);
-
         await sendBookingConfirmationEmail({
           to: email,
           customerName: name,
-          providerName: provider?.business_name ?? "a szolgáltató",
-          providerPhone: provider?.phone ?? null,
-          providerAddress: provider?.address ?? null,
-          providerCity: provider?.city ?? null,
+          providerName: result.provider_name ?? "a szolgáltató",
+          providerPhone: result.provider_phone ?? null,
+          providerAddress: result.provider_address ?? null,
+          providerCity: result.provider_city ?? null,
           serviceName: result.service_name,
-          priceHuf: service?.price_huf ?? 0,
+          priceHuf: result.price_huf ?? 0,
           startsAt: result.starts_at,
-          staffName: staff?.name ?? null,
+          staffName: result.staff_name ?? null,
         });
       } catch {
         // A foglalás sikerét az email-hiba nem hiúsíthatja meg.

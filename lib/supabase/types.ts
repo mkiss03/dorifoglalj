@@ -182,9 +182,25 @@ export type PublicProvider = {
   }[];
 };
 
-/** A `create_booking` / `create_manual_booking` RPC-k visszatérési alakja. */
+/** A `create_booking` / `create_manual_booking` RPC-k visszatérési alakja.
+ * A `create_booking` (vendég-oldali) válasza a schema_v16.sql óta a
+ * visszaigazoló emailhez szükséges provider/staff adatokat is
+ * tartalmazza; a `create_manual_booking` (dashboard) válasza ezeket
+ * nem adja vissza, mert ott nincs email-küldés. */
 export type CreateBookingResult =
-  | { ok: true; booking_id: string; service_name: string; starts_at: string; ends_at: string }
+  | {
+      ok: true;
+      booking_id: string;
+      service_name: string;
+      starts_at: string;
+      ends_at: string;
+      price_huf?: number;
+      provider_name?: string;
+      provider_phone?: string | null;
+      provider_address?: string | null;
+      provider_city?: string | null;
+      staff_name?: string | null;
+    }
   | {
       ok: false;
       error:

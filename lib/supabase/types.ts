@@ -233,3 +233,22 @@ export type AdminProviderRow = {
 export type AdminSetProviderStatusResult =
   | { ok: true }
   | { ok: false; error: "not_admin" | "invalid_status" | "provider_not_found" };
+
+/** Az `admin_get_monitoring_stats` RPC visszatérési alakja — az admin monitorozó oldalhoz. */
+export type AdminMonitoringStats = {
+  total_providers: number;
+  pending_providers: number;
+  active_providers: number;
+  suspended_providers: number;
+  total_users: number;
+  total_services: number;
+  total_staff: number;
+  total_bookings: number;
+  confirmed_bookings: number;
+  month_bookings: number;
+  today_bookings: number;
+  unique_customers: number;
+  media_files_count: number;
+  media_bytes_estimated: number;
+  total_db_rows: number;
+};

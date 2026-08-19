@@ -23,10 +23,9 @@ export async function setPasswordAction(
 
   const supabase = await createClient();
 
-  // Ide csak a /auth/confirm route-on átment, érvényes "recovery" (jelszó-
-  // visszaállítás) vagy egyéb bejelentkezett session-nel lehet eljutni —
-  // updateUser() a jelenlegi session felhasználóján hajtja végre a
-  // jelszóváltást, külön user-azonosító megadása nélkül.
+  // Ide csak a /auth/confirm route-on átment, érvényes "recovery" session-nel
+  // lehet eljutni; updateUser() a jelenlegi session felhasználóján hajtja
+  // végre a jelszóváltást.
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -10,7 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/admin/", "/dashboard/", "/auth/", "/api/"],
       },
-      // AI Keresőmotorok kifejezett engedélyezése (GEO / Generative Engine Optimization)
       {
         userAgent: [
           "GPTBot",

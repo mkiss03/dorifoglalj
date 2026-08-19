@@ -3,13 +3,11 @@
 -- Additív a schema.sql .. schema_v14.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban.
 --
--- FONTOS a futtatás után: a Supabase PostgREST rétege néhány
--- másodpercen belül automatikusan felismeri az új függvényt (schema
--- cache reload). Ha az admin felület "RPC nem elérhető" hibát mutat
--- közvetlenül a futtatás után, várj 10-20 másodpercet és tölts újra,
--- vagy kézzel is kikényszerítheted: Supabase Dashboard → Database →
--- API Settings → "Reload schema cache" gomb (vagy SQL Editorban:
--- NOTIFY pgrst, 'reload schema';).
+-- Futtatás után a Supabase PostgREST rétege néhány másodpercen belül
+-- felismeri az új függvényt. Ha az admin felület közvetlenül a futtatás
+-- után "RPC nem elérhető" hibát mutat, várj 10-20 másodpercet és tölts
+-- újra, vagy kényszerítsd ki: Supabase Dashboard → Database → API
+-- Settings → "Reload schema cache".
 -- ============================================================
 
 create or replace function public.admin_get_monitoring_stats()

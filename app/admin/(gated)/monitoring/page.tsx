@@ -14,11 +14,11 @@ import {
   Users,
 } from "lucide-react";
 
-// Supabase Free Tier referencia határok (2026-os állapot szerint) — ha a
-// Supabase módosítja a csomagjait, ezeket az értékeket kell frissíteni.
-const SUPABASE_FREE_DB_ROWS_LIMIT = 500_000; // tájékoztató becslés (a tényleges limit a 500 MB DB-méret, ez sor-közelítés)
+// Supabase Free Tier referencia határok. Ha a Supabase módosítja a
+// csomagjait, ezeket az értékeket kell frissíteni.
+const SUPABASE_FREE_DB_ROWS_LIMIT = 500_000; // tájékoztató becslés a ~500 MB DB-mérethez
 const SUPABASE_FREE_STORAGE_BYTES_LIMIT = 1_073_741_824; // 1 GB
-const SUPABASE_FREE_MAU_LIMIT = 50_000; // 50 000 havi aktív felhasználó
+const SUPABASE_FREE_MAU_LIMIT = 50_000; // havi aktív felhasználó
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 B";
@@ -91,10 +91,8 @@ export default async function AdminMonitoringPage() {
   const supabase = await createClient();
   const { data: rpcData, error: rpcError } = await supabase.rpc("admin_get_monitoring_stats");
 
-  // Nincs csendes/félrevezető fallback: ha az RPC (schema_v15.sql) nincs
-  // lefuttatva vagy hibázik, ezt nyíltan jelezzük — a korábbi verzió itt
-  // RLS által amúgy is nullára korlátozott közvetlen lekérdezésekre esett
-  // vissza, ami hamis "minden nulla" képet mutatott admin számára.
+  // Nincs csendes fallback: ha az RPC (schema_v15.sql) nincs lefuttatva
+  // vagy hibázik, ezt nyíltan jelezzük ahelyett, hogy hamis nullákat mutatnánk.
   if (rpcError || !rpcData) {
     return (
       <section className="space-y-6">
@@ -161,7 +159,6 @@ export default async function AdminMonitoringPage() {
         </p>
       </div>
 
-      {/* Összesített kapacitás-állapot */}
       <div className="shadow-sheet rounded-3xl bg-white p-6 sm:p-8">
         <div className="flex items-center gap-3">
           <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${SEVERITY_ICON_CLASS[overallSeverity]}`}>
@@ -201,7 +198,6 @@ export default async function AdminMonitoringPage() {
         )}
       </div>
 
-      {/* Platform-statisztikák */}
       <div>
         <h2 className="font-display text-xl text-ink">Platform-statisztikák</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -232,15 +228,14 @@ export default async function AdminMonitoringPage() {
         </div>
       </div>
 
-      {/* Általános forgalmi statisztika (látogatottság) */}
       <div className="shadow-sheet rounded-3xl bg-white p-6 sm:p-8">
         <div className="flex items-center gap-3">
           <BarChart3 className="h-6 w-6 text-accent-dark" strokeWidth={2.25} />
           <h2 className="font-display text-xl text-ink">Oldal-látogatottság</h2>
         </div>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-          A látogatói forgalmat (oldalmegtekintések, forgalmi források, eszköztípusok) a Vercel Web Analytics méri —
-          ez a szolgáltatás <strong>cookie-mentes és nem használ egyedi azonosítót</strong> a látogatók
+          A látogatói forgalmat (oldalmegtekintések, forgalmi források, eszköztípusok) a Vercel Web Analytics méri.
+          Ez a szolgáltatás <strong>cookie-mentes és nem használ egyedi azonosítót</strong> a látogatók
           követésére, így a jelenlegi magyar adatvédelmi (GDPR / Infotv.) értelmezés szerint nem igényel
           sütiengedélyező (cookie consent) felugró ablakot. A részletes, napi bontású grafikonok a Vercel saját
           irányítópultján érhetők el.
@@ -256,7 +251,6 @@ export default async function AdminMonitoringPage() {
         </Link>
       </div>
 
-      {/* Ingyenes → fizetős átállás irányelvei */}
       <div className="shadow-sheet space-y-6 rounded-3xl bg-white p-6 sm:p-8">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-accent-dark" strokeWidth={2.25} />

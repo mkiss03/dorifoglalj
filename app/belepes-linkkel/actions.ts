@@ -21,11 +21,10 @@ export async function magicLinkAction(
   const supabase = await createClient();
   const siteUrl = await getTrustedSiteUrl();
 
-  // `shouldCreateUser: false` — a magic link csak meglévő fiókkal való
-  // bejelentkezésre szolgál, nem regisztrációra (az a /regisztracio
-  // oldalon, jelszóval történik). Ha az email cím nem tartozik fiókhoz,
-  // a Supabase hibát ad vissza, amit szándékosan nem árulunk el a
-  // válaszban (ne lehessen kitalálni, mely email van regisztrálva).
+  // shouldCreateUser: false, mert a magic link csak meglévő fiókkal való
+  // bejelentkezésre szolgál (regisztráció a /regisztracio oldalon,
+  // jelszóval történik). A választ szándékosan nem ágaztatjuk el a
+  // hiba/siker között, hogy ne legyen kideríthető, mely email van regisztrálva.
   await supabase.auth.signInWithOtp({
     email,
     options: {

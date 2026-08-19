@@ -6,7 +6,7 @@ type RateLimitRecord = {
 
 const store = new Map<string, RateLimitRecord>();
 
-// Időszakos takarítás a memóriaszemét ellen (5 percenként)
+/** Időszakos takarítás a memóriaszemét ellen (5 percenként). */
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 let lastCleanup = Date.now();
 
@@ -35,14 +35,13 @@ export async function getClientIp(): Promise<string> {
     const realIp = headersList.get("x-real-ip");
     if (realIp) return realIp.trim();
   } catch {
-    // Ha Server Component/Action kontextuson kívül hívódna meg
+    // Server Component/Action kontextuson kívül hívva nincs headers()
   }
   return "127.0.0.1";
 }
 
-/** csúszóablakos (sliding window) rate limit ellenőrzés IP alapon.
- * Returns `{ success: true }` ha az engedélyezett korláton belül van, vagy `{ success: false }` ha túllépte.
- */
+/** Csúszóablakos (sliding window) rate limit ellenőrzés IP alapon. `success: true`
+ * az engedélyezett korláton belül, `success: false` túllépés esetén. */
 export async function checkRateLimit(
   actionKey: string,
   limit: number = 10,
@@ -60,7 +59,6 @@ export async function checkRateLimit(
     store.set(key, record);
   }
 
-  // Szűrés a jelenlegi időablakra
   record.timestamps = record.timestamps.filter((ts) => now - ts < windowMs);
 
   if (record.timestamps.length >= limit) {

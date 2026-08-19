@@ -23,7 +23,6 @@ export async function sendContactMessageAction(
     return { status: "success", message: "Köszönjük, hamarosan válaszolunk!" };
   }
 
-  // Rate limit: max 5 kapcsolat üzenet / IP / 10 perc
   const rateLimit = await checkRateLimit("contact", 5, 10 * 60 * 1000);
   if (!rateLimit.success) {
     return {

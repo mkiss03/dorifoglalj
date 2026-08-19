@@ -5,7 +5,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://idopontneked.hu";
   const now = new Date();
 
-  // Statikus marketing és jogi oldalak
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
@@ -51,7 +50,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Aktív szolgáltatói foglalási aloldalak lekérése
   let providerRoutes: MetadataRoute.Sitemap = [];
   try {
     const supabase = createPublicClient();
@@ -71,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }));
     }
   } catch {
-    // Graceful fallback ha a Supabase nem elérhető sitemap generáláskor
+    // Supabase nem elérhető sitemap generáláskor: csak a statikus útvonalak
   }
 
   return [...staticRoutes, ...providerRoutes];

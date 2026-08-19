@@ -22,14 +22,12 @@ export async function forgotPasswordAction(
   const siteUrl = await getTrustedSiteUrl();
 
   // A tényleges linket a Supabase "Reset Password" email sablonja állítja
-  // össze (ugyanúgy, mint a már működő "Confirm Signup" sablonnál) —
-  // formátuma: {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}
-  // &type=recovery&next=/jelszo-uj — ezt kell beállítani a Supabase
-  // dashboardon. A `redirectTo` itt csak a `{{ .RedirectTo }}` merge-mezőt
-  // tölti fel, ha a sablon azt is használná.
+  // össze (ugyanúgy, mint a Confirm Signup sablonnál): formátuma
+  // {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery
+  // &next=/jelszo-uj (ezt kell beállítani a Supabase dashboardon).
   //
-  // Szándékosan NEM ágazunk el a hiba/siker között a válaszban — így nem
-  // deríthető ki, hogy egy adott email cím regisztrálva van-e a rendszerben.
+  // Szándékosan nem ágazunk el a hiba/siker között a válaszban, hogy ne
+  // legyen kideríthető, mely email cím van regisztrálva a rendszerben.
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/jelszo-uj`,
   });

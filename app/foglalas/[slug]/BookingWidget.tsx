@@ -400,7 +400,6 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
 
       {selectedSlot && selectedService && effectiveStaffId && holdToken && !holdExpired && (
         <form action={formAction} className="mt-6 space-y-3 border-t border-line pt-6">
-          {/* Honeypot rejtett mező botok ellen */}
           <div className="sr-only" aria-hidden="true">
             <label htmlFor="hp_website">Ne töltsd ki ezt a mezőt</label>
             <input id="hp_website" name="hp_website" type="text" tabIndex={-1} autoComplete="off" />

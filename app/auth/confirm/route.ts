@@ -3,10 +3,9 @@ import { redirect } from "next/navigation";
 import { type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-/** A `next` célt vagy relatív path-ként ("/jelszo-uj"), vagy — ha a Supabase
- * email-sablon a `{{ .RedirectTo }}` mezőt használja — ugyanerre az originre
- * mutató abszolút URL-ként kapjuk. Mindkét formát elfogadjuk, de csak
- * ugyanarra az originre mutató célt engedünk át (nyílt redirect ellen). */
+/** A `next` célt vagy relatív path-ként kapjuk, vagy ugyanerre az originre
+ * mutató abszolút URL-ként. Mindkét formát elfogadjuk, de csak ugyanarra
+ * az originre mutató célt engedünk át, nyílt redirect ellen védve. */
 function resolveNext(nextParam: string | null, requestUrl: string): string {
   if (!nextParam) return "/dashboard";
   if (nextParam.startsWith("/")) return nextParam;

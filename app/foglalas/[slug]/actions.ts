@@ -27,12 +27,10 @@ export async function createBookingAction(
   _prevState: BookingFormState,
   formData: FormData
 ): Promise<BookingFormState> {
-  // Honeypot check
   if (String(formData.get("hp_website") ?? "").trim()) {
     return { status: "error", message: "Hiba történt a foglalás során." };
   }
 
-  // Rate limit: max 10 foglalás / IP / 5 perc
   const rateLimit = await checkRateLimit("booking", 10, 5 * 60 * 1000);
   if (!rateLimit.success) {
     return { status: "error", message: "Túl sok foglalási kísérlet. Próbáld újra néhány perc múlva." };
@@ -75,7 +73,6 @@ export async function createBookingAction(
     return { status: "error", message: ERROR_MESSAGES[result.error] ?? "Nem sikerült a foglalás." };
   }
 
-  // Ha a vendég megadta az e-mail címét, visszaigazoló e-mailt küldünk neki
   if (email) {
     void (async () => {
       try {
@@ -98,7 +95,7 @@ export async function createBookingAction(
           staffName: staff?.name ?? null,
         });
       } catch {
-        // Csendes fallback — a foglalás sikerét az email-hiba nem hiúsíthatja meg
+        // A foglalás sikerét az email-hiba nem hiúsíthatja meg.
       }
     })();
   }

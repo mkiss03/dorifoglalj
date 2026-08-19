@@ -20,6 +20,14 @@
 -- jogosultsággal fut), már úgyis hozzáfér ezekhez az adatokhoz — a
 -- válaszába egyszerűen belefoglaljuk őket, nincs szükség külön
 -- lekérdezésre a hívó oldalon.
+--
+-- Javítás a v16 első verziójához képest: a korábbi verzióban egy
+-- `record` típusú változó (`v_provider`) egyes mezőire próbáltunk
+-- közvetlenül `select ... into` listával értéket adni
+-- (`v_provider.business_name` stb.) — ez érvénytelen PL/pgSQL
+-- szintaxis, emiatt a függvény minden hívásnál hibázott ("Hiba
+-- történt a foglalás során"). Ez a verzió önálló skalár változókat
+-- használ helyette.
 -- ============================================================
 
 drop function if exists public.create_booking(text, uuid, uuid, timestamptz, text, text, text, uuid);
@@ -41,8 +49,11 @@ set search_path = ''
 as $$
 declare
   v_provider_id uuid;
+  v_provider_name text;
+  v_provider_phone text;
+  v_provider_address text;
+  v_provider_city text;
   v_buffer interval;
-  v_provider record;
   v_service record;
   v_staff_name text;
   v_dur interval;
@@ -59,7 +70,7 @@ begin
   end if;
 
   select id, business_name, phone, address, city, make_interval(mins => coalesce(buffer_minutes, 0))
-    into v_provider_id, v_provider.business_name, v_provider.phone, v_provider.address, v_provider.city, v_buffer
+    into v_provider_id, v_provider_name, v_provider_phone, v_provider_address, v_provider_city, v_buffer
     from public.providers where slug = p_slug and booking_enabled = true;
   if v_provider_id is null then
     return json_build_object('ok', false, 'error', 'provider_not_found');
@@ -183,10 +194,10 @@ begin
     'starts_at', p_starts_at,
     'ends_at', v_ends_at,
     'price_huf', v_service.price_huf,
-    'provider_name', v_provider.business_name,
-    'provider_phone', v_provider.phone,
-    'provider_address', v_provider.address,
-    'provider_city', v_provider.city,
+    'provider_name', v_provider_name,
+    'provider_phone', v_provider_phone,
+    'provider_address', v_provider_address,
+    'provider_city', v_provider_city,
     'staff_name', v_staff_name
   );
 end;

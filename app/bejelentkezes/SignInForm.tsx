@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { signInAction, type SignInState } from "./actions";
 
 const initialState: SignInState = { status: "idle" };
@@ -32,9 +33,14 @@ export function SignInForm({ action = signInAction }: { action?: typeof signInAc
         />
       </div>
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-soft">
-          Jelszó
-        </label>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wide text-ink-soft">
+            Jelszó
+          </label>
+          <Link href="/elfelejtett-jelszo" className="text-xs font-semibold text-accent-dark hover:text-accent">
+            Elfelejtetted?
+          </Link>
+        </div>
         <input
           id="password"
           name="password"
@@ -57,6 +63,14 @@ export function SignInForm({ action = signInAction }: { action?: typeof signInAc
       >
         {pending ? "Belépés…" : "Bejelentkezés"}
       </button>
+
+      <p className="text-center text-sm text-ink-soft">
+        Vagy{" "}
+        <Link href="/belepes-linkkel" className="font-semibold text-accent-dark hover:text-accent">
+          jelentkezz be email linkkel
+        </Link>{" "}
+        jelszó nélkül.
+      </p>
     </form>
   );
 }

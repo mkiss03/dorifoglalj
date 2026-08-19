@@ -6,6 +6,7 @@ import { categories } from "@/lib/categories";
 import { HUNGARY_REGIONS } from "@/lib/hungaryMap";
 import { PROVIDER_TAGS, type CreateBookingResult, type ProviderTag } from "@/lib/supabase/types";
 import { sendCancellationEmail } from "@/lib/email/sendCancellationEmail";
+import { getTrustedSiteUrl } from "@/lib/site-url";
 
 export type ProfileState = {
   status: "idle" | "error" | "success";
@@ -798,4 +799,68 @@ export async function updateStaffPhotoAction(_prevState: MediaState, formData: F
 
   revalidatePath("/dashboard", "layout");
   return { status: "success", message: "Fotó frissítve." };
+}
+
+export type AccountState =
+  | { status: "idle" }
+  | { status: "error"; message: string }
+  | { status: "success"; message: string };
+
+/** Fiók e-mail címének módosítása (Supabase Auth, nem a `providers` tábla
+ * mezője). A Supabase alapból két megerősítő emailt küld — a régi és az új
+ * címre is —, és a váltás csak azután lép életbe, hogy mindkettőt
+ * megerősítették (ld. "Secure email change" beállítás a Supabase-ben). */
+export async function updateEmailAction(_prevState: AccountState, formData: FormData): Promise<AccountState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const newEmail = String(formData.get("email") ?? "").trim();
+  if (!newEmail || !newEmail.includes("@")) {
+    return { status: "error", message: "Adj meg egy érvényes e-mail címet." };
+  }
+  if (newEmail === user.email) {
+    return { status: "error", message: "Ez már a jelenlegi e-mail címed." };
+  }
+
+  const supabase = await createClient();
+  const siteUrl = await getTrustedSiteUrl();
+
+  const { error } = await supabase.auth.updateUser(
+    { email: newEmail },
+    { emailRedirectTo: `${siteUrl}/auth/confirm?next=/dashboard/fiok` }
+  );
+
+  if (error) {
+    return { status: "error", message: "Hiba történt az e-mail cím módosítása során." };
+  }
+
+  return {
+    status: "success",
+    message: "Megerősítő emailt küldtünk a régi és az új címedre is — a váltás csak mindkettő megerősítése után lép életbe.",
+  };
+}
+
+/** Fiók jelszavának módosítása bejelentkezve (nem összekeverendő az
+ * "elfelejtett jelszó" flow-val, ami kijelentkezett állapotból indul). */
+export async function updatePasswordAction(_prevState: AccountState, formData: FormData): Promise<AccountState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const password = String(formData.get("password") ?? "");
+  const passwordConfirm = String(formData.get("password_confirm") ?? "");
+
+  if (password.length < 8) {
+    return { status: "error", message: "A jelszó legalább 8 karakter legyen." };
+  }
+  if (password !== passwordConfirm) {
+    return { status: "error", message: "A két jelszó nem egyezik." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    return { status: "error", message: "Hiba történt a jelszó módosítása során." };
+  }
+
+  return { status: "success", message: "Jelszavad frissült." };
 }

@@ -45,5 +45,14 @@ export const config = {
   // getUser()-hívással. Korábban ez MINDEN navigáción lefuttatott egy
   // Supabase auth-kört is a marketing oldalakon — ez adta a lassú
   // oldalváltás érzetének egyik fő okát.
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/bejelentkezes", "/regisztracio", "/auth/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/admin/:path*",
+    "/bejelentkezes",
+    "/regisztracio",
+    "/auth/:path*",
+    "/elfelejtett-jelszo",
+    "/jelszo-uj",
+    "/belepes-linkkel",
+  ],
 };

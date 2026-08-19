@@ -11,6 +11,7 @@ import {
   Repeat,
   FileCheck2,
   Plus,
+  BadgePercent,
   type LucideIcon,
 } from "lucide-react";
 import { Container } from "./ui/Container";
@@ -148,6 +149,13 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
             >
               {content.cta_label}
             </Link>
+
+            {content.founding_note && (
+              <div className="mt-5 flex items-start gap-2.5 rounded-2xl border border-accent-dark/20 bg-accent-light/40 p-4">
+                <BadgePercent className="mt-0.5 h-4 w-4 shrink-0 text-accent-dark" strokeWidth={2} />
+                <p className="text-[13px] leading-relaxed text-ink">{content.founding_note}</p>
+              </div>
+            )}
           </div>
 
           <div className="relative isolate">

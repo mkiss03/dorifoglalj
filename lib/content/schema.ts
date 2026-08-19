@@ -271,6 +271,14 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     ],
   },
   { key: "forproviders.cta_label", section: "forproviders", label: "CTA gomb szövege", kind: "text", default: "Csatlakozom szolgáltatóként" },
+  {
+    key: "forproviders.founding_note",
+    section: "forproviders",
+    label: "Kezdeti/ingyenes időszak megjegyzése (üresen hagyva eltűnik)",
+    kind: "textarea",
+    default:
+      "A platform jelenleg induló, ingyenes időszakban jár — a most csatlakozó szolgáltatóknak a regisztráció és a foglalási rendszer használata díjmentes. A díjszabás esetleges bevezetéséről a meglévő szolgáltatókat előre, e-mailben értesítjük.",
+  },
   { key: "forproviders.mock_date_label", section: "forproviders", label: "Minta-naptár dátuma", kind: "text", default: "Kedd, november 17." },
   {
     key: "forproviders.mock_bookings",
@@ -509,6 +517,11 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         id: "cookies",
         label: "Munkamenet-sütik:",
         text: "kizárólag a bejelentkezés fenntartásához szükséges, funkcionálisan kötelező sütik. Marketing- vagy követő sütiket nem használunk.",
+      },
+      {
+        id: "analytics",
+        label: "Látogatottsági statisztika:",
+        text: "az oldal forgalmát (megtekintések száma, forrás, eszköztípus) cookie-mentes, egyéni azonosítást nem alkalmazó analitikai szolgáltatással (Vercel Web Analytics) mérjük — ez nem alkalmas az egyes látogatók személyes nyomon követésére.",
       },
     ],
   },

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo_Black, Ubuntu } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const display = Archivo_Black({
@@ -124,6 +125,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         {children}
+        <Analytics />
       </body>
     </html>
   );

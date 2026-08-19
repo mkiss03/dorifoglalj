@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BadgePercent } from "lucide-react";
 import { getUser } from "@/lib/supabase/server";
+import { getSiteContent } from "@/lib/content/get-site-content";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/Container";
 import { SignUpForm } from "./SignUpForm";
@@ -8,6 +10,9 @@ import { SignUpForm } from "./SignUpForm";
 export default async function RegisztracioPage() {
   const user = await getUser();
   if (user) redirect("/dashboard");
+
+  const content = await getSiteContent();
+  const foundingNote = content.forproviders.founding_note;
 
   return (
     <section className="flex min-h-screen items-center bg-paper py-14">
@@ -26,6 +31,14 @@ export default async function RegisztracioPage() {
             Hozd létre a fiókod, utána a profilodat és a szolgáltatásaidat az
             irányítópulton állíthatod be.
           </p>
+
+          {foundingNote && (
+            <div className="mt-4 flex items-start gap-2.5 rounded-2xl border border-accent-dark/20 bg-accent-light/40 p-4">
+              <BadgePercent className="mt-0.5 h-4 w-4 shrink-0 text-accent-dark" strokeWidth={2} />
+              <p className="text-[13px] leading-relaxed text-ink">{foundingNote}</p>
+            </div>
+          )}
+
           <SignUpForm />
           <p className="mt-6 text-center text-sm text-ink-soft">
             Már van fiókod?{" "}

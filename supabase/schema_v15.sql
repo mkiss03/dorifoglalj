@@ -2,6 +2,14 @@
 -- IdőpontNeked.hu — schema_v15: admin-monitoring RPC
 -- Additív a schema.sql .. schema_v14.sql-hez. Egyszer lefuttatandó a
 -- Supabase SQL Editorban.
+--
+-- FONTOS a futtatás után: a Supabase PostgREST rétege néhány
+-- másodpercen belül automatikusan felismeri az új függvényt (schema
+-- cache reload). Ha az admin felület "RPC nem elérhető" hibát mutat
+-- közvetlenül a futtatás után, várj 10-20 másodpercet és tölts újra,
+-- vagy kézzel is kikényszerítheted: Supabase Dashboard → Database →
+-- API Settings → "Reload schema cache" gomb (vagy SQL Editorban:
+-- NOTIFY pgrst, 'reload schema';).
 -- ============================================================
 
 create or replace function public.admin_get_monitoring_stats()
@@ -25,6 +33,8 @@ begin
     'pending_providers', (select count(*) from public.providers where status = 'pending'),
     'active_providers', (select count(*) from public.providers where status = 'active'),
     'suspended_providers', (select count(*) from public.providers where status = 'suspended'),
+    'providers_this_week', (select count(*) from public.providers where created_at >= now() - interval '7 days'),
+    'providers_this_month', (select count(*) from public.providers where created_at >= date_trunc('month', now())),
     'total_users', (select count(*) from auth.users),
     'total_services', (select count(*) from public.provider_services),
     'total_staff', (select count(*) from public.staff_members),
@@ -32,9 +42,10 @@ begin
     'confirmed_bookings', (select count(*) from public.bookings where status = 'confirmed'),
     'month_bookings', (select count(*) from public.bookings where created_at >= date_trunc('month', now())),
     'today_bookings', (select count(*) from public.bookings where created_at >= date_trunc('day', now())),
+    'week_bookings', (select count(*) from public.bookings where created_at >= now() - interval '7 days'),
     'unique_customers', (select count(distinct customer_email) from public.bookings where customer_email is not null and customer_email != ''),
-    'media_files_count', coalesce((select count(*) from storage.objects where bucket_id = 'provider-media'), 0),
-    'media_bytes_estimated', coalesce((select sum(coalesce((metadata->>'size')::bigint, 0)) from storage.objects where bucket_id = 'provider-media'), 0),
+    'media_files_count', coalesce((select count(*) from storage.objects where bucket_id in ('provider-media', 'site-media')), 0),
+    'media_bytes_estimated', coalesce((select sum(coalesce((metadata->>'size')::bigint, 0)) from storage.objects where bucket_id in ('provider-media', 'site-media')), 0),
     'total_db_rows', (
       (select count(*) from public.providers) +
       (select count(*) from public.provider_services) +

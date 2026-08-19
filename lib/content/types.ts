@@ -112,6 +112,7 @@ export type SiteContent = {
     promises: { id: string; title: string; text: string }[];
     benefits: { id: string; label: string }[];
     cta_label: string;
+    founding_note: string;
     mock_date_label: string;
     mock_bookings: { id: string; name: string; service: string }[];
     mock_facebook_note: string;

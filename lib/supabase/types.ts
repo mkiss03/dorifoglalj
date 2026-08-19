@@ -240,6 +240,8 @@ export type AdminMonitoringStats = {
   pending_providers: number;
   active_providers: number;
   suspended_providers: number;
+  providers_this_week: number;
+  providers_this_month: number;
   total_users: number;
   total_services: number;
   total_staff: number;
@@ -247,6 +249,7 @@ export type AdminMonitoringStats = {
   confirmed_bookings: number;
   month_bookings: number;
   today_bookings: number;
+  week_bookings: number;
   unique_customers: number;
   media_files_count: number;
   media_bytes_estimated: number;

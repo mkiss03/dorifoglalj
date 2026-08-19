@@ -15,12 +15,13 @@ export function SignUpForm() {
     return (
       <div className="mt-6 space-y-3">
         <p className="rounded-2xl bg-paper-alt p-4 text-[15px] leading-relaxed text-ink">
-          Elküldtük a megerősítő e-mailt — kattints a benne lévő linkre, utána
-          bejelentkezhetsz.
-        </p>
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-[15px] leading-relaxed text-amber-900">
-          Köszönjük a regisztrációt! Fiókod jóváhagyásra vár. Miután egyeztetünk veled
-          emailben, aktiváljuk a profilod. Addig is állítsd be az adataidat a dashboardban.
+          Ha ez az e-mail cím még nem regisztrált nálunk, elküldtük rá a megerősítő linket —
+          nézd meg a postaládád (a spam mappát is), és kattints a linkre a folytatáshoz. Ha
+          már van fiókod ezzel a címmel, egyszerűen{" "}
+          <a href="/bejelentkezes" className="font-semibold underline underline-offset-2">
+            jelentkezz be
+          </a>
+          .
         </p>
       </div>
     );

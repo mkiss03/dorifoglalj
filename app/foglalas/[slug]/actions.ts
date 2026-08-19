@@ -1,5 +1,6 @@
 "use server";
 
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { CreateBookingResult } from "@/lib/supabase/types";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -74,7 +75,14 @@ export async function createBookingAction(
   }
 
   if (email) {
-    void (async () => {
+    // A `create_booking` RPC-nél korábban `void (async () => {...})()`
+    // mintát használtunk az email küldésére a válasz visszaadása után —
+    // ez serverless környezetben (Vercel) megbízhatatlan volt, mert a
+    // függvényfolyamat leállhat, mielőtt a háttérben induló promise
+    // ténylegesen lefutna, így az email némán elveszett. A Next.js
+    // `after()` API-ja garantálja, hogy ez a kód a válasz elküldése
+    // után is végigfusson, mielőtt a függvény ténylegesen leáll.
+    after(async () => {
       try {
         const [{ data: provider }, { data: service }, { data: staff }] = await Promise.all([
           supabase.from("providers").select("business_name, phone, address, city").eq("slug", slug).single(),
@@ -97,7 +105,7 @@ export async function createBookingAction(
       } catch {
         // A foglalás sikerét az email-hiba nem hiúsíthatja meg.
       }
-    })();
+    });
   }
 
   return { status: "success", result };

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Globe, Link2, MapPin, Phone } from "lucide-react";
@@ -9,6 +10,45 @@ import { TAG_LABELS, type PublicProvider } from "@/lib/supabase/types";
 
 function formatHuf(n: number) {
   return new Intl.NumberFormat("hu-HU").format(n) + " Ft";
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("get_public_provider", { p_slug: slug });
+  if (!data) return { title: "Szolgáltató nem található" };
+
+  const provider = data as PublicProvider;
+  const categoryName = categories.find((c) => c.slug === provider.category)?.name;
+  const title = `${provider.business_name} — Időpontfoglalás`;
+  const description = provider.description
+    ? provider.description.slice(0, 160)
+    : `${provider.business_name} online időpontfoglalás (${categoryName ?? "szolgáltató"}, ${provider.city ?? "Magyarország"}). Foglalj szabad időpontot online.`;
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://idopontneked.hu";
+  const url = `${siteUrl}/foglalas/${slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: provider.cover_url || provider.logo_url ? [{ url: provider.cover_url || provider.logo_url! }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
 }
 
 export default async function BookingPage({
@@ -26,9 +66,44 @@ export default async function BookingPage({
   const categoryName = categories.find((c) => c.slug === provider.category)?.name;
   const initial = provider.business_name.trim().charAt(0).toUpperCase() || "?";
   const locationLine = [provider.address, provider.city].filter(Boolean).join(", ");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://idopontneked.hu";
+
+  const localBusinessJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BeautySalon",
+    name: provider.business_name,
+    description: provider.description || `${categoryName ?? "Szépségipari"} szolgáltató: ${provider.business_name}`,
+    url: `${siteUrl}/foglalas/${slug}`,
+    telephone: provider.phone || undefined,
+    address: provider.city || provider.address ? {
+      "@type": "PostalAddress",
+      addressLocality: provider.city || undefined,
+      streetAddress: provider.address || undefined,
+      addressCountry: "HU",
+    } : undefined,
+    image: provider.cover_url || provider.logo_url || undefined,
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Szolgáltatások",
+      itemListElement: provider.services.map((s) => ({
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: s.name,
+          description: s.description || undefined,
+        },
+        price: s.price_huf,
+        priceCurrency: "HUF",
+      })),
+    },
+  };
 
   return (
     <section className="pb-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+      />
       <div className="h-36 w-full overflow-hidden sm:h-52">
         {provider.cover_url ? (
           // eslint-disable-next-line @next/next/no-img-element

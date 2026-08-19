@@ -2,6 +2,7 @@
 
 import { sendContactEmail } from "@/lib/email/sendContactEmail";
 import { SUPPORT_EMAIL } from "@/lib/contact";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export type ContactState = {
   status: "idle" | "error" | "success";
@@ -20,6 +21,15 @@ export async function sendContactMessageAction(
   // bot ne próbálkozzon tovább, de ténylegesen nem küldünk semmit.
   if (String(formData.get("website") ?? "").trim()) {
     return { status: "success", message: "Köszönjük, hamarosan válaszolunk!" };
+  }
+
+  // Rate limit: max 5 kapcsolat üzenet / IP / 10 perc
+  const rateLimit = await checkRateLimit("contact", 5, 10 * 60 * 1000);
+  if (!rateLimit.success) {
+    return {
+      status: "error",
+      message: "Túl sok üzenetküldési kísérlet. Próbáld újra néhány perc múlva.",
+    };
   }
 
   const name = String(formData.get("name") ?? "").trim();

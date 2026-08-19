@@ -14,20 +14,94 @@ const body = Ubuntu({
   weight: ["300", "400", "500", "700"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://idopontneked.hu";
+
 export const metadata: Metadata = {
-  title: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
+    template: "%s — IdőpontNeked.hu",
+  },
   description:
-    "Az IdőpontNeked.hu egy online időpontfoglaló platform, ahol könnyedén megtalálod a számodra megfelelő szolgáltatót, megnézheted a szabad időpontokat, és néhány kattintással lefoglalhatod a Neked megfelelő időpontot telefonálás és hosszas egyeztetés nélkül.",
+    "Az IdőpontNeked.hu egy online időpontfoglaló platform, ahol könnyedén megtalálod a számodra megfelelő szolgáltatót (fodrász, köröm, kozmetika, masszázs stb.), megnézheted a szabad időpontokat, és néhány kattintással lefoglalhatod a Neked megfelelő időpontot.",
+  keywords: [
+    "időpontfoglalás",
+    "időpontfoglaló",
+    "fodrász időpont",
+    "körmös időpont",
+    "kozmetikus időpont",
+    "szépségipar",
+    "online foglalás",
+    "idopontneked",
+  ],
+  alternates: {
+    canonical: "./",
+  },
+  openGraph: {
+    title: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
+    description:
+      "Online időpontfoglaló piactér szépségipari szolgáltatóknak és a szabad időpontot kereső vendégeknek.",
+    url: siteUrl,
+    siteName: "IdőpontNeked.hu",
+    locale: "hu_HU",
+    type: "website",
+    images: [
+      {
+        url: "/apple-icon.png",
+        width: 512,
+        height: 512,
+        alt: "IdőpontNeked.hu logó",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
+    description: "Online időpontfoglaló piactér szépségipari szolgáltatóknak és vendégeknek.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "IdőpontNeked.hu",
-  url: "https://idopontneked.hu",
+  url: siteUrl,
+  logo: `${siteUrl}/icon.png`,
   slogan: "Ahol a szabad időpontok várnak.",
   description:
     "Online időpontfoglaló platform szépségipari szolgáltatóknak és az őket kereső vendégeknek.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "dori@idopontneked.hu",
+    contactType: "customer support",
+    availableLanguage: "Hungarian",
+  },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "IdőpontNeked.hu",
+  url: siteUrl,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${siteUrl}/kereses?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default function RootLayout({
@@ -44,6 +118,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         {children}
       </body>

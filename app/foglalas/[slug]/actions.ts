@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { CreateBookingResult } from "@/lib/supabase/types";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { sendBookingConfirmationEmail } from "@/lib/email/sendBookingConfirmationEmail";
 
 export type BookingFormState = {
   status: "idle" | "error" | "success";
@@ -25,6 +27,17 @@ export async function createBookingAction(
   _prevState: BookingFormState,
   formData: FormData
 ): Promise<BookingFormState> {
+  // Honeypot check
+  if (String(formData.get("hp_website") ?? "").trim()) {
+    return { status: "error", message: "Hiba történt a foglalás során." };
+  }
+
+  // Rate limit: max 10 foglalás / IP / 5 perc
+  const rateLimit = await checkRateLimit("booking", 10, 5 * 60 * 1000);
+  if (!rateLimit.success) {
+    return { status: "error", message: "Túl sok foglalási kísérlet. Próbáld újra néhány perc múlva." };
+  }
+
   const slug = String(formData.get("slug") ?? "");
   const serviceId = String(formData.get("service_id") ?? "");
   const staffId = String(formData.get("staff_id") ?? "");
@@ -60,6 +73,34 @@ export async function createBookingAction(
   const result = data as CreateBookingResult;
   if (!result.ok) {
     return { status: "error", message: ERROR_MESSAGES[result.error] ?? "Nem sikerült a foglalás." };
+  }
+
+  // Ha a vendég megadta az e-mail címét, visszaigazoló e-mailt küldünk neki
+  if (email) {
+    void (async () => {
+      try {
+        const [{ data: provider }, { data: service }, { data: staff }] = await Promise.all([
+          supabase.from("providers").select("business_name, phone, address, city").eq("slug", slug).single(),
+          supabase.from("provider_services").select("price_huf").eq("id", serviceId).single(),
+          supabase.from("staff_members").select("name").eq("id", staffId).single(),
+        ]);
+
+        await sendBookingConfirmationEmail({
+          to: email,
+          customerName: name,
+          providerName: provider?.business_name ?? "a szolgáltató",
+          providerPhone: provider?.phone ?? null,
+          providerAddress: provider?.address ?? null,
+          providerCity: provider?.city ?? null,
+          serviceName: result.service_name,
+          priceHuf: service?.price_huf ?? 0,
+          startsAt: result.starts_at,
+          staffName: staff?.name ?? null,
+        });
+      } catch {
+        // Csendes fallback — a foglalás sikerét az email-hiba nem hiúsíthatja meg
+      }
+    })();
   }
 
   return { status: "success", result };

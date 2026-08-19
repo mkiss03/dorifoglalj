@@ -28,6 +28,12 @@ export function SignUpForm() {
 
   return (
     <form action={formAction} className="mt-6 space-y-4">
+      {/* Honeypot rejtett mező botok ellen */}
+      <div className="sr-only" aria-hidden="true">
+        <label htmlFor="hp_website">Ne töltsd ki ezt a mezőt</label>
+        <input id="hp_website" name="hp_website" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <div>
         <label htmlFor="business_name" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-soft">
           Vállalkozás neve

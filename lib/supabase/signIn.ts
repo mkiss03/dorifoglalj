@@ -1,10 +1,17 @@
 import { createClient } from "./server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 /** A tényleges bejelentkezési logika, megosztva a nyilvános (/bejelentkezes)
  * és az admin (/admin/bejelentkezes) belépő oldal server actionje között —
  * a hitelesítés ugyanaz, csak a sikeres belépés utáni átirányítás célja
  * különbözik a két ajtó között (lásd a két actions.ts fájlt). */
 export async function attemptSignIn(formData: FormData): Promise<{ ok: true } | { ok: false; message: string }> {
+  // Rate limit: max 10 belépési kísérlet / IP / 10 perc
+  const rateLimit = await checkRateLimit("signin", 10, 10 * 60 * 1000);
+  if (!rateLimit.success) {
+    return { ok: false, message: "Túl sok bejelentkezési kísérlet. Próbáld újra néhány perc múlva." };
+  }
+
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 

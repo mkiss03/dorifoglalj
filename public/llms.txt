@@ -1,0 +1,26 @@
+# IdőpontNeked.hu — Online Időpontfoglaló Piactér
+
+> Az IdőpontNeked.hu (https://idopontneked.hu) egy magyar online időpontfoglaló piactér szépségipari és wellness szolgáltatóknak (fodrász, köröm, kozmetika, smink, szempilla, szemöldök, szőrtelenítés, masszázs, testkezelés, PMU) és az őket kereső vendégeknek.
+
+## Fő jellemzők
+- **Vendégeknek**: 0–24 órás online időpontfoglalás regisztráció és hívás nélkül, valós szabad időpontokkal, 1 kattintásos naptárba mentéssel (.ics). Vendégeknek teljesen ingyenes.
+- **Szolgáltatóknak**: Apple-stílusú irányítópult, naprakész naptár, szünet (puffer) időpontok között, zárolás (hold) versenyhelyzet ellen, egyedi foglalási landing page link, QR-kód generálás, munkatársak (staff) kezelése, eseti nyitvatartás-kizárások.
+
+## Kategóriák
+- Fodrász (vágás, festés, balayage, hajápolás)
+- Köröm & Műköröm (gél lakk, műköröm, manikűr, pedikűr)
+- Kozmetika (arctisztítás, mélytisztítás, anti-aging, peeling)
+- Smink (nappali smink, alkalmi smink, esküvői smink)
+- Szempilla & Szemöldök (1D-6D volume pilla, szempilla lifting, szemöldök formázás, laminálás)
+- Szőrtelenítés (gyantázás, lézeres szőrtelenítés, cukorpaszta)
+- Masszázs (svédmasszázs, frissítő masszázs, gyógymasszázs, talpmasszázs)
+- Testkezelések (alakformálás, zsírbontás, nyirokmasszázs)
+- PMU & Sminktetoválás (szemöldök tetoválás, ajaktetoválás, szemhéj tetoválás)
+
+## Hasznos hivatkozások
+- Főoldal: https://idopontneked.hu
+- Szolgáltatók keresése: https://idopontneked.hu/kereses
+- Szolgáltatói regisztráció: https://idopontneked.hu/regisztracio
+- Általános Szerződési Feltételek: https://idopontneked.hu/aszf
+- Adatkezelési tájékoztató: https://idopontneked.hu/adatkezeles
+- Impresszum: https://idopontneked.hu/impresszum

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { MiniCalendar } from "@/components/ui/MiniCalendar";
 import { CancelBookingModal } from "./CancelBookingModal";
 import type { Availability, Booking, StaffMember } from "@/lib/supabase/types";
@@ -63,6 +63,7 @@ export function BookingsSection({
   const columns = staff.length > 1 ? staff : null;
 
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
+  const [showMobileCalendar, setShowMobileCalendar] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
   const [nowHour, setNowHour] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -129,15 +130,64 @@ export function BookingsSection({
   return (
     <div className="shadow-sheet rounded-3xl bg-white p-4 lg:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
-        <p className="font-display text-lg text-ink">{formatDayHeader(selectedDate)}</p>
-        <button
-          type="button"
-          onClick={() => setSelectedDate(new Date())}
-          className="rounded-full bg-paper-alt px-3.5 py-1.5 text-xs font-semibold text-ink-soft transition-colors hover:bg-panel"
-        >
-          Ma
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              const prev = new Date(selectedDate);
+              prev.setDate(prev.getDate() - 1);
+              setSelectedDate(prev);
+            }}
+            aria-label="Előző nap"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:bg-panel hover:text-ink md:hidden"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <p className="font-display text-lg text-ink">{formatDayHeader(selectedDate)}</p>
+          <button
+            type="button"
+            onClick={() => {
+              const next = new Date(selectedDate);
+              next.setDate(next.getDate() + 1);
+              setSelectedDate(next);
+            }}
+            aria-label="Következő nap"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:bg-panel hover:text-ink md:hidden"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowMobileCalendar((v) => !v)}
+            aria-label="Dátumválasztó"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:bg-panel hover:text-ink md:hidden"
+          >
+            <CalendarDays className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedDate(new Date())}
+            className="rounded-full bg-paper-alt px-3.5 py-1.5 text-xs font-semibold text-ink-soft transition-colors hover:bg-panel"
+          >
+            Ma
+          </button>
+        </div>
       </div>
+
+      {showMobileCalendar && (
+        <div className="mt-3 border-b border-line pb-4 md:hidden">
+          <MiniCalendar
+            compact
+            selected={selectedDate}
+            onSelect={(d) => {
+              setSelectedDate(d);
+              setShowMobileCalendar(false);
+            }}
+          />
+        </div>
+      )}
 
       <div className="flex gap-6 pt-4">
         <div className="hidden shrink-0 md:block md:w-72">
@@ -234,9 +284,9 @@ export function BookingsSection({
                             onClick={() => setCancelTarget(b)}
                             aria-label="Lemondás"
                             title="Lemondás"
-                            className="absolute right-1.5 top-1.5 text-ink-soft/60 transition-colors hover:text-accent-dark"
+                            className="absolute right-0.5 top-0.5 flex h-7 w-7 items-center justify-center rounded-full text-ink-soft/60 transition-colors hover:bg-accent-light hover:text-accent-dark active:scale-95"
                           >
-                            <X className="h-3.5 w-3.5" strokeWidth={2.5} />
+                            <X className="h-4 w-4" strokeWidth={2.5} />
                           </button>
                         </div>
                       );

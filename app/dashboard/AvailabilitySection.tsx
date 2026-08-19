@@ -65,8 +65,8 @@ export function AvailabilitySection({ availability, staffId }: { availability: A
         {DAYS.map((d, index) => {
           const row = rows[index];
           return (
-            <div key={d.weekday} className="flex flex-wrap items-center gap-3 rounded-2xl bg-paper-alt px-4 py-2.5">
-              <label className="flex w-32 shrink-0 items-center gap-2 text-sm font-medium text-ink">
+            <div key={d.weekday} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 rounded-2xl bg-paper-alt px-4 py-2.5">
+              <label className="flex w-32 shrink-0 items-center gap-2 text-sm font-medium text-ink cursor-pointer py-1">
                 <input
                   type="checkbox"
                   name={`day_${d.weekday}_enabled`}
@@ -76,21 +76,23 @@ export function AvailabilitySection({ availability, staffId }: { availability: A
                 />
                 {d.label}
               </label>
-              <input
-                type="time"
-                name={`day_${d.weekday}_start`}
-                value={row.start}
-                onChange={(e) => updateRow(index, { start: e.target.value })}
-                className="rounded-xl bg-white px-3 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-accent-light"
-              />
-              <span className="text-ink-soft">–</span>
-              <input
-                type="time"
-                name={`day_${d.weekday}_end`}
-                value={row.end}
-                onChange={(e) => updateRow(index, { end: e.target.value })}
-                className="rounded-xl bg-white px-3 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-accent-light"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="time"
+                  name={`day_${d.weekday}_start`}
+                  value={row.start}
+                  onChange={(e) => updateRow(index, { start: e.target.value })}
+                  className="rounded-xl bg-white px-3 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-accent-light"
+                />
+                <span className="text-ink-soft">–</span>
+                <input
+                  type="time"
+                  name={`day_${d.weekday}_end`}
+                  value={row.end}
+                  onChange={(e) => updateRow(index, { end: e.target.value })}
+                  className="rounded-xl bg-white px-3 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-accent-light"
+                />
+              </div>
             </div>
           );
         })}

@@ -130,175 +130,173 @@ export function HungaryMap({
       viewport={bare ? undefined : { once: true, margin: "-60px" }}
       transition={bare ? undefined : { duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={clsx(
-        "rounded-3xl p-4 sm:p-6",
+        "rounded-3xl p-3 sm:p-6",
         bare ? "bg-paper-alt" : "shadow-sheet bg-white"
       )}
     >
       {heading && <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">{heading}</p>}
-      <div className="overflow-x-auto">
-        <div ref={wrapperRef} className="relative w-full min-w-[420px]">
-          <svg
-            viewBox={HUNGARY_VIEWBOX}
-            className="block w-full"
-            role="img"
-            aria-label="Magyarország térkép, megyénként böngészhető"
-          >
-            {HUNGARY_REGIONS.map((region) => {
-              const isDisplayed = region.id === displayedId;
-              const isSelected = region.id === selectedRegionId;
-              const isActive = isDisplayed || isSelected;
-              return (
-                <g key={region.id}>
-                  <path
-                    d={region.d}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`${region.title}: ${citiesForRegion(region.id).join(", ")}`}
-                    aria-expanded={isDisplayed}
-                    aria-pressed={isSelected}
-                    onMouseEnter={() => setHoverId(region.id)}
-                    onMouseLeave={() => setHoverId(null)}
-                    onFocus={() => setHoverId(region.id)}
-                    onBlur={() => setHoverId(null)}
-                    onClick={() => handleRegionClick(region)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleRegionClick(region);
-                      }
-                    }}
-                    stroke={bare ? "var(--paper-alt)" : "#fff"}
-                    strokeWidth={isActive ? 2 : 1.4}
-                    strokeLinejoin="round"
-                    className={clsx(
-                      "cursor-pointer outline-none transition-[fill,stroke-width] duration-200",
-                      isActive ? "fill-accent-light" : bare ? "fill-white hover:fill-accent-light" : "fill-paper-alt hover:fill-accent-light"
-                    )}
-                  />
-                  {region.cities.map((city) => {
-                    const isCityActive = isDisplayed || city.name === selectedCity;
-                    return city.enclaveD ? (
-                      // Az enclave-alakzat egy tényleges lyuk a megye path-jában
-                      // (ellentétes körüljárású subpath, nonzero fill-rule) — enélkül
-                      // a kézmutató itt a semmit találná el, kiesne a hoverből, és a
-                      // megye kiemelése villogna (ez okozta a "kiugró térkép" hibát).
-                      <path
-                        key={city.name}
-                        d={city.enclaveD}
-                        onMouseEnter={() => setHoverId(region.id)}
-                        onMouseLeave={() => setHoverId(null)}
-                        onClick={() => handleRegionClick(region)}
-                        className={clsx(
-                          "cursor-pointer transition-colors duration-200",
-                          isCityActive ? "fill-accent-dark" : "fill-ink/25"
-                        )}
-                      />
-                    ) : (
-                      <circle
-                        key={city.name}
-                        cx={city.markerX}
-                        cy={city.markerY}
-                        r={3}
-                        pointerEvents="none"
-                        className={clsx("transition-colors duration-200", isCityActive ? "fill-accent-dark" : "fill-ink/25")}
-                      />
-                    );
-                  })}
-                </g>
-              );
-            })}
-          </svg>
-
-          <AnimatePresence>
-            {displayed && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.92 }}
-                transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                style={{
-                  left: `${anchorXPct}%`,
-                  top: `${anchorYPct}%`,
-                  // Az x/y-t (nem sima transform stringet) a motion maga
-                  // komponálja össze a scale-lel — egy kézzel írt
-                  // style.transform-ot felülírna minden animációs frame-en,
-                  // emiatt az above/below igazítás soha nem érvényesült
-                  // ténylegesen, és a tooltip mindig jobbra-lefelé lógott ki
-                  // a horgonypontból (ez okozta, hogy alsó megyéknél, pl.
-                  // Baranyánál, a tooltip kilógott a térkép-kártya aljából).
-                  x: alignX === "left" ? "0%" : alignX === "right" ? "-100%" : "-50%",
-                  y: alignY === "above" ? "calc(-100% - 10px)" : "10px",
-                }}
-                className="shadow-card pointer-events-none absolute z-10 min-w-[9.5rem] rounded-2xl border border-line bg-white px-3 py-2.5"
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-soft">
-                  {regionKindLabel(displayed.id)}
-                  {displayed.id !== "HU-BU" && <> · {displayed.title}</>}
-                </p>
-                {(() => {
-                  const allCityNames = citiesForRegion(displayed.id);
-                  const VISIBLE_CAP = 6;
-                  const visibleCityNames = expanded ? allCityNames : allCityNames.slice(0, VISIBLE_CAP);
-                  const hiddenCount = allCityNames.length - visibleCityNames.length;
-                  const linkClassName =
-                    "pointer-events-auto flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-sm font-semibold text-ink transition-colors hover:bg-accent-light hover:text-accent-dark";
-                  return (
-                    <ul className={clsx("mt-1", expanded && "max-h-56 overflow-y-auto")}>
-                      {visibleCityNames.map((cityName) => {
-                        const inner = (
-                          <>
-                            <MapPin className="h-3.5 w-3.5 shrink-0 text-accent-dark" strokeWidth={2} />
-                            {cityName}
-                          </>
-                        );
-                        return (
-                          <li key={cityName}>
-                            {onSelectCity ? (
-                              <button
-                                type="button"
-                                className={linkClassName}
-                                onClick={() => {
-                                  onSelectCity(cityName);
-                                  setPinnedId(null);
-                                }}
-                              >
-                                {inner}
-                              </button>
-                            ) : (
-                              <Link href={`/kereses?city=${encodeURIComponent(cityName)}`} className={linkClassName}>
-                                {inner}
-                              </Link>
-                            )}
-                          </li>
-                        );
-                      })}
-                      {hiddenCount > 0 && (
-                        <li>
-                          <button
-                            type="button"
-                            className="pointer-events-auto w-full rounded-lg px-1.5 py-1 text-left text-xs font-semibold text-accent-dark transition-colors hover:bg-accent-light"
-                            onClick={() => {
-                              // A kibontás megnöveli a tooltip magasságát, ami
-                              // (az "above" igazításnál a saját magasságtól
-                              // függő y-eltolás miatt) elmozdítja a dobozt —
-                              // enélkül az egér a régi helyén egy másik megye
-                              // fölött maradhatna, és a tooltip átugorna oda.
-                              // A rögzítés (pin) ezt zárja ki.
-                              setPinnedId(displayed.id);
-                              setExpanded(true);
-                            }}
-                          >
-                            +{hiddenCount} további település
-                          </button>
-                        </li>
+      <div ref={wrapperRef} className="relative w-full">
+        <svg
+          viewBox={HUNGARY_VIEWBOX}
+          className="block w-full"
+          role="img"
+          aria-label="Magyarország térkép, megyénként böngészhető"
+        >
+          {HUNGARY_REGIONS.map((region) => {
+            const isDisplayed = region.id === displayedId;
+            const isSelected = region.id === selectedRegionId;
+            const isActive = isDisplayed || isSelected;
+            return (
+              <g key={region.id}>
+                <path
+                  d={region.d}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${region.title}: ${citiesForRegion(region.id).join(", ")}`}
+                  aria-expanded={isDisplayed}
+                  aria-pressed={isSelected}
+                  onMouseEnter={() => setHoverId(region.id)}
+                  onMouseLeave={() => setHoverId(null)}
+                  onFocus={() => setHoverId(region.id)}
+                  onBlur={() => setHoverId(null)}
+                  onClick={() => handleRegionClick(region)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleRegionClick(region);
+                    }
+                  }}
+                  stroke={bare ? "var(--paper-alt)" : "#fff"}
+                  strokeWidth={isActive ? 2 : 1.4}
+                  strokeLinejoin="round"
+                  className={clsx(
+                    "cursor-pointer outline-none transition-[fill,stroke-width] duration-200",
+                    isActive ? "fill-accent-light" : bare ? "fill-white hover:fill-accent-light" : "fill-paper-alt hover:fill-accent-light"
+                  )}
+                />
+                {region.cities.map((city) => {
+                  const isCityActive = isDisplayed || city.name === selectedCity;
+                  return city.enclaveD ? (
+                    // Az enclave-alakzat egy tényleges lyuk a megye path-jában
+                    // (ellentétes körüljárású subpath, nonzero fill-rule) — enélkül
+                    // a kézmutató itt a semmit találná el, kiesne a hoverből, és a
+                    // megye kiemelése villogna (ez okozta a "kiugró térkép" hibát).
+                    <path
+                      key={city.name}
+                      d={city.enclaveD}
+                      onMouseEnter={() => setHoverId(region.id)}
+                      onMouseLeave={() => setHoverId(null)}
+                      onClick={() => handleRegionClick(region)}
+                      className={clsx(
+                        "cursor-pointer transition-colors duration-200",
+                        isCityActive ? "fill-accent-dark" : "fill-ink/25"
                       )}
-                    </ul>
+                    />
+                  ) : (
+                    <circle
+                      key={city.name}
+                      cx={city.markerX}
+                      cy={city.markerY}
+                      r={3}
+                      pointerEvents="none"
+                      className={clsx("transition-colors duration-200", isCityActive ? "fill-accent-dark" : "fill-ink/25")}
+                    />
                   );
-                })()}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                })}
+              </g>
+            );
+          })}
+        </svg>
+
+        <AnimatePresence>
+          {displayed && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                left: `${anchorXPct}%`,
+                top: `${anchorYPct}%`,
+                // Az x/y-t (nem sima transform stringet) a motion maga
+                // komponálja össze a scale-lel — egy kézzel írt
+                // style.transform-ot felülírna minden animációs frame-en,
+                // emiatt az above/below igazítás soha nem érvényesült
+                // ténylegesen, és a tooltip mindig jobbra-lefelé lógott ki
+                // a horgonypontból (ez okozta, hogy alsó megyéknél, pl.
+                // Baranyánál, a tooltip kilógott a térkép-kártya aljából).
+                x: alignX === "left" ? "0%" : alignX === "right" ? "-100%" : "-50%",
+                y: alignY === "above" ? "calc(-100% - 10px)" : "10px",
+              }}
+              className="shadow-card pointer-events-none absolute z-10 min-w-[9.5rem] max-w-[calc(100vw-4rem)] rounded-2xl border border-line bg-white px-3 py-2.5"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-soft">
+                {regionKindLabel(displayed.id)}
+                {displayed.id !== "HU-BU" && <> · {displayed.title}</>}
+              </p>
+              {(() => {
+                const allCityNames = citiesForRegion(displayed.id);
+                const VISIBLE_CAP = 6;
+                const visibleCityNames = expanded ? allCityNames : allCityNames.slice(0, VISIBLE_CAP);
+                const hiddenCount = allCityNames.length - visibleCityNames.length;
+                const linkClassName =
+                  "pointer-events-auto flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-sm font-semibold text-ink transition-colors hover:bg-accent-light hover:text-accent-dark";
+                return (
+                  <ul className={clsx("mt-1", expanded && "max-h-56 overflow-y-auto")}>
+                    {visibleCityNames.map((cityName) => {
+                      const inner = (
+                        <>
+                          <MapPin className="h-3.5 w-3.5 shrink-0 text-accent-dark" strokeWidth={2} />
+                          {cityName}
+                        </>
+                      );
+                      return (
+                        <li key={cityName}>
+                          {onSelectCity ? (
+                            <button
+                              type="button"
+                              className={linkClassName}
+                              onClick={() => {
+                                onSelectCity(cityName);
+                                setPinnedId(null);
+                              }}
+                            >
+                              {inner}
+                            </button>
+                          ) : (
+                            <Link href={`/kereses?city=${encodeURIComponent(cityName)}`} className={linkClassName}>
+                              {inner}
+                            </Link>
+                          )}
+                        </li>
+                      );
+                    })}
+                    {hiddenCount > 0 && (
+                      <li>
+                        <button
+                          type="button"
+                          className="pointer-events-auto w-full rounded-lg px-1.5 py-1 text-left text-xs font-semibold text-accent-dark transition-colors hover:bg-accent-light"
+                          onClick={() => {
+                            // A kibontás megnöveli a tooltip magasságát, ami
+                            // (az "above" igazításnál a saját magasságtól
+                            // függő y-eltolás miatt) elmozdítja a dobozt —
+                            // enélkül az egér a régi helyén egy másik megye
+                            // fölött maradhatna, és a tooltip átugorna oda.
+                            // A rögzítés (pin) ezt zárja ki.
+                            setPinnedId(displayed.id);
+                            setExpanded(true);
+                          }}
+                        >
+                          +{hiddenCount} további település
+                        </button>
+                      </li>
+                    )}
+                  </ul>
+                );
+              })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <p className="mt-4 text-center text-xs text-ink-soft sm:hidden">Koppints egy megyére a városok megjelenítéséhez</p>

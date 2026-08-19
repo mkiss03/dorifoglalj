@@ -91,7 +91,7 @@ export async function createBookingAction(
     //     válaszában visszaadja ezeket az adatokat (schema_v16.sql).
     after(async () => {
       try {
-        await sendBookingConfirmationEmail({
+        const emailResult = await sendBookingConfirmationEmail({
           to: email,
           customerName: name,
           providerName: result.provider_name ?? "a szolgáltató",
@@ -103,8 +103,15 @@ export async function createBookingAction(
           startsAt: result.starts_at,
           staffName: result.staff_name ?? null,
         });
-      } catch {
-        // A foglalás sikerét az email-hiba nem hiúsíthatja meg.
+        // A foglalás sikerét az email-hiba nem hiúsíthatja meg, de a
+        // Vercel function logokban látszódnia kell, ha az email nem
+        // ment ki (pl. hiányzó RESEND_API_KEY vagy Resend API hiba) —
+        // korábban ez a hiba teljesen némán veszett el.
+        if (!emailResult.ok) {
+          console.error("[createBookingAction] Foglalás-visszaigazoló email nem ment ki:", emailResult.error);
+        }
+      } catch (err) {
+        console.error("[createBookingAction] Foglalás-visszaigazoló email küldése hibázott:", err);
       }
     });
   }

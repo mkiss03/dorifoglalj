@@ -51,7 +51,7 @@ export async function sendContactMessageAction(
     if (result.error === "missing_api_key") {
       return {
         status: "error",
-        message: `Az üzenetküldés jelenleg nincs beállítva — írj közvetlenül a ${SUPPORT_EMAIL} címre.`,
+        message: `Az üzenetküldés jelenleg nincs beállítva, írj közvetlenül a ${SUPPORT_EMAIL} címre.`,
       };
     }
     return { status: "error", message: "Hiba történt az üzenet küldése közben, próbáld újra." };

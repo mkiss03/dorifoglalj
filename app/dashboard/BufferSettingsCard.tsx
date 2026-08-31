@@ -14,7 +14,7 @@ export function BufferSettingsCard({ bufferMinutes }: { bufferMinutes: number })
     <div className="shadow-sheet mt-6 rounded-3xl bg-white p-6">
       <h2 className="font-display text-xl text-ink">Szünet két időpont között</h2>
       <p className="mt-1 text-sm text-ink-soft">
-        Ennyi időnek kell eltelnie egy foglalás vége és a következő kezdete között — így nem
+        Ennyi időnek kell eltelnie egy foglalás vége és a következő kezdete között, így nem
         kezdődhet új időpont közvetlenül az előző után.
       </p>
 

@@ -13,7 +13,7 @@ export default async function DashboardProfilePage() {
     <section>
       <h1 className="font-display text-3xl text-ink">Profil</h1>
       <p className="mt-2 text-[15px] text-ink-soft">
-        Ez jelenik meg a publikus foglalási oldaladon — minél teljesebb, annál megbízhatóbb a vendégeidnek.
+        Ez jelenik meg a publikus foglalási oldaladon. Minél teljesebb, annál megbízhatóbb a vendégeidnek.
       </p>
 
       <div className="shadow-sheet mt-6 overflow-hidden rounded-3xl bg-white">

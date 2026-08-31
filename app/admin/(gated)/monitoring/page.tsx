@@ -145,7 +145,7 @@ export default async function AdminMonitoringPage() {
   const SEVERITY_LABEL: Record<Severity, string> = {
     ok: "A kapacitás megfelelő",
     warning: "Közeledünk az ingyenes csomag korlátaihoz",
-    critical: "Az ingyenes csomag korlátai közelében vagyunk — bővítés szükséges",
+    critical: "Az ingyenes csomag korlátai közelében vagyunk, bővítés szükséges",
   };
   const OverallIcon = SEVERITY_ICON[overallSeverity];
 
@@ -193,7 +193,7 @@ export default async function AdminMonitoringPage() {
         {overallSeverity !== "ok" && (
           <p className="mt-6 rounded-2xl bg-paper-alt p-4 text-sm leading-relaxed text-ink-soft">
             Ha ez a kihasználtsági szint tartósan fennáll, érdemes megfontolni a Supabase Pro csomagra váltást, illetve
-            elkezdeni tervezni az ingyenes időszak lezárását — lásd lentebb az irányelveket.
+            elkezdeni tervezni az ingyenes időszak lezárását. Lásd lentebb az irányelveket.
           </p>
         )}
       </div>

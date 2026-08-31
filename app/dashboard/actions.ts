@@ -419,7 +419,7 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   return {
     status: "success",
     message: hasOverlap
-      ? "Kizárás mentve. Figyelem: erre az időszakra már van visszaigazolt foglalás — érdemes egyeztetni a vendéggel."
+      ? "Kizárás mentve. Figyelem: erre az időszakra már van visszaigazolt foglalás, érdemes egyeztetni a vendéggel."
       : "Kizárás mentve.",
   };
 }
@@ -500,7 +500,7 @@ export async function updateBookingLinkAction(
 
   if (error) {
     if (error.code === "23505") {
-      return { status: "error", message: "Ez a link már foglalt — válassz másikat." };
+      return { status: "error", message: "Ez a link már foglalt, válassz másikat." };
     }
     return { status: "error", message: "Hiba történt a mentés során." };
   }
@@ -556,7 +556,7 @@ export async function cancelBookingAction(
   if (!booking.customer_email) {
     return {
       status: "success",
-      message: "Foglalás lemondva. A vendégnek nincs email címe rögzítve — érdemes telefonon is értesíteni.",
+      message: "Foglalás lemondva. A vendégnek nincs email címe rögzítve, érdemes telefonon is értesíteni.",
     };
   }
 
@@ -581,7 +581,7 @@ export async function cancelBookingAction(
       emailResult.error === "missing_api_key" ? "az email-küldés nincs beállítva" : "az email küldése nem sikerült";
     return {
       status: "success",
-      message: `Foglalás lemondva. Az értesítő emailt nem sikerült elküldeni (${detail}) — érdemes telefonon is szólni a vendégnek.`,
+      message: `Foglalás lemondva. Az értesítő emailt nem sikerült elküldeni (${detail}), érdemes telefonon is szólni a vendégnek.`,
     };
   }
 
@@ -750,7 +750,7 @@ export async function deleteStaffAction(_prevState: StaffState, formData: FormDa
     .eq("provider_id", user.id);
 
   if ((totalStaff ?? 0) <= 1) {
-    return { status: "error", message: "Legalább egy munkatársnak lennie kell — inaktiváld törlés helyett." };
+    return { status: "error", message: "Legalább egy munkatársnak lennie kell, inaktiváld törlés helyett." };
   }
 
   const { count: bookingCount } = await supabase
@@ -762,7 +762,7 @@ export async function deleteStaffAction(_prevState: StaffState, formData: FormDa
   if ((bookingCount ?? 0) > 0) {
     return {
       status: "error",
-      message: "Ennek a munkatársnak már volt foglalása — törlés helyett inaktiváld.",
+      message: "Ennek a munkatársnak már volt foglalása, törlés helyett inaktiváld.",
     };
   }
 
@@ -836,7 +836,7 @@ export async function updateEmailAction(_prevState: AccountState, formData: Form
 
   return {
     status: "success",
-    message: "Megerősítő emailt küldtünk a régi és az új címedre is — a váltás csak mindkettő megerősítése után lép életbe.",
+    message: "Megerősítő emailt küldtünk a régi és az új címedre is. A váltás csak mindkettő megerősítése után lép életbe.",
   };
 }
 

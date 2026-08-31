@@ -15,8 +15,8 @@ export function SignUpForm() {
     return (
       <div className="mt-6 space-y-3">
         <p className="rounded-2xl bg-paper-alt p-4 text-[15px] leading-relaxed text-ink">
-          Ha ez az e-mail cím még nem regisztrált nálunk, elküldtük rá a megerősítő linket —
-          nézd meg a postaládád (a spam mappát is), és kattints a linkre a folytatáshoz. Ha
+          Ha ez az e-mail cím még nem regisztrált nálunk, elküldtük rá a megerősítő linket.
+          Nézd meg a postaládád (a spam mappát is), és kattints a linkre a folytatáshoz. Ha
           már van fiókod ezzel a címmel, egyszerűen{" "}
           <a href="/bejelentkezes" className="font-semibold underline underline-offset-2">
             jelentkezz be

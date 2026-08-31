@@ -56,7 +56,7 @@ export async function sendCancellationEmail(
   const { error } = await client.emails.send({
     from: RESEND_FROM_EMAIL,
     to: params.to,
-    subject: `Foglalás lemondva — ${params.providerName}`,
+    subject: `Foglalás lemondva – ${params.providerName}`,
     text,
     html,
   });

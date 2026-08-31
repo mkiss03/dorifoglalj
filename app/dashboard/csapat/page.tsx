@@ -16,7 +16,7 @@ export default async function DashboardStaffPage() {
     <section>
       <h1 className="font-display text-3xl text-ink">Csapat</h1>
       <p className="mt-2 text-[15px] text-ink-soft">
-        Ha többen dolgoztok (pl. körmös és pillás), vegyétek fel őket itt — mindenki saját nyitvatartást és
+        Ha többen dolgoztok (pl. körmös és pillás), vegyétek fel őket itt. Mindenki saját nyitvatartást és
         naptárat kap, a vendégek pedig foglaláskor kiválaszthatják, kihez szeretnének menni.
       </p>
 

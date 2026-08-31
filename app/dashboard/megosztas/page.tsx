@@ -19,11 +19,11 @@ export default async function DashboardSharingPage() {
     <section>
       <h1 className="font-display text-3xl text-ink">Megosztás</h1>
       <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-        Ez a saját, brandelt foglalási oldalad — nemcsak új érdeklődőknek szól: a{" "}
+        Ez a saját foglalási oldalad. Nemcsak új érdeklődők találhatnak rajta rád: a{" "}
         <span className="font-semibold text-ink">meglévő, visszatérő vendégeid</span> is nyugodtan
-        ezen keresztül foglalhatnak új időpontot, anélkül hogy fel kellene hívniuk vagy üzenniük
-        neked munka közben. Küldd ki egyszer a linket vagy a QR-kódot, utána a naptáradban
-        automatikusan megjelenik minden foglalásuk.
+        foglalhatnak itt új időpontot, anélkül hogy fel kellene hívniuk vagy üzenniük neked munka
+        közben. Küldd ki nekik egyszer a linket vagy a QR-kódot, utána minden foglalásuk
+        automatikusan megjelenik a naptáradban.
       </p>
 
       <div className="mt-6">

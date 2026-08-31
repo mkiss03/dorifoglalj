@@ -27,7 +27,7 @@ export async function sendContactEmail(params: SendContactEmailParams): Promise<
     from: RESEND_FROM_EMAIL,
     to: SUPPORT_EMAIL,
     replyTo: params.email,
-    subject: `Kapcsolatfelvétel — ${params.name}`,
+    subject: `Kapcsolatfelvétel – ${params.name}`,
     text,
     html,
   });

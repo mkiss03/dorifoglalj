@@ -132,7 +132,7 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
         <div>
           <h1 className="font-display text-3xl text-ink">Oldal-szerkesztő</h1>
           <p className="mt-1 text-[15px] text-ink-soft">
-            Válaszd ki lent, melyik oldalt szerkeszted — kattints bármire jobbra, hogy a hozzá tartozó mezőre ugorj, vagy
+            Válaszd ki lent, melyik oldalt szerkeszted. Kattints bármire jobbra, hogy a hozzá tartozó mezőre ugorj, vagy
             írj a bal oldali mezőkbe és nézd élőben a változást. Mentéskor azonnal élesbe kerül.
           </p>
         </div>
@@ -179,7 +179,7 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
           </div>
           {activePage === "legal" && (
             <p className="mb-2 px-1 text-[11px] text-ink-soft">
-              Ez az adat mindhárom jogi oldalon (ÁSZF, Adatkezelés, Impresszum) megjelenik — itt az Impresszumon
+              Ez az adat mindhárom jogi oldalon (ÁSZF, Adatkezelés, Impresszum) megjelenik, itt az Impresszumon
               látszik, mert az mutatja mind az 5 mezőt.
             </p>
           )}

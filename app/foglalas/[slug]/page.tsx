@@ -24,7 +24,7 @@ export async function generateMetadata({
 
   const provider = data as PublicProvider;
   const categoryName = categories.find((c) => c.slug === provider.category)?.name;
-  const title = `${provider.business_name} — Időpontfoglalás`;
+  const title = `${provider.business_name} · Időpontfoglalás`;
   const description = provider.description
     ? provider.description.slice(0, 160)
     : `${provider.business_name} online időpontfoglalás (${categoryName ?? "szolgáltató"}, ${provider.city ?? "Magyarország"}). Foglalj szabad időpontot online.`;
@@ -229,7 +229,7 @@ export default async function BookingPage({
         </div>
 
         <p className="mt-8 text-center text-xs text-ink-soft">
-          Foglalási oldal —{" "}
+          Foglalási oldal ·{" "}
           <Link href="/" className="font-semibold text-ink hover:text-accent-dark">
             IdőpontNeked.hu
           </Link>

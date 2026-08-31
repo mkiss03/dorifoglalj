@@ -81,7 +81,7 @@ export async function sendBookingConfirmationEmail(
       </div>
 
       <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #9ca3af;">
-        <p>Üdvözlettel,<br /><strong>IdőpontNeked.hu</strong> — Ahol a szabad időpontok várnak</p>
+        <p>Üdvözlettel,<br /><strong>IdőpontNeked.hu</strong> · Ahol a szabad időpontok várnak</p>
       </div>
     </div>
   `;
@@ -89,7 +89,7 @@ export async function sendBookingConfirmationEmail(
   const { error } = await client.emails.send({
     from: RESEND_FROM_EMAIL,
     to: params.to,
-    subject: `Foglalás visszaigazolva — ${params.providerName}`,
+    subject: `Foglalás visszaigazolva – ${params.providerName}`,
     text,
     html,
   });

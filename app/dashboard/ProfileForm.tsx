@@ -175,7 +175,7 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
       <div className="border-t border-line pt-4">
         <p className={labelClass}>Milyen alkalmakra vállalsz munkát?</p>
         <p className="mb-3 text-[13px] text-ink-soft">
-          Válassz legalább egyet — ez alapján tudnak majd rád szűrni a vendégek.
+          Válassz legalább egyet, ez alapján tudnak majd rád szűrni a vendégek.
         </p>
         <div className="flex flex-wrap gap-2">
           {PROVIDER_TAGS.map((tag) => (

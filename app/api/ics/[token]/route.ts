@@ -38,7 +38,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         `DTSTAMP:${formatDt(b.created_at)}`,
         `DTSTART:${formatDt(b.starts_at)}`,
         `DTEND:${formatDt(b.ends_at)}`,
-        `SUMMARY:${escapeIcs(`${b.service_name} — ${b.customer_name}`)}`,
+        `SUMMARY:${escapeIcs(`${b.service_name} · ${b.customer_name}`)}`,
         `DESCRIPTION:${escapeIcs(`Tel: ${b.customer_phone}`)}`,
         "END:VEVENT",
       ].join("\r\n")

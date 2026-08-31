@@ -20,8 +20,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://idopontneked.hu";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
-    template: "%s — IdőpontNeked.hu",
+    default: "IdőpontNeked.hu · Ahol a szabad időpontok várnak",
+    template: "%s · IdőpontNeked.hu",
   },
   description:
     "Az IdőpontNeked.hu egy online időpontfoglaló platform, ahol könnyedén megtalálod a számodra megfelelő szolgáltatót (fodrász, köröm, kozmetika, masszázs stb.), megnézheted a szabad időpontokat, és néhány kattintással lefoglalhatod a Neked megfelelő időpontot.",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     canonical: "./",
   },
   openGraph: {
-    title: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
+    title: "IdőpontNeked.hu · Ahol a szabad időpontok várnak",
     description:
       "Online időpontfoglaló piactér szépségipari szolgáltatóknak és a szabad időpontot kereső vendégeknek.",
     url: siteUrl,
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "IdőpontNeked.hu — Ahol a szabad időpontok várnak",
+    title: "IdőpontNeked.hu · Ahol a szabad időpontok várnak",
     description: "Online időpontfoglaló piactér szépségipari szolgáltatóknak és vendégeknek.",
   },
   robots: {

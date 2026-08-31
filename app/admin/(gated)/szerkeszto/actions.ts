@@ -70,5 +70,5 @@ export async function saveSiteContentAction(payload: SiteContent): Promise<SaveC
   revalidateTag("site-content", "max");
   revalidatePath("/", "layout");
 
-  return { status: "success", message: "Elmentve — a változtatások élesben is látszanak." };
+  return { status: "success", message: "Elmentve, a változtatások élesben is látszanak." };
 }

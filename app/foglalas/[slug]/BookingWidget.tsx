@@ -17,10 +17,10 @@ const HOLD_ERROR_MESSAGES: Record<string, string> = {
   service_not_found: "Ez a szolgáltatás nem található.",
   staff_not_found: "Ez a munkatárs nem érhető el.",
   staff_not_eligible: "Ez a munkatárs nem végzi ezt a szolgáltatást.",
-  in_past: "Ez az időpont már elmúlt — válassz másikat.",
-  outside_hours: "Ez az időpont már nem elérhető — válassz másikat.",
-  slot_blocked: "Ez az időpont már nem elérhető — válassz másikat.",
-  slot_taken: "Ezt az időpontot időközben lefoglalták — válassz másikat.",
+  in_past: "Ez az időpont már elmúlt, válassz másikat.",
+  outside_hours: "Ez az időpont már nem elérhető, válassz másikat.",
+  slot_blocked: "Ez az időpont már nem elérhető, válassz másikat.",
+  slot_taken: "Ezt az időpontot időközben lefoglalták, válassz másikat.",
 };
 
 function formatHuf(n: number) {
@@ -95,7 +95,7 @@ function BookingConfirmation({
   result: Extract<CreateBookingResult, { ok: true }>;
 }) {
   const icsHref = buildIcsDataUri({
-    title: `${result.service_name} — ${provider.business_name}`,
+    title: `${result.service_name} · ${provider.business_name}`,
     start: result.starts_at,
     end: result.ends_at,
     description: `Foglalás itt: ${provider.business_name}`,
@@ -108,7 +108,7 @@ function BookingConfirmation({
       </span>
       <h2 className="mt-4 font-display text-2xl text-ink">Foglalás visszaigazolva</h2>
       <p className="mt-2 text-ink-soft">
-        {result.service_name} —{" "}
+        {result.service_name} ·{" "}
         {new Intl.DateTimeFormat("hu-HU", {
           dateStyle: "full",
           timeStyle: "short",
@@ -430,14 +430,14 @@ export function BookingWidget({ provider }: { provider: PublicProvider }) {
             disabled={pending}
             className="w-full rounded-full bg-ink px-6 py-3 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90 disabled:opacity-60"
           >
-            {pending ? "Foglalás…" : `Foglalás — ${formatHuf(selectedService.price_huf)}`}
+            {pending ? "Foglalás…" : `Foglalás · ${formatHuf(selectedService.price_huf)}`}
           </button>
         </form>
       )}
 
       {holdExpired && (
         <div className="mt-6 border-t border-line pt-6">
-          <p className="text-sm text-red-700">A foglalási idő lejárt — válaszd ki újra az időpontot.</p>
+          <p className="text-sm text-red-700">A foglalási idő lejárt, válaszd ki újra az időpontot.</p>
         </div>
       )}
     </div>

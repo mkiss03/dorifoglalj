@@ -108,7 +108,7 @@ function ManualBookingForm({
 
       {serviceId && eligibleStaff.length === 0 && (
         <p className="mt-3 text-sm text-ink-soft">
-          Ehhez a szolgáltatáshoz jelenleg nincs hozzárendelt munkatárs — rendeld hozzá a Csapat fülön.
+          Ehhez a szolgáltatáshoz jelenleg nincs hozzárendelt munkatárs, rendeld hozzá a Csapat fülön.
         </p>
       )}
 
@@ -222,7 +222,7 @@ export function ManualBookingPanel({
 
       {open && activeServices.length === 0 && (
         <p className="mt-3 text-sm text-ink-soft">
-          Nincs aktív szolgáltatásod — vegyél fel egyet a Szolgáltatások fülön.
+          Nincs aktív szolgáltatásod, vegyél fel egyet a Szolgáltatások fülön.
         </p>
       )}
 

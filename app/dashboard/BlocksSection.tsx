@@ -38,7 +38,7 @@ export function BlocksSection({
       <h2 className="font-display text-xl text-ink">Eseti kizárások</h2>
       <p className="mt-1 text-sm text-ink-soft">
         Ha a heti nyitvatartásodon belül egy adott napon/időszakban mégsem érsz rá (pl. kedden
-        8–9 között ügyet kell intézned), itt jelölheted ki — ekkor a vendégek nem tudnak arra
+        8–9 között ügyet kell intézned), itt jelölheted ki. Ekkor a vendégek nem tudnak arra
         az időpontra foglalni.
       </p>
 

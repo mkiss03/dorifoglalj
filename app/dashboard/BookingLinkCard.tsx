@@ -36,7 +36,7 @@ export function BookingLinkCard({
 
   return (
     <div className="shadow-sheet overflow-hidden rounded-3xl bg-white">
-      {/* Brandelt fejléc — a szolgáltató saját logójával/nevével, hogy a
+      {/* Brandelt fejléc: a szolgáltató saját logójával/nevével, hogy a
           szekció ne egy generikus "itt a linked" doboznak hasson, hanem a
           saját, kiküldésre kész foglalási oldalának. */}
       <div className="flex items-center gap-3 bg-ink px-6 py-5">
@@ -57,14 +57,14 @@ export function BookingLinkCard({
       <div className="p-6">
         <p className="text-sm leading-relaxed text-ink-soft">
           Ez a saját foglalási oldalad. A <span className="font-semibold text-ink">meglévő vendégeid</span> is
-          nyugodtan foglalhatnak rajta keresztül — nem kell hozzá regisztrálniuk, és téged sem kell közben
+          nyugodtan foglalhatnak rajta keresztül, nem kell hozzá regisztrálniuk, és téged sem kell közben
           hívniuk vagy üzenniük.
         </p>
 
         {provider.status === "pending" && (
           <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
             A link és a QR-kód már most elmenthető/kiosztható, de a foglalási oldal csak azután él, hogy a
-            fiókodat jóváhagytuk — addig a vendégek 404-et kapnak rá.
+            fiókodat jóváhagytuk. Addig a vendégek 404-et kapnak rá.
           </p>
         )}
 
@@ -198,7 +198,7 @@ export function BookingLinkCard({
         <div className="mt-5 border-t border-line pt-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Naptár-szinkron (Google / Apple)</p>
           <p className="mt-1 text-sm text-ink-soft">
-            Told be ezt a linket a saját naptáradba („Feliratkozás URL alapján” / „Új naptár-előfizetés”) — az új
+            Told be ezt a linket a saját naptáradba („Feliratkozás URL alapján” / „Új naptár-előfizetés”), és az új
             foglalások automatikusan megjelennek benne.
           </p>
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-paper-alt p-2 pl-4">

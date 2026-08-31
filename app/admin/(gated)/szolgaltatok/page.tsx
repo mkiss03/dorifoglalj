@@ -73,7 +73,7 @@ export default async function AdminSzolgaltatokPage({
     <section>
       <h1 className="font-display text-3xl text-ink">Szolgáltatók</h1>
       <p className="mt-2 text-[15px] text-ink-soft">
-        Jóváhagyás, felfüggesztés — a Supabase SQL Editor helyett innen kezelheted a szolgáltatói fiókokat.
+        Jóváhagyás, felfüggesztés: a Supabase SQL Editor helyett innen kezelheted a szolgáltatói fiókokat.
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

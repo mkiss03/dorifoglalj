@@ -40,7 +40,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   {
     key: "hero.heading_segments",
     section: "hero",
-    label: "Főcím (3 rész — a középső színes kiemeléssel jelenik meg)",
+    label: "Főcím (3 rész, a középső színes kiemeléssel jelenik meg)",
     kind: "list",
     mode: "fixed",
     itemLabel: "Szövegrész",
@@ -64,7 +64,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     section: "hero",
     label: "Kiemelt mottó a bevezető szöveg alatt",
     kind: "text",
-    default: "IdőpontNeked.hu – ahol a szabad időpontok várnak.",
+    default: "IdőpontNeked.hu, ahol a szabad időpontok várnak.",
   },
   { key: "hero.search_button_label", section: "hero", label: "Keresés gomb szövege", kind: "text", default: "Keresés" },
   {
@@ -284,7 +284,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Kezdeti/ingyenes időszak megjegyzése (üresen hagyva eltűnik)",
     kind: "textarea",
     default:
-      "A platform jelenleg induló, ingyenes időszakban jár — a most csatlakozó szolgáltatóknak a regisztráció és a foglalási rendszer használata díjmentes. A díjszabás esetleges bevezetéséről a meglévő szolgáltatókat előre, e-mailben értesítjük.",
+      "A platform jelenleg induló, ingyenes időszakban jár, a most csatlakozó szolgáltatóknak a regisztráció és a foglalási rendszer használata díjmentes. A díjszabás esetleges bevezetéséről a meglévő szolgáltatókat előre, e-mailben értesítjük.",
   },
   { key: "forproviders.mock_date_label", section: "forproviders", label: "Minta-naptár dátuma", kind: "text", default: "Kedd, november 17." },
   {
@@ -324,7 +324,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   {
     key: "ctabanner.heading_segments",
     section: "ctabanner",
-    label: "Címsor (3 rész — a középső színes kiemeléssel jelenik meg)",
+    label: "Címsor (3 rész, a középső színes kiemeléssel jelenik meg)",
     kind: "list",
     mode: "fixed",
     itemLabel: "Szövegrész",
@@ -420,7 +420,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       },
     ],
   },
-  { key: "footer.copyright_suffix", section: "footer", label: "Copyright-sor (az évszám automatikus)", kind: "text", default: "IdőpontNeked.hu — Minden jog fenntartva." },
+  { key: "footer.copyright_suffix", section: "footer", label: "Copyright-sor (az évszám automatikus)", kind: "text", default: "IdőpontNeked.hu. Minden jog fenntartva." },
   { key: "footer.bottom_note", section: "footer", label: "Alsó sor jobb oldali szövege", kind: "text", default: "Készült Magyarországon" },
   { key: "footer.facebook_url", section: "footer", label: "Facebook link", kind: "text", default: "#" },
   { key: "footer.instagram_url", section: "footer", label: "Instagram link", kind: "text", default: "#" },
@@ -513,7 +513,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       {
         id: "guest",
         label: "Foglaláskor (vendégként):",
-        text: "név, telefonszám, és — ha megadod — e-mail cím, a foglalás időpontja és a választott szolgáltatás. Regisztráció nem szükséges.",
+        text: "név, telefonszám, ha megadod akkor e-mail cím, a foglalás időpontja és a választott szolgáltatás. Regisztráció nem szükséges.",
       },
       {
         id: "provider",
@@ -528,7 +528,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       {
         id: "analytics",
         label: "Látogatottsági statisztika:",
-        text: "az oldal forgalmát (megtekintések száma, forrás, eszköztípus) cookie-mentes, egyéni azonosítást nem alkalmazó analitikai szolgáltatással (Vercel Web Analytics) mérjük — ez nem alkalmas az egyes látogatók személyes nyomon követésére.",
+        text: "az oldal forgalmát (megtekintések száma, forrás, eszköztípus) cookie-mentes, egyéni azonosítást nem alkalmazó analitikai szolgáltatással (Vercel Web Analytics) mérjük. Ez nem alkalmas az egyes látogatók személyes nyomon követésére.",
       },
     ],
   },
@@ -558,9 +558,9 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   {
     key: "adatkezeles.retention_extra_body",
     section: "adatkezeles",
-    label: "Megőrzési idő — kiegészítő szöveg (a fiókadatokról)",
+    label: "Megőrzési idő - kiegészítő szöveg (a fiókadatokról)",
     kind: "richtext",
-    default: "A szolgáltatói fiók adatait a fiók törléséig, illetve — ha ezt kéred — a törlési kérelem teljesítéséig kezeljük.",
+    default: "A szolgáltatói fiók adatait a fiók törléséig, illetve ha ezt kéred, a törlési kérelem teljesítéséig kezeljük.",
   },
   {
     key: "adatkezeles.rights_body",

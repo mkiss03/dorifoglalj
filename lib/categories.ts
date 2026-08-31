@@ -9,6 +9,7 @@ import {
   Waves,
   Flame,
   Stamp,
+  Armchair,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,23 +27,15 @@ export type Category = {
 export const categories: Category[] = [
   {
     slug: "haj",
-    name: "Haj",
+    name: "Fodrászat",
     icon: Scissors,
-    items: [
-      "Fodrászat",
-      "Barber",
-      "Hajhosszabbítás",
-      "Alkalmi frizurák",
-      "Menyasszonyi frizurák",
-      "Hajkezelések",
-      "Hajfestés",
-    ],
+    items: ["Női fodrászat", "Férfi fodrászat", "Gyermek fodrászat"],
   },
   {
     slug: "korom",
-    name: "Köröm",
+    name: "Manikűr, pedikűr",
     icon: Hand,
-    items: ["Manikűr", "Műköröm", "Gél lakk", "Pedikűr", "Körömápolás"],
+    items: ["Műköröm", "Gél lakk"],
   },
   {
     slug: "kozmetika",
@@ -84,7 +77,7 @@ export const categories: Category[] = [
     slug: "szortelenites",
     name: "Szőrtelenítés",
     icon: Zap,
-    items: ["Gyanta", "Cukorgyanta", "IPL", "Lézer"],
+    items: ["Gyantázás", "Cukorgyanta", "Tartós szőrtelenítés", "Lézer"],
   },
   {
     slug: "masszazs",
@@ -107,9 +100,15 @@ export const categories: Category[] = [
   },
   {
     slug: "pmu",
-    name: "PMU",
+    name: "Sminktetoválás",
     icon: Stamp,
     items: ["Szemöldök", "Ajak", "Szemhéj"],
+  },
+  {
+    slug: "barber",
+    name: "Barber",
+    icon: Armchair,
+    items: ["Férfi hajvágás", "Szakálligazítás", "Borotválás"],
   },
 ];
 

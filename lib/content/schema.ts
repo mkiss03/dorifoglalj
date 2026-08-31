@@ -27,8 +27,8 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     ],
     default: [
       { id: "nl-1", label: "Szolgáltatók keresése", href: "/kereses" },
-      { id: "nl-2", label: "Szolgáltatóknak", href: "#szolgaltatoknak" },
-      { id: "nl-5", label: "Kapcsolat", href: "#gyik" },
+      { id: "nl-2", label: "Szolgáltatóknak", href: "/#szolgaltatoknak" },
+      { id: "nl-5", label: "Kapcsolat", href: "/#gyik" },
     ],
   },
   { key: "header.categories_menu_label", section: "header", label: "„Kategóriák” menügomb", kind: "text", default: "Kategóriák" },
@@ -46,9 +46,9 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     itemLabel: "Szövegrész",
     fields: [{ key: "text", label: "Szöveg", kind: "text" }],
     default: [
-      { id: "lead", text: "Fodrász, körmös, kozmetikus: időpont " },
-      { id: "accent", text: "30 másodperc alatt," },
-      { id: "tail", text: " telefon nélkül." },
+      { id: "lead", text: "Foglalj időpontot egyszerűen, " },
+      { id: "accent", text: "online kedvenc szolgáltatódhoz," },
+      { id: "tail", text: " telefonálás nélkül." },
     ],
   },
   {
@@ -57,7 +57,14 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "Bevezető szöveg",
     kind: "textarea",
     default:
-      "Az IdőpontNeked.hu összeköti a vendégeket a szépségipari szolgáltatókkal. Böngéssz kategória vagy település szerint, nézd meg a valós szabad időpontokat, és regisztráció nélkül foglalj.",
+      "Az IdőpontNeked.hu-n könnyedén megtalálod a hozzád illő szolgáltatót, megnézheted a valós szabad időpontokat, és néhány kattintással lefoglalhatod a Neked megfelelőt regisztráció nélkül.",
+  },
+  {
+    key: "hero.tagline",
+    section: "hero",
+    label: "Kiemelt mottó a bevezető szöveg alatt",
+    kind: "text",
+    default: "IdőpontNeked.hu – ahol a szabad időpontok várnak.",
   },
   { key: "hero.search_button_label", section: "hero", label: "Keresés gomb szövege", kind: "text", default: "Keresés" },
   {
@@ -72,7 +79,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { key: "label", label: "Leírás", kind: "text" },
     ],
     default: [
-      { id: "categories", value: "10", label: "fő kategória, 46+ szolgáltatástípus" },
+      { id: "categories", value: "11", label: "fő kategória, 40+ szolgáltatástípus" },
       { id: "free", value: "0 Ft", label: "regisztrációs és foglalási díj" },
       { id: "hours", value: "0–24", label: "non-stop online időpontfoglalás" },
       { id: "sync", value: "1 naptár", label: "Google és Apple naptárral szinkronban" },
@@ -390,16 +397,16 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         title: "Vendégeknek",
         links: [
           { id: "l-1", label: "Szolgáltatók keresése", href: "/kereses" },
-          { id: "l-2", label: "Hogyan működik", href: "#hogyan-mukodik" },
-          { id: "l-3", label: "Kategóriák", href: "#kategoriak" },
-          { id: "l-4", label: "Gyakori kérdések", href: "#gyik" },
+          { id: "l-2", label: "Hogyan működik", href: "/#hogyan-mukodik" },
+          { id: "l-3", label: "Kategóriák", href: "/#kategoriak" },
+          { id: "l-4", label: "Gyakori kérdések", href: "/#gyik" },
         ],
       },
       {
         id: "col-2",
         title: "Szolgáltatóknak",
         links: [
-          { id: "l-5", label: "Csatlakozom szolgáltatóként", href: "#szolgaltatoknak" },
+          { id: "l-5", label: "Csatlakozom szolgáltatóként", href: "/#szolgaltatoknak" },
         ],
       },
       {

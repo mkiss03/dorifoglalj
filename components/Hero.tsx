@@ -453,6 +453,9 @@ export function Hero({
               />
 
               <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
+              {content.tagline && (
+                <p className="mt-3 text-sm font-semibold text-accent-dark lg:text-base">{content.tagline}</p>
+              )}
             </div>
 
             <div className="relative hidden lg:block">

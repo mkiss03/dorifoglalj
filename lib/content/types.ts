@@ -72,6 +72,7 @@ export type SiteContent = {
     eyebrow: string;
     heading_segments: { id: string; text: string }[];
     paragraph: string;
+    tagline: string;
     search_button_label: string;
     stats: { id: string; value: string; label: string }[];
     collage_image: string;

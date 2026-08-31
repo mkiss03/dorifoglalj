@@ -505,7 +505,7 @@ export function Hero({
               </AnimatePresence>
             </div>
 
-            <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mt-4">
+            <div className="mt-3 flex flex-wrap gap-2.5 lg:mt-4">
               {categories.map((c) => {
                 const active = category === c.name;
                 const Icon = categoryIconBySlug[c.slug];

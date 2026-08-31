@@ -18,8 +18,12 @@ export default async function DashboardSharingPage() {
   return (
     <section>
       <h1 className="font-display text-3xl text-ink">Megosztás</h1>
-      <p className="mt-2 text-[15px] text-ink-soft">
-        Oszd meg ezt a linket az ügyfeleiddel — regisztráció nélkül tudnak nálad időpontot foglalni.
+      <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
+        Ez a saját, brandelt foglalási oldalad — nemcsak új érdeklődőknek szól: a{" "}
+        <span className="font-semibold text-ink">meglévő, visszatérő vendégeid</span> is nyugodtan
+        ezen keresztül foglalhatnak új időpontot, anélkül hogy fel kellene hívniuk vagy üzenniük
+        neked munka közben. Küldd ki egyszer a linket vagy a QR-kódot, utána a naptáradban
+        automatikusan megjelenik minden foglalásuk.
       </p>
 
       <div className="mt-6">
@@ -27,7 +31,7 @@ export default async function DashboardSharingPage() {
           <BookingLinkCard
             provider={typedProvider}
             siteUrl={siteUrl}
-            qrDataUrl={await QRCode.toDataURL(`${siteUrl}/foglalas/${typedProvider.slug}`, { margin: 1, width: 240 })}
+            qrDataUrl={await QRCode.toDataURL(`${siteUrl}/foglalas/${typedProvider.slug}`, { margin: 1, width: 480 })}
           />
         ) : (
           <p className="text-sm text-ink-soft">A profilod betöltése után itt jelenik meg a foglalási linked.</p>

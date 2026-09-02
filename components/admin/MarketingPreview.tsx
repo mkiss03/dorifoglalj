@@ -2,12 +2,12 @@
 
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { Categories } from "@/components/Categories";
 import { FeaturedProviders } from "@/components/FeaturedProviders";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Comparison } from "@/components/Comparison";
 import { WhyUs } from "@/components/WhyUs";
 import { ForProviders } from "@/components/ForProviders";
+import { ForProvidersWhy } from "@/components/ForProvidersWhy";
 import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
@@ -38,8 +38,11 @@ export function MarketingPreview({ content }: { content: SiteContent }) {
         <Section id="hero">
           <Hero content={content.hero} categories={resolvedCategories} countyCities={[]} />
         </Section>
-        <Section id="categories">
-          <Categories content={content.categories} categories={resolvedCategories} />
+        <Section id="forproviders">
+          <ForProviders content={content.forproviders} />
+        </Section>
+        <Section id="forproviderswhy">
+          <ForProvidersWhy content={content.forproviderswhy} />
         </Section>
         <Section id="featuredproviders">
           <FeaturedProviders content={content.featuredproviders} providers={[]} />
@@ -52,9 +55,6 @@ export function MarketingPreview({ content }: { content: SiteContent }) {
         </Section>
         <Section id="whyus">
           <WhyUs content={content.whyus} />
-        </Section>
-        <Section id="forproviders">
-          <ForProviders content={content.forproviders} />
         </Section>
         <Section id="ctabanner">
           <CtaBanner content={content.ctabanner} />

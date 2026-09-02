@@ -17,6 +17,7 @@ export const MARKETING_SECTION_ORDER: SectionId[] = [
   "comparison",
   "howitworks",
   "forproviders",
+  "forproviderswhy",
   "featuredproviders",
   "mobilestickycta",
 ];

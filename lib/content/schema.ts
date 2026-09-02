@@ -67,6 +67,9 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     default: "IdőpontNeked.hu, ahol a szabad időpontok várnak.",
   },
   { key: "hero.search_button_label", section: "hero", label: "Keresés gomb szövege", kind: "text", default: "Keresés" },
+  { key: "hero.guest_cta_label", section: "hero", label: "Vendég CTA gomb szövege", kind: "text", default: "Időpontot keresek" },
+  { key: "hero.guest_cta_sublabel", section: "hero", label: "Vendég CTA gomb al-szövege (zárójelben)", kind: "text", default: "vendég vagyok" },
+  { key: "hero.provider_cta_label", section: "hero", label: "Szolgáltató CTA gomb szövege", kind: "text", default: "Szolgáltatóként csatlakozom" },
   {
     key: "hero.stats",
     section: "hero",
@@ -121,17 +124,11 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   // ------------------------------------------------------------ howitworks
   { key: "howitworks.eyebrow", section: "howitworks", label: "Felirat a cím felett", kind: "text", default: "Egyszerű folyamat" },
   { key: "howitworks.heading", section: "howitworks", label: "Címsor", kind: "text", default: "Hogyan működik?" },
+  { key: "howitworks.guest_heading", section: "howitworks", label: "Bal oszlop címe (vendégeknek)", kind: "text", default: "Vendégként így foglalsz" },
   {
-    key: "howitworks.disclaimer",
+    key: "howitworks.guest_steps",
     section: "howitworks",
-    label: "Kis megjegyzés a képernyők mellett",
-    kind: "text",
-    default: "Illusztráció, mintaadatokkal.",
-  },
-  {
-    key: "howitworks.steps",
-    section: "howitworks",
-    label: "Lépések",
+    label: "Vendég-lépések",
     kind: "list",
     mode: "fixed",
     itemLabel: "Lépés",
@@ -140,30 +137,31 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { key: "text", label: "Leírás", kind: "text" },
     ],
     default: [
-      { id: "search", title: "Keresd meg", text: "Válaszd ki a számodra megfelelő szolgáltatót kategória, település vagy szolgáltatás alapján." },
-      { id: "pick", title: "Válaszd ki", text: "Nézd meg a szolgáltató szabad időpontjait, szolgáltatásait és referenciáit." },
-      { id: "book", title: "Foglalj", text: "Foglalj időpontot néhány kattintással, telefonálás nélkül." },
+      { id: "search", title: "Keresd meg", text: "a számodra megfelelő szolgáltatót." },
+      { id: "pick", title: "Válaszd ki", text: "a szabad időpontot." },
+      { id: "details", title: "Add meg", text: "az adataidat." },
+      { id: "confirm", title: "Megkapod", text: "a visszaigazolást e-mailben." },
     ],
   },
+  { key: "howitworks.provider_heading", section: "howitworks", label: "Jobb oszlop címe (szolgáltatóknak)", kind: "text", default: "Szolgáltatóként így működik" },
   {
-    key: "howitworks.mock_results",
+    key: "howitworks.provider_steps",
     section: "howitworks",
-    label: "1. lépés minta-találatai",
+    label: "Szolgáltató-lépések",
     kind: "list",
     mode: "fixed",
-    itemLabel: "Minta találat",
+    itemLabel: "Lépés",
     fields: [
-      { key: "name", label: "Név", kind: "text" },
-      { key: "area", label: "Terület", kind: "text" },
+      { key: "title", label: "Cím", kind: "text" },
+      { key: "text", label: "Leírás", kind: "text" },
     ],
     default: [
-      { id: "r1", name: "Anna Nails Studio", area: "Budapest, XIII. ker." },
-      { id: "r2", name: "Aurum Hajszalon", area: "Budapest, VI. ker." },
+      { id: "register", title: "Regisztrálj", text: "pár perc alatt." },
+      { id: "profile", title: "Töltsd ki", text: "az adatlapod." },
+      { id: "calendar", title: "Állítsd be", text: "a naptárad." },
+      { id: "accept", title: "Kezdd el", text: "fogadni a foglalásokat." },
     ],
   },
-  { key: "howitworks.mock_booking_service_day", section: "howitworks", label: "2. lépés minta szolgáltatás/nap", kind: "text", default: "Gél lakk · kedd" },
-  { key: "howitworks.mock_confirmation_title", section: "howitworks", label: "3. lépés minta cím", kind: "text", default: "Foglalás visszaigazolva" },
-  { key: "howitworks.mock_confirmation_detail", section: "howitworks", label: "3. lépés minta részlet", kind: "text", default: "Kedd, 13:30 · Anna Nails Studio" },
 
   // ------------------------------------------------------------ comparison
   { key: "comparison.eyebrow", section: "comparison", label: "Felirat a cím felett", kind: "text", default: "A különbség" },
@@ -200,6 +198,13 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   // ----------------------------------------------------------------- whyus
   { key: "whyus.eyebrow", section: "whyus", label: "Felirat a cím felett", kind: "text", default: "Vendégeknek" },
   { key: "whyus.heading", section: "whyus", label: "Címsor", kind: "text", default: "Miért az IdőpontNeked?" },
+  {
+    key: "whyus.subheading",
+    section: "whyus",
+    label: "Kiemelt, figyelemfelkeltő alcím",
+    kind: "text",
+    default: "Ne kérdezd, van-e szabad időpont — nézd meg, és foglald le!",
+  },
   {
     key: "whyus.points",
     section: "whyus",
@@ -319,6 +324,65 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     default: "Illusztráció, mintaadatokkal.",
   },
 
+  // -------------------------------------------------------- forproviderswhy
+  { key: "forproviderswhy.eyebrow", section: "forproviderswhy", label: "Felirat a cím felett", kind: "text", default: "Miért érdemes csatlakozni" },
+  {
+    key: "forproviderswhy.heading",
+    section: "forproviderswhy",
+    label: "Címsor",
+    kind: "text",
+    default: "Miért éri meg szolgáltatóként csatlakozni?",
+  },
+  {
+    key: "forproviderswhy.points",
+    section: "forproviderswhy",
+    label: "Pontok",
+    kind: "list",
+    mode: "fixed",
+    itemLabel: "Pont",
+    fields: [
+      { key: "label", label: "Cím", kind: "text" },
+      { key: "text", label: "Leírás", kind: "text" },
+    ],
+    default: [
+      {
+        id: "hours",
+        label: "0–24 órás online foglalás",
+        text: "A vendégeid akkor is tudnak időpontot kérni, amikor te éppen dolgozol.",
+      },
+      {
+        id: "calls",
+        label: "Kevesebb telefonálás",
+        text: "Nem kell minden „Van esetleg jövő héten egy szabad időpontod?” üzenetre válaszolnod.",
+      },
+      {
+        id: "page",
+        label: "Saját foglalási oldal",
+        text: "Egyetlen link, amit megoszthatsz Facebookon, Instagramon, vagy akár QR-kóddal a szalonodban, plakáton, névjegykártyán.",
+      },
+      {
+        id: "prices",
+        label: "Szolgáltatások és árak egy helyen",
+        text: "A vendég már foglalás előtt láthatja, mit kínálsz, és mennyibe kerül.",
+      },
+      {
+        id: "portfolio",
+        label: "Referenciák bemutatása",
+        text: "Mutasd meg a munkáidat, és segítsd a vendéget a választásban.",
+      },
+      {
+        id: "confirm",
+        label: "Automatikus visszaigazolás",
+        text: "A vendég azonnal értesül a sikeres foglalásról.",
+      },
+      {
+        id: "calendar",
+        label: "Naprakész naptár",
+        text: "A foglalható időpontjaid automatikusan frissülnek, és akár a saját telefonos naptáradhoz is hozzáadhatod.",
+      },
+    ],
+  },
+
   // ---------------------------------------------------------------- ctabanner
   { key: "ctabanner.eyebrow", section: "ctabanner", label: "Felirat a cím felett", kind: "text", default: "Miért érdemes minket választani?" },
   {
@@ -398,7 +462,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         links: [
           { id: "l-1", label: "Szolgáltatók keresése", href: "/kereses" },
           { id: "l-2", label: "Hogyan működik", href: "/#hogyan-mukodik" },
-          { id: "l-3", label: "Kategóriák", href: "/#kategoriak" },
+          { id: "l-3", label: "Kategóriák", href: "/kereses" },
           { id: "l-4", label: "Gyakori kérdések", href: "/#gyik" },
         ],
       },

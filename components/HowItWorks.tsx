@@ -1,89 +1,64 @@
 "use client";
 
-import Image from "next/image";
-import { Search, CalendarCheck, CheckCircle2, Star, Clock, type LucideIcon } from "lucide-react";
+import {
+  Search,
+  CalendarCheck,
+  ClipboardList,
+  CheckCircle2,
+  UserPlus,
+  UserRound,
+  CalendarClock,
+  Inbox,
+  type LucideIcon,
+} from "lucide-react";
 import { Container } from "./ui/Container";
 import type { SiteContent } from "@/lib/content/types";
 
-const STEP_ICONS: Record<string, LucideIcon> = {
+const GUEST_ICONS: Record<string, LucideIcon> = {
   search: Search,
   pick: CalendarCheck,
-  book: CheckCircle2,
+  details: ClipboardList,
+  confirm: CheckCircle2,
 };
 
-const RESULT_IMAGES: Record<string, string> = {
-  r1: "/images/nails-closeup.jpg",
-  r2: "/images/hair-color.jpg",
+const PROVIDER_ICONS: Record<string, LucideIcon> = {
+  register: UserPlus,
+  profile: UserRound,
+  calendar: CalendarClock,
+  accept: Inbox,
 };
 
-function Stars({ count }: { count: number }) {
+function FlowColumn({
+  heading,
+  steps,
+  icons,
+}: {
+  heading: string;
+  steps: { id: string; title: string; text: string }[];
+  icons: Record<string, LucideIcon>;
+}) {
   return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className={i < count ? "h-3 w-3 fill-ink text-ink" : "h-3 w-3 text-line"} />
-      ))}
-    </div>
-  );
-}
-
-function StepMock({ index, content }: { index: number; content: SiteContent["howitworks"] }) {
-  if (index === 0) {
-    return (
-      <div className="flex h-full flex-col justify-center gap-2.5 p-5">
-        {content.mock_results.map((r) => (
-          <div key={r.id} className="shadow-card flex gap-3 rounded-2xl bg-white p-2.5">
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl">
-              <Image src={RESULT_IMAGES[r.id] ?? "/images/nails-closeup.jpg"} alt={r.name} fill sizes="48px" className="photo-grade object-cover" />
+    <div className="shadow-card rounded-3xl bg-white p-6 lg:p-8">
+      <h3 className="font-display text-xl text-ink">{heading}</h3>
+      <div className="mt-6">
+        {steps.map((s, i) => {
+          const Icon = icons[s.id] ?? CheckCircle2;
+          const isLast = i === steps.length - 1;
+          return (
+            <div key={s.id} className="relative flex gap-4 pb-6 last:pb-0">
+              {!isLast && (
+                <span aria-hidden className="absolute left-5 top-11 bottom-0 w-px bg-line" />
+              )}
+              <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-panel text-ink">
+                <Icon className="h-4 w-4" strokeWidth={1.75} />
+              </span>
+              <p className="pt-2 text-sm leading-relaxed text-ink">
+                <span className="font-semibold">{s.title}</span> <span className="text-ink-soft">{s.text}</span>
+              </p>
             </div>
-            <div className="min-w-0">
-              <p className="truncate text-[13px] font-semibold text-ink">{r.name}</p>
-              <Stars count={5} />
-              <p className="mt-0.5 truncate text-[11px] text-ink-soft">{r.area}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-    );
-  }
-  if (index === 1) {
-    const first = content.mock_results[0];
-    return (
-      <div className="p-5">
-        <div className="flex items-center gap-2.5">
-          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
-            <Image src="/images/nails-pink.jpg" alt={first?.name ?? ""} fill sizes="36px" className="photo-grade object-cover" />
-          </div>
-          <div>
-            <p className="text-[13px] font-semibold text-ink">{first?.name}</p>
-            <p className="text-[11px] text-ink-soft">{content.mock_booking_service_day}</p>
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          {["09:00", "11:00", "13:30", "14:30"].map((t, i) => (
-            <span
-              key={t}
-              className={
-                "flex items-center justify-center rounded-full py-2 text-xs font-semibold tabular-nums " +
-                (i === 2 ? "bg-accent-dark text-paper" : "bg-paper-alt text-ink-soft")
-              }
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="flex h-full flex-col items-start justify-center p-6">
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-dark text-paper">
-        <CheckCircle2 className="h-5 w-5" strokeWidth={2} />
-      </span>
-      <p className="mt-4 text-[15px] font-semibold text-ink">{content.mock_confirmation_title}</p>
-      <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-soft">
-        <Clock className="h-3.5 w-3.5" strokeWidth={2} />
-        {content.mock_confirmation_detail}
-      </p>
     </div>
   );
 }
@@ -92,33 +67,12 @@ export function HowItWorks({ content }: { content: SiteContent["howitworks"] }) 
   return (
     <section id="hogyan-mukodik" className="scroll-mt-16 bg-paper py-14 lg:scroll-mt-20 lg:py-20">
       <Container>
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
-            <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
-          </div>
-          <p className="text-xs italic text-ink-soft">{content.disclaimer}</p>
-        </div>
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
+        <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-3">
-          {content.steps.map((s, i) => {
-            const Icon = STEP_ICONS[s.id] ?? Search;
-            return (
-              <div key={s.id} className="flex flex-col">
-                <div className="shadow-sheet h-56 overflow-hidden rounded-3xl bg-white">
-                  <StepMock index={i} content={content} />
-                </div>
-                <div className="mt-5 flex items-center gap-2">
-                  <Icon className="h-4 w-4 text-accent-dark" strokeWidth={1.75} />
-                  <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                    {String(i + 1).padStart(2, "0")}
-                  </p>
-                </div>
-                <h3 className="mt-2 font-display text-xl text-ink">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{s.text}</p>
-              </div>
-            );
-          })}
+        <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <FlowColumn heading={content.guest_heading} steps={content.guest_steps} icons={GUEST_ICONS} />
+          <FlowColumn heading={content.provider_heading} steps={content.provider_steps} icons={PROVIDER_ICONS} />
         </div>
       </Container>
     </section>

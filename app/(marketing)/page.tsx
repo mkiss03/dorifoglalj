@@ -1,10 +1,10 @@
 import { Hero } from "@/components/Hero";
-import { Categories } from "@/components/Categories";
 import { FeaturedProviders } from "@/components/FeaturedProviders";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Comparison } from "@/components/Comparison";
 import { WhyUs } from "@/components/WhyUs";
 import { ForProviders } from "@/components/ForProviders";
+import { ForProvidersWhy } from "@/components/ForProvidersWhy";
 import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
 import { getSiteContent } from "@/lib/content/get-site-content";
@@ -57,14 +57,14 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd) }}
       />
       <Hero content={content.hero} categories={categories} countyCities={countyCities} />
-      <Categories content={content.categories} categories={categories} />
+      <ForProviders content={content.forproviders} />
+      <ForProvidersWhy content={content.forproviderswhy} />
       {featuredProviders.length > 0 && (
         <FeaturedProviders content={content.featuredproviders} providers={featuredProviders} />
       )}
       <HowItWorks content={content.howitworks} />
       <Comparison content={content.comparison} />
       <WhyUs content={content.whyus} />
-      <ForProviders content={content.forproviders} />
       <CtaBanner content={content.ctabanner} />
       <Faq content={content.faq} />
     </>

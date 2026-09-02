@@ -2,13 +2,24 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, MapPin, Search, X, LayoutGrid, Wallet, Clock3, RefreshCcw, type LucideIcon } from "lucide-react";
+import Image from "next/image";
+import {
+  ChevronDown,
+  MapPin,
+  Search,
+  X,
+  LayoutGrid,
+  Wallet,
+  Clock3,
+  RefreshCcw,
+  ArrowRight,
+  type LucideIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { clsx } from "clsx";
 import { Container } from "./ui/Container";
 import { RevealText } from "./ui/RevealText";
 import { MiniCalendar } from "./ui/MiniCalendar";
-import { Collage } from "./ui/Collage";
 import { HungaryMap } from "./HungaryMap";
 import { ProviderCard } from "./search/ProviderCard";
 import { cities } from "@/lib/cities";
@@ -363,6 +374,15 @@ export function Hero({
   const [searchError, setSearchError] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
   const searchAreaRef = useClickOutside(() => setResultsOpen(false));
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // A hero-beli "Időpontot keresek" gomb nem navigál sehova — a kereső már
+  // ott van a szekcióban, csak legörgetünk hozzá és rá is fókuszálunk.
+  function focusSearch(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    searchInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => searchInputRef.current?.focus(), 350);
+  }
 
   // Escape zárja a találati panelt — ugyanaz a minta, mint a HungaryMap
   // rögzített tooltipjénél.
@@ -436,39 +456,76 @@ export function Hero({
       className="scroll-mt-16 bg-[radial-gradient(ellipse_120%_100%_at_50%_0%,_var(--accent-light)_0%,_var(--paper-alt)_55%)] py-8 lg:scroll-mt-20 lg:py-16"
     >
       <Container>
-        <div className="shadow-sheet relative rounded-3xl bg-white p-5 lg:p-12">
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
+        <div className="grid gap-10 pb-8 lg:grid-cols-2 lg:items-center lg:pb-12">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
 
-              <RevealText
-                as="h1"
-                className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
-                fieldAnchor="hero.heading_segments"
-                segments={[
-                  { text: segmentByid.lead ?? "" },
-                  { text: segmentByid.accent ?? "", className: "text-accent-dark" },
-                  { text: segmentByid.tail ?? "" },
-                ]}
-              />
+            <RevealText
+              as="h1"
+              className="mt-4 text-balance text-[1.75rem] leading-[1.08] tracking-tight font-display text-ink sm:text-[clamp(2.25rem,4vw,3.75rem)]"
+              fieldAnchor="hero.heading_segments"
+              segments={[
+                { text: segmentByid.lead ?? "" },
+                { text: segmentByid.accent ?? "", className: "text-accent-dark" },
+                { text: segmentByid.tail ?? "" },
+              ]}
+            />
 
-              <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
-              {content.tagline && (
-                <p className="mt-3 text-sm font-semibold text-accent-dark lg:text-base">{content.tagline}</p>
-              )}
-            </div>
+            <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
+            {content.tagline && (
+              <p className="mt-3 text-sm font-semibold text-accent-dark lg:text-base">{content.tagline}</p>
+            )}
 
-            <div className="relative hidden lg:block">
-              <Collage image={content.collage_image} alt={content.collage_alt} fieldAnchor="hero.collage_image" />
+            <div className="mt-6 flex flex-wrap items-center gap-3 lg:mt-8">
+              <a
+                href="#kereses-input"
+                onClick={focusSearch}
+                className="flex items-center gap-2.5 rounded-full bg-ink px-6 py-3.5 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90"
+              >
+                <Search className="h-4 w-4" strokeWidth={2} />
+                {content.guest_cta_label}
+                {content.guest_cta_sublabel && (
+                  <span className="font-normal text-paper/60">({content.guest_cta_sublabel})</span>
+                )}
+              </a>
+              <Link
+                href="/regisztracio"
+                className="flex items-center gap-2.5 rounded-full border border-ink/15 bg-white px-6 py-3.5 text-[15px] font-semibold text-ink shadow-card transition-colors duration-200 hover:bg-paper-alt"
+              >
+                {content.provider_cta_label}
+                <ArrowRight className="h-4 w-4" strokeWidth={2} />
+              </Link>
             </div>
           </div>
 
-          <div className="relative z-10 mt-6 lg:mt-10">
+          <div className="relative hidden lg:block">
+            <div
+              className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden"
+              style={{
+                WebkitMaskImage: "radial-gradient(65% 65% at 50% 42%, black 35%, transparent 100%)",
+                maskImage: "radial-gradient(65% 65% at 50% 42%, black 35%, transparent 100%)",
+              }}
+              data-field-anchor="hero.collage_image"
+            >
+              <Image
+                src={content.collage_image}
+                alt={content.collage_alt}
+                fill
+                sizes="(min-width: 1024px) 40vw, 0px"
+                className="photo-grade object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="shadow-sheet relative rounded-3xl bg-white p-5 lg:p-12">
+          <div id="kereses-input" className="relative z-10 scroll-mt-24">
             <div ref={searchAreaRef} className="relative">
               <form onSubmit={handleSubmit} className="shadow-card rounded-2xl bg-white">
                 <div className="flex items-center gap-3 border-b border-line px-5 py-4">
                   <Search className="h-5 w-5 shrink-0 text-ink-soft" strokeWidth={2} />
                   <input
+                    ref={searchInputRef}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Mit keresel? pl. mandula köröm, balayage, gél lakk…"

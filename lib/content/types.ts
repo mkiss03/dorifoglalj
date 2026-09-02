@@ -16,6 +16,7 @@ export type SectionId =
   | "comparison"
   | "whyus"
   | "forproviders"
+  | "forproviderswhy"
   | "ctabanner"
   | "faq"
   | "featuredproviders"
@@ -48,6 +49,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   comparison: "A különbség",
   whyus: "Miért az IdőpontNeked",
   forproviders: "Szolgáltatóknak",
+  forproviderswhy: "Miért éri meg szolgáltatóként",
   ctabanner: "CTA banner",
   faq: "Gyakori kérdések",
   featuredproviders: "Szolgáltatói adatlap-minta",
@@ -74,6 +76,9 @@ export type SiteContent = {
     paragraph: string;
     tagline: string;
     search_button_label: string;
+    guest_cta_label: string;
+    guest_cta_sublabel: string;
+    provider_cta_label: string;
     stats: { id: string; value: string; label: string }[];
     collage_image: string;
     collage_alt: string;
@@ -87,12 +92,10 @@ export type SiteContent = {
   howitworks: {
     eyebrow: string;
     heading: string;
-    disclaimer: string;
-    steps: { id: string; title: string; text: string }[];
-    mock_results: { id: string; name: string; area: string }[];
-    mock_booking_service_day: string;
-    mock_confirmation_title: string;
-    mock_confirmation_detail: string;
+    guest_heading: string;
+    guest_steps: { id: string; title: string; text: string }[];
+    provider_heading: string;
+    provider_steps: { id: string; title: string; text: string }[];
   };
   comparison: {
     eyebrow: string;
@@ -105,6 +108,7 @@ export type SiteContent = {
   whyus: {
     eyebrow: string;
     heading: string;
+    subheading: string;
     points: { id: string; label: string; text: string; visual: string }[];
   };
   forproviders: {
@@ -118,6 +122,11 @@ export type SiteContent = {
     mock_bookings: { id: string; name: string; service: string }[];
     mock_facebook_note: string;
     mock_disclaimer: string;
+  };
+  forproviderswhy: {
+    eyebrow: string;
+    heading: string;
+    points: { id: string; label: string; text: string }[];
   };
   ctabanner: {
     eyebrow: string;

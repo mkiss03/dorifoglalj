@@ -77,7 +77,6 @@ export type SiteContent = {
     tagline: string;
     search_button_label: string;
     guest_cta_label: string;
-    guest_cta_sublabel: string;
     provider_cta_label: string;
     stats: { id: string; value: string; label: string }[];
     collage_image: string;

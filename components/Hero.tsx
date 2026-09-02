@@ -476,24 +476,21 @@ export function Hero({
               <p className="mt-3 text-sm font-semibold text-accent-dark lg:text-base">{content.tagline}</p>
             )}
 
-            <div className="mt-6 flex flex-wrap items-center gap-3 lg:mt-8">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:mt-8">
               <a
                 href="#kereses-input"
                 onClick={focusSearch}
-                className="flex items-center gap-2.5 rounded-full bg-ink px-6 py-3.5 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90"
+                className="flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-ink px-6 py-3.5 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90 sm:flex-1"
               >
-                <Search className="h-4 w-4" strokeWidth={2} />
+                <Search className="h-4 w-4 shrink-0" strokeWidth={2} />
                 {content.guest_cta_label}
-                {content.guest_cta_sublabel && (
-                  <span className="font-normal text-paper/60">({content.guest_cta_sublabel})</span>
-                )}
               </a>
               <Link
                 href="/regisztracio"
-                className="flex items-center gap-2.5 rounded-full border border-ink/15 bg-white px-6 py-3.5 text-[15px] font-semibold text-ink shadow-card transition-colors duration-200 hover:bg-paper-alt"
+                className="flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-ink/15 bg-white px-6 py-3.5 text-[15px] font-semibold text-ink shadow-card transition-colors duration-200 hover:bg-paper-alt sm:flex-1"
               >
                 {content.provider_cta_label}
-                <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                <ArrowRight className="h-4 w-4 shrink-0" strokeWidth={2} />
               </Link>
             </div>
           </div>
@@ -502,8 +499,8 @@ export function Hero({
             <div
               className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden"
               style={{
-                WebkitMaskImage: "radial-gradient(65% 65% at 50% 42%, black 35%, transparent 100%)",
-                maskImage: "radial-gradient(65% 65% at 50% 42%, black 35%, transparent 100%)",
+                WebkitMaskImage: "radial-gradient(58% 58% at 50% 42%, black 68%, transparent 100%)",
+                maskImage: "radial-gradient(58% 58% at 50% 42%, black 68%, transparent 100%)",
               }}
               data-field-anchor="hero.collage_image"
             >

@@ -110,7 +110,7 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
   return (
     <section id="szolgaltatoknak" className="scroll-mt-16 bg-paper-alt py-14 lg:scroll-mt-20 lg:py-20">
       <Container>
-        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
             <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
@@ -149,13 +149,6 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
             >
               {content.cta_label}
             </Link>
-
-            {content.founding_note && (
-              <div className="mt-5 flex items-start gap-2.5 rounded-2xl border border-accent-dark/20 bg-accent-light/40 p-4">
-                <BadgePercent className="mt-0.5 h-4 w-4 shrink-0 text-accent-dark" strokeWidth={2} />
-                <p className="text-[13px] leading-relaxed text-ink">{content.founding_note}</p>
-              </div>
-            )}
           </div>
 
           <div className="relative isolate">
@@ -192,6 +185,13 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
             </div>
           </div>
         </div>
+
+        {content.founding_note && (
+          <div className="mt-10 flex items-start gap-3 rounded-2xl border border-accent-dark/20 bg-accent-light/40 p-5 lg:mt-14">
+            <BadgePercent className="mt-0.5 h-4 w-4 shrink-0 text-accent-dark" strokeWidth={2} />
+            <p className="text-[13px] leading-relaxed text-ink">{content.founding_note}</p>
+          </div>
+        )}
       </Container>
     </section>
   );

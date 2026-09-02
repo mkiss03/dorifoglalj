@@ -68,7 +68,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   },
   { key: "hero.search_button_label", section: "hero", label: "Keresés gomb szövege", kind: "text", default: "Keresés" },
   { key: "hero.guest_cta_label", section: "hero", label: "Vendég CTA gomb szövege", kind: "text", default: "Időpontot keresek" },
-  { key: "hero.guest_cta_sublabel", section: "hero", label: "Vendég CTA gomb al-szövege (zárójelben)", kind: "text", default: "vendég vagyok" },
   { key: "hero.provider_cta_label", section: "hero", label: "Szolgáltató CTA gomb szövege", kind: "text", default: "Szolgáltatóként csatlakozom" },
   {
     key: "hero.stats",

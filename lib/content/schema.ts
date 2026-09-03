@@ -504,14 +504,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
 
   // ------------------------------------------------------------------- aszf
   {
-    key: "aszf.disclaimer",
-    section: "aszf",
-    label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
-    kind: "textarea",
-    default:
-      "Ez az oldal még véglegesítés alatt áll: a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírtak a rendszer jelenlegi, tényleges működését tükrözik.",
-  },
-  {
     key: "aszf.service_body",
     section: "aszf",
     label: "„A szolgáltatás” szövege",
@@ -553,14 +545,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   },
 
   // ------------------------------------------------------------ adatkezeles
-  {
-    key: "adatkezeles.disclaimer",
-    section: "adatkezeles",
-    label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
-    kind: "textarea",
-    default:
-      "Ez az oldal még véglegesítés alatt áll: a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve. A leírt adatkezelési gyakorlat magát a rendszer működését pontosan tükrözi.",
-  },
   {
     key: "adatkezeles.data_categories",
     section: "adatkezeles",
@@ -635,14 +619,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   },
 
   // ------------------------------------------------------------- impresszum
-  {
-    key: "impresszum.disclaimer",
-    section: "impresszum",
-    label: "Megjegyzés-doboz szövege (üresen hagyva eltűnik)",
-    kind: "textarea",
-    default:
-      "Ez az oldal még véglegesítés alatt áll: a szögletes zárójelben szereplő adatok a szolgáltató cégbejegyzési adataival lesznek kitöltve.",
-  },
   {
     key: "impresszum.hosting_body",
     section: "impresszum",

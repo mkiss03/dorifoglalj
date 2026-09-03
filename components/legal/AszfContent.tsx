@@ -18,16 +18,6 @@ export function AszfContent({
           Általános Szerződési Feltételek
         </h1>
 
-        {aszf.disclaimer && (
-          <p className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
-            {aszf.disclaimer} Kérdésed van addig is? Írj:{" "}
-            <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold underline underline-offset-2">
-              {SUPPORT_EMAIL}
-            </a>
-            .
-          </p>
-        )}
-
         <div className="mt-8 space-y-6 text-[15px] leading-relaxed text-ink-soft">
           <div>
             <h2 className="font-display text-xl text-ink">A szolgáltatás</h2>

@@ -169,7 +169,6 @@ export type SiteContent = {
     registering_court: string;
   };
   aszf: {
-    disclaimer: string;
     service_body: string;
     guests_body: string;
     providers_body: string;
@@ -177,7 +176,6 @@ export type SiteContent = {
     modification_body: string;
   };
   adatkezeles: {
-    disclaimer: string;
     data_categories: { id: string; label: string; text: string }[];
     purpose_body: string;
     recipients_body: string;
@@ -186,7 +184,6 @@ export type SiteContent = {
     rights_body: string;
   };
   impresszum: {
-    disclaimer: string;
     hosting_body: string;
     enforcement_body: string;
   };

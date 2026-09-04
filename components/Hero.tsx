@@ -496,11 +496,12 @@ export function Hero({
           </div>
 
           <div className="relative hidden lg:block">
+            <div aria-hidden className="absolute -inset-10 -z-10 rounded-full bg-accent-light blur-2xl" />
             <div
               className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden"
               style={{
-                WebkitMaskImage: "radial-gradient(58% 58% at 50% 42%, black 68%, transparent 100%)",
-                maskImage: "radial-gradient(58% 58% at 50% 42%, black 68%, transparent 100%)",
+                WebkitMaskImage: "radial-gradient(58% 58% at 50% 42%, black 60%, transparent 100%)",
+                maskImage: "radial-gradient(58% 58% at 50% 42%, black 60%, transparent 100%)",
               }}
               data-field-anchor="hero.collage_image"
             >
@@ -510,6 +511,15 @@ export function Hero({
                 fill
                 sizes="(min-width: 1024px) 40vw, 0px"
                 className="photo-grade object-cover"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: "radial-gradient(circle at 50% 42%, transparent 55%, var(--accent-light) 100%)",
+                  mixBlendMode: "multiply",
+                  opacity: 0.35,
+                }}
               />
             </div>
           </div>

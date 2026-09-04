@@ -7,6 +7,7 @@ import { ForProviders } from "@/components/ForProviders";
 import { ForProvidersWhy } from "@/components/ForProvidersWhy";
 import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
+import { FinalCta } from "@/components/FinalCta";
 import { getSiteContent } from "@/lib/content/get-site-content";
 import { resolveCategories } from "@/lib/content/resolveCategories";
 import { getCountyCities } from "@/lib/supabase/countyCities";
@@ -67,6 +68,7 @@ export default async function Home() {
       <WhyUs content={content.whyus} />
       <CtaBanner content={content.ctabanner} />
       <Faq content={content.faq} />
+      <FinalCta content={content.finalcta} />
     </>
   );
 }

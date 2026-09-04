@@ -10,6 +10,7 @@ import { ForProviders } from "@/components/ForProviders";
 import { ForProvidersWhy } from "@/components/ForProvidersWhy";
 import { CtaBanner } from "@/components/CtaBanner";
 import { Faq } from "@/components/Faq";
+import { FinalCta } from "@/components/FinalCta";
 import { Footer } from "@/components/Footer";
 import { resolveCategories } from "@/lib/content/resolveCategories";
 import type { SectionId, SiteContent } from "@/lib/content/types";
@@ -61,6 +62,9 @@ export function MarketingPreview({ content }: { content: SiteContent }) {
         </Section>
         <Section id="faq">
           <Faq content={content.faq} />
+        </Section>
+        <Section id="finalcta">
+          <FinalCta content={content.finalcta} />
         </Section>
       </main>
       <Section id="footer">

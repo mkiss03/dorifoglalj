@@ -19,6 +19,7 @@ export type SectionId =
   | "forproviderswhy"
   | "ctabanner"
   | "faq"
+  | "finalcta"
   | "featuredproviders"
   | "footer"
   | "mobilestickycta"
@@ -52,6 +53,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   forproviderswhy: "Miért éri meg szolgáltatóként",
   ctabanner: "CTA banner",
   faq: "Gyakori kérdések",
+  finalcta: "Záró CTA (lábléc előtt)",
   featuredproviders: "Szolgáltatói adatlap-minta",
   footer: "Lábléc",
   mobilestickycta: "Mobil alsó sáv",
@@ -75,6 +77,7 @@ export type SiteContent = {
     heading_segments: { id: string; text: string }[];
     paragraph: string;
     tagline: string;
+    search_prompt: string;
     search_button_label: string;
     guest_cta_label: string;
     provider_cta_label: string;
@@ -113,6 +116,7 @@ export type SiteContent = {
   forproviders: {
     eyebrow: string;
     heading: string;
+    subheading: string;
     promises: { id: string; title: string; text: string }[];
     benefits: { id: string; label: string }[];
     cta_label: string;
@@ -134,6 +138,15 @@ export type SiteContent = {
     cta_label: string;
     image: string;
     image_alt: string;
+  };
+  finalcta: {
+    heading: string;
+    guest_title: string;
+    guest_text: string;
+    guest_cta_label: string;
+    provider_title: string;
+    provider_text: string;
+    provider_cta_label: string;
   };
   faq: {
     eyebrow: string;

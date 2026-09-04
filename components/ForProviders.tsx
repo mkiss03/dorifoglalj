@@ -114,6 +114,9 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
             <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
+            {content.subheading && (
+              <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{content.subheading}</p>
+            )}
 
             <div className="mt-8 space-y-6">
               {content.promises.map((p, i) => (

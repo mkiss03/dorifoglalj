@@ -66,6 +66,13 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     kind: "text",
     default: "IdőpontNeked.hu, ahol a szabad időpontok várnak.",
   },
+  {
+    key: "hero.search_prompt",
+    section: "hero",
+    label: "Kiemelt felirat a kereső doboz felett",
+    kind: "text",
+    default: "Hol és mikor keresel időpontot?",
+  },
   { key: "hero.search_button_label", section: "hero", label: "Keresés gomb szövege", kind: "text", default: "Keresés" },
   { key: "hero.guest_cta_label", section: "hero", label: "Vendég CTA gomb szövege", kind: "text", default: "Időpontot keresek" },
   { key: "hero.provider_cta_label", section: "hero", label: "Szolgáltató CTA gomb szövege", kind: "text", default: "Szolgáltatóként csatlakozom" },
@@ -231,7 +238,14 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     section: "forproviders",
     label: "Címsor",
     kind: "text",
-    default: "Szerezz új vendégeket, és kezeld a foglalásaidat egy helyen.",
+    default: "Érd el azokat a vendégeket, akik online szeretnének időpontot foglalni.",
+  },
+  {
+    key: "forproviders.subheading",
+    section: "forproviders",
+    label: "Alcím",
+    kind: "text",
+    default: "Mutasd meg szolgáltatásaidat, áraidat és referenciáidat, miközben a vendégek online foglalhatnak hozzád.",
   },
   {
     key: "forproviders.promises",
@@ -253,7 +267,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       {
         id: "p2",
         title: "Mindig naprakész naptár.",
-        text: "A szabad időpontjaid automatikusan frissülnek a nyitvatartásod és a meglévő foglalásaid alapján, így dupla foglalás nem fordulhat elő.",
+        text: "A szabad időpontjaid automatikusan frissülnek a nyitvatartásod és a meglévő foglalásaid alapján, így jelentősen csökkenthető a dupla foglalások kockázata.",
       },
       {
         id: "p3",
@@ -426,6 +440,39 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { key: "answer", label: "Válasz (üres sor = új bekezdés)", kind: "richtext" },
     ],
     default: faqItems.map((item, i) => ({ id: `faq-${i}`, ...item })),
+  },
+
+  // ----------------------------------------------------------------- finalcta
+  {
+    key: "finalcta.heading",
+    section: "finalcta",
+    label: "Címsor",
+    kind: "text",
+    default: "Készen állsz az egyszerűbb időpontfoglalásra?",
+  },
+  { key: "finalcta.guest_title", section: "finalcta", label: "Bal kártya címe", kind: "text", default: "Vendég vagy?" },
+  {
+    key: "finalcta.guest_text",
+    section: "finalcta",
+    label: "Bal kártya szövege",
+    kind: "text",
+    default: "Találd meg a következő időpontodat néhány kattintással.",
+  },
+  { key: "finalcta.guest_cta_label", section: "finalcta", label: "Bal gomb szövege", kind: "text", default: "Időpontot keresek" },
+  { key: "finalcta.provider_title", section: "finalcta", label: "Jobb kártya címe", kind: "text", default: "Szolgáltató vagy?" },
+  {
+    key: "finalcta.provider_text",
+    section: "finalcta",
+    label: "Jobb kártya szövege",
+    kind: "text",
+    default: "Hozd létre saját foglalási oldaladat, és kezdd el fogadni az online foglalásokat.",
+  },
+  {
+    key: "finalcta.provider_cta_label",
+    section: "finalcta",
+    label: "Jobb gomb szövege",
+    kind: "text",
+    default: "Szolgáltatóként csatlakozom",
   },
 
   // ------------------------------------------------------- featuredproviders

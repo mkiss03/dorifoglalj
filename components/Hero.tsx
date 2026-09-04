@@ -517,6 +517,9 @@ export function Hero({
 
         <div className="shadow-sheet relative rounded-3xl bg-white p-5 lg:p-12">
           <div id="kereses-input" className="relative z-10 scroll-mt-24">
+            {content.search_prompt && (
+              <p className="mb-4 font-display text-xl text-ink sm:text-2xl">{content.search_prompt}</p>
+            )}
             <div ref={searchAreaRef} className="relative">
               <form onSubmit={handleSubmit} className="shadow-card rounded-2xl bg-white">
                 <div className="flex items-center gap-3 border-b border-line px-5 py-4">

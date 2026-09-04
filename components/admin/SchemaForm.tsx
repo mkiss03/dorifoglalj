@@ -12,6 +12,7 @@ export const MARKETING_SECTION_ORDER: SectionId[] = [
   "footer",
   "ctabanner",
   "faq",
+  "finalcta",
   "categories",
   "whyus",
   "comparison",

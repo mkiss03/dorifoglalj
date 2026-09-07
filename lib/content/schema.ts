@@ -363,9 +363,34 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         text: "A vendégeid akkor is tudnak időpontot kérni, amikor te éppen dolgozol.",
       },
       {
+        id: "calls",
+        label: "Kevesebb telefonálás",
+        text: "Nem kell minden „Van esetleg jövő héten egy szabad időpontod?” üzenetre válaszolnod.",
+      },
+      {
+        id: "page",
+        label: "Saját foglalási oldal",
+        text: "Egyetlen link, amit megoszthatsz Facebookon, Instagramon, vagy akár QR-kóddal a szalonodban, plakáton, névjegykártyán.",
+      },
+      {
+        id: "prices",
+        label: "Szolgáltatások és árak egy helyen",
+        text: "A vendég már foglalás előtt láthatja, mit kínálsz, és mennyibe kerül.",
+      },
+      {
         id: "portfolio",
         label: "Referenciák bemutatása",
         text: "Mutasd meg a munkáidat, és segítsd a vendéget a választásban.",
+      },
+      {
+        id: "confirm",
+        label: "Automatikus visszaigazolás",
+        text: "A vendég azonnal értesül a sikeres foglalásról.",
+      },
+      {
+        id: "calendar",
+        label: "Naprakész naptár",
+        text: "A foglalható időpontjaid automatikusan frissülnek, és akár a saját telefonos naptáradhoz is hozzáadhatod.",
       },
     ],
   },

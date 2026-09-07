@@ -28,7 +28,7 @@ export function FinalCta({ content }: { content: SiteContent["finalcta"] }) {
 
         <div className="mx-auto mt-10 flex max-w-3xl flex-col gap-3 sm:flex-row">
           <a
-            href="#kereses-input"
+            href="#kereses"
             className="flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-paper px-6 py-3.5 text-[15px] font-semibold text-ink transition-colors duration-200 hover:bg-paper/90 sm:flex-1"
           >
             <Search className="h-4 w-4 shrink-0" strokeWidth={2} />

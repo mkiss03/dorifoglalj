@@ -15,7 +15,7 @@ export function Faq({ content }: { content: SiteContent["faq"] }) {
   return (
     <section id="gyik" className="scroll-mt-16 bg-paper-alt py-14 lg:scroll-mt-20 lg:py-20">
       <Container className="grid gap-8 lg:grid-cols-[0.9fr_1.3fr] lg:gap-12">
-        <div>
+        <div id="kapcsolat" className="scroll-mt-16 lg:scroll-mt-20">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-dark">{content.eyebrow}</p>
           <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">{content.heading}</h2>
           <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-soft">{content.intro}</p>

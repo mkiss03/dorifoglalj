@@ -28,7 +28,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     default: [
       { id: "nl-1", label: "Szolgáltatók keresése", href: "/kereses" },
       { id: "nl-2", label: "Szolgáltatóknak", href: "/#szolgaltatoknak" },
-      { id: "nl-5", label: "Kapcsolat", href: "/#gyik" },
+      { id: "nl-5", label: "Kapcsolat", href: "/#kapcsolat" },
     ],
   },
   { key: "header.categories_menu_label", section: "header", label: "„Kategóriák” menügomb", kind: "text", default: "Kategóriák" },
@@ -58,13 +58,6 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     kind: "textarea",
     default:
       "Az IdőpontNeked.hu-n könnyedén megtalálod a hozzád illő szolgáltatót, megnézheted a valós szabad időpontokat, és néhány kattintással lefoglalhatod a Neked megfelelőt regisztráció nélkül.",
-  },
-  {
-    key: "hero.tagline",
-    section: "hero",
-    label: "Kiemelt mottó a bevezető szöveg alatt",
-    kind: "text",
-    default: "IdőpontNeked.hu, ahol a szabad időpontok várnak.",
   },
   {
     key: "hero.search_prompt",
@@ -364,34 +357,9 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
         text: "A vendégeid akkor is tudnak időpontot kérni, amikor te éppen dolgozol.",
       },
       {
-        id: "calls",
-        label: "Kevesebb telefonálás",
-        text: "Nem kell minden „Van esetleg jövő héten egy szabad időpontod?” üzenetre válaszolnod.",
-      },
-      {
-        id: "page",
-        label: "Saját foglalási oldal",
-        text: "Egyetlen link, amit megoszthatsz Facebookon, Instagramon, vagy akár QR-kóddal a szalonodban, plakáton, névjegykártyán.",
-      },
-      {
-        id: "prices",
-        label: "Szolgáltatások és árak egy helyen",
-        text: "A vendég már foglalás előtt láthatja, mit kínálsz, és mennyibe kerül.",
-      },
-      {
         id: "portfolio",
         label: "Referenciák bemutatása",
         text: "Mutasd meg a munkáidat, és segítsd a vendéget a választásban.",
-      },
-      {
-        id: "confirm",
-        label: "Automatikus visszaigazolás",
-        text: "A vendég azonnal értesül a sikeres foglalásról.",
-      },
-      {
-        id: "calendar",
-        label: "Naprakész naptár",
-        text: "A foglalható időpontjaid automatikusan frissülnek, és akár a saját telefonos naptáradhoz is hozzáadhatod.",
       },
     ],
   },

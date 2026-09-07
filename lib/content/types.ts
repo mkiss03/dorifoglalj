@@ -76,7 +76,6 @@ export type SiteContent = {
     eyebrow: string;
     heading_segments: { id: string; text: string }[];
     paragraph: string;
-    tagline: string;
     search_prompt: string;
     search_button_label: string;
     guest_cta_label: string;

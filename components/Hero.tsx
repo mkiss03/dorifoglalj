@@ -452,7 +452,6 @@ export function Hero({
 
   return (
     <section
-      id="kereses"
       className="scroll-mt-16 bg-[radial-gradient(ellipse_120%_100%_at_50%_0%,_var(--accent-light)_0%,_var(--paper-alt)_55%)] py-8 lg:scroll-mt-20 lg:py-16"
     >
       <Container>
@@ -472,13 +471,10 @@ export function Hero({
             />
 
             <p className="mt-3 text-base leading-relaxed text-ink lg:mt-5 lg:text-lg">{content.paragraph}</p>
-            {content.tagline && (
-              <p className="mt-3 text-sm font-semibold text-accent-dark lg:text-base">{content.tagline}</p>
-            )}
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:mt-8">
               <a
-                href="#kereses-input"
+                href="#kereses"
                 onClick={focusSearch}
                 className="flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-ink px-6 py-3.5 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-ink/90 sm:flex-1"
               >
@@ -526,7 +522,7 @@ export function Hero({
         </div>
 
         <div className="shadow-sheet relative rounded-3xl bg-white p-5 lg:p-12">
-          <div id="kereses-input" className="relative z-10 scroll-mt-24">
+          <div id="kereses" className="relative z-10 scroll-mt-24">
             {content.search_prompt && (
               <p className="mb-4 font-display text-xl text-ink sm:text-2xl">{content.search_prompt}</p>
             )}

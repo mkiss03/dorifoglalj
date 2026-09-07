@@ -1,26 +1,12 @@
 "use client";
 
-import {
-  Clock3,
-  PhoneOff,
-  Link2,
-  Tags,
-  Images,
-  BellRing,
-  CalendarClock,
-  type LucideIcon,
-} from "lucide-react";
+import { Clock3, Images, type LucideIcon } from "lucide-react";
 import { Container } from "./ui/Container";
 import type { SiteContent } from "@/lib/content/types";
 
 const POINT_ICONS: Record<string, LucideIcon> = {
   hours: Clock3,
-  calls: PhoneOff,
-  page: Link2,
-  prices: Tags,
   portfolio: Images,
-  confirm: BellRing,
-  calendar: CalendarClock,
 };
 
 export function ForProvidersWhy({ content }: { content: SiteContent["forproviderswhy"] }) {
@@ -36,10 +22,7 @@ export function ForProvidersWhy({ content }: { content: SiteContent["forprovider
           {content.points.map((p) => {
             const Icon = POINT_ICONS[p.id] ?? Clock3;
             return (
-              <div
-                key={p.id}
-                className="shadow-card flex w-full flex-col rounded-2xl bg-white p-6 sm:w-[calc(50%-0.625rem)] lg:w-[calc(25%-0.9375rem)]"
-              >
+              <div key={p.id} className="shadow-card flex w-full max-w-sm flex-col rounded-2xl bg-white p-6 sm:w-80">
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-panel text-ink">
                   <Icon className="h-5 w-5" strokeWidth={1.75} />
                 </span>

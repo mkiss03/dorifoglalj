@@ -362,6 +362,10 @@ export function Hero({
   categories: ResolvedCategory[];
   countyCities: CountyCityCount[];
 }) {
+  // Amíg a kivágott (átlátszó hátterű) hero-portré fájl nincs feltöltve
+  // (vagy hibás elérési útra mutat), egy méret-tartó placeholder jelenik meg
+  // helyette — nem törött kép-ikon.
+  const [personImageError, setPersonImageError] = useState(false);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(categories[1]?.name ?? categories[0]?.name ?? "");
   const [city, setCity] = useState("");
@@ -491,32 +495,29 @@ export function Hero({
             </div>
           </div>
 
-          <div className="relative hidden lg:block">
-            <div aria-hidden className="absolute -inset-10 -z-10 rounded-full bg-accent-light blur-2xl" />
-            <div
-              className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden"
-              style={{
-                WebkitMaskImage: "radial-gradient(58% 58% at 50% 42%, black 60%, transparent 100%)",
-                maskImage: "radial-gradient(58% 58% at 50% 42%, black 60%, transparent 100%)",
-              }}
-              data-field-anchor="hero.collage_image"
-            >
-              <Image
-                src={content.collage_image}
-                alt={content.collage_alt}
-                fill
-                sizes="(min-width: 1024px) 40vw, 0px"
-                className="photo-grade object-cover"
-              />
+          <div className="flex justify-center lg:self-end">
+            <div className="relative h-[380px] w-[260px] lg:h-[600px] lg:w-[440px]">
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background: "radial-gradient(circle at 50% 42%, transparent 55%, var(--accent-light) 100%)",
-                  mixBlendMode: "multiply",
-                  opacity: 0.35,
-                }}
+                className="absolute bottom-8 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-accent-dark/[0.06] blur-2xl lg:h-96 lg:w-96"
               />
+              {personImageError ? (
+                <div aria-hidden className="h-full w-full" />
+              ) : (
+                <Image
+                  src={content.collage_image}
+                  alt={content.collage_alt}
+                  fill
+                  sizes="(min-width: 1024px) 440px, 260px"
+                  onError={() => setPersonImageError(true)}
+                  data-field-anchor="hero.collage_image"
+                  className="object-contain object-bottom"
+                  style={{
+                    WebkitMaskImage: "linear-gradient(to bottom, black 82%, transparent 100%)",
+                    maskImage: "linear-gradient(to bottom, black 82%, transparent 100%)",
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

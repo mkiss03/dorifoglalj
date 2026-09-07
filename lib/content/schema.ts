@@ -87,8 +87,14 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
       { id: "sync", value: "1 naptár", label: "Google és Apple naptárral szinkronban" },
     ],
   },
-  { key: "hero.collage_image", section: "hero", label: "Kép a főcím mellett", kind: "image", default: "/images/hero-phone-salon.jpg" },
-  { key: "hero.collage_alt", section: "hero", label: "Kép leírása (alt szöveg)", kind: "text", default: "Vendég mosolyogva böngészi a telefonján az időpontfoglalást egy szépségszalonban" },
+  {
+    key: "hero.collage_image",
+    section: "hero",
+    label: "Kivágott (átlátszó hátterű) portré a főcím mellett",
+    kind: "image",
+    default: "/images/hero-person.png",
+  },
+  { key: "hero.collage_alt", section: "hero", label: "Kép leírása (alt szöveg)", kind: "text", default: "Mosolyogva a telefonját néző nő" },
 
   // ------------------------------------------------------------ categories
   { key: "categories.eyebrow", section: "categories", label: "Felirat a cím felett", kind: "text", default: "Kategóriák" },

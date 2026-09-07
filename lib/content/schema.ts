@@ -92,7 +92,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     section: "hero",
     label: "Kivágott (átlátszó hátterű) portré a főcím mellett",
     kind: "image",
-    default: "/images/cutoutfixed.png",
+    default: "/images/cutoutfixed-trimmed.png",
   },
   { key: "hero.collage_alt", section: "hero", label: "Kép leírása (alt szöveg)", kind: "text", default: "Mosolyogva a telefonját néző nő" },
 

@@ -459,7 +459,7 @@ export function Hero({
       className="scroll-mt-16 bg-[radial-gradient(ellipse_120%_100%_at_50%_0%,_var(--accent-light)_0%,_var(--paper-alt)_55%)] py-8 lg:scroll-mt-20 lg:py-16"
     >
       <Container>
-        <div className="grid gap-10 pb-8 lg:grid-cols-2 lg:items-center lg:pb-12">
+        <div className="relative grid gap-10 pb-8 lg:grid-cols-2 lg:items-stretch lg:pb-12">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent-dark">{content.eyebrow}</p>
 
@@ -495,31 +495,31 @@ export function Hero({
             </div>
           </div>
 
-          <div className="flex justify-center lg:self-end">
-            <div className="relative w-[300px] lg:w-[440px]">
-              <div
-                aria-hidden
-                className="absolute bottom-0 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-accent-dark/[0.06] blur-2xl lg:h-80 lg:w-80"
+          <div aria-hidden className="hidden lg:block" />
+
+          <div className="relative mx-auto w-[280px] sm:w-[340px] lg:absolute lg:bottom-0 lg:right-4 lg:mx-0 lg:w-[520px]">
+            <div
+              aria-hidden
+              className="absolute bottom-0 left-1/2 -z-10 h-64 w-64 -translate-x-1/2 rounded-full bg-accent-dark/[0.06] blur-2xl lg:h-[28rem] lg:w-[28rem]"
+            />
+            {personImageError ? (
+              <div aria-hidden className="aspect-[1226/1340] w-full" />
+            ) : (
+              <Image
+                src={content.collage_image}
+                alt={content.collage_alt}
+                width={1226}
+                height={1340}
+                sizes="(min-width: 1024px) 520px, 340px"
+                onError={() => setPersonImageError(true)}
+                data-field-anchor="hero.collage_image"
+                className="h-auto w-full object-contain object-bottom"
+                style={{
+                  WebkitMaskImage: "linear-gradient(to bottom, black 85%, transparent 100%)",
+                  maskImage: "linear-gradient(to bottom, black 85%, transparent 100%)",
+                }}
               />
-              {personImageError ? (
-                <div aria-hidden className="aspect-[2048/1366] w-full" />
-              ) : (
-                <Image
-                  src={content.collage_image}
-                  alt={content.collage_alt}
-                  width={2048}
-                  height={1366}
-                  sizes="(min-width: 1024px) 440px, 300px"
-                  onError={() => setPersonImageError(true)}
-                  data-field-anchor="hero.collage_image"
-                  className="h-auto w-full object-contain object-bottom"
-                  style={{
-                    WebkitMaskImage: "linear-gradient(to bottom, black 82%, transparent 100%)",
-                    maskImage: "linear-gradient(to bottom, black 82%, transparent 100%)",
-                  }}
-                />
-              )}
-            </div>
+            )}
           </div>
         </div>
 

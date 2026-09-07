@@ -45,7 +45,7 @@ export type ContentEntry =
 export const SECTION_LABELS: Record<SectionId, string> = {
   header: "Fejléc",
   hero: "Hero (nyitó szekció)",
-  categories: "Kategóriák",
+  categories: "Kategóriák (fejléc, lábléc, kereső)",
   howitworks: "Hogyan működik",
   comparison: "A különbség",
   whyus: "Miért az IdőpontNeked",
@@ -85,9 +85,6 @@ export type SiteContent = {
     collage_alt: string;
   };
   categories: {
-    eyebrow: string;
-    heading: string;
-    intro: string;
     items: { id: string; name: string; items: string[]; photo: string | null }[];
   };
   howitworks: {

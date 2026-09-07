@@ -21,11 +21,16 @@ export function ImpresszumContent({
           <div>
             <h2 className="font-display text-xl text-ink">A szolgáltató adatai</h2>
             <ul className="mt-2 space-y-1">
-              <li>Név: {legal.company_name}</li>
-              <li>Székhely: {legal.company_address}</li>
-              <li>Cégjegyzékszám: {legal.registration_number}</li>
-              <li>Nyilvántartó hatóság: {legal.registering_court}</li>
-              <li>Adószám: {legal.tax_number}</li>
+              <li>Név: <span data-field-anchor="legal.company_name">{legal.company_name}</span></li>
+              <li>Székhely: <span data-field-anchor="legal.company_address">{legal.company_address}</span></li>
+              <li>
+                Cégjegyzékszám: <span data-field-anchor="legal.registration_number">{legal.registration_number}</span>
+              </li>
+              <li>
+                Nyilvántartó hatóság:{" "}
+                <span data-field-anchor="legal.registering_court">{legal.registering_court}</span>
+              </li>
+              <li>Adószám: <span data-field-anchor="legal.tax_number">{legal.tax_number}</span></li>
               <li>
                 E-mail:{" "}
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-ink">

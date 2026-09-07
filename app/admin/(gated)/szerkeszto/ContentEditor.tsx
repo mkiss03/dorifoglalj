@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   SchemaForm,
   SectionJumpNav,
@@ -40,6 +40,22 @@ const SECTIONS_BY_PAGE: Record<PageId, SectionId[]> = {
   impresszum: IMPRESSZUM_SECTION_ORDER,
 };
 
+// Melyik lapon (tab) van a form-mezője egy adott szekciónak — ez kell, mert
+// pl. a "legal" (Cégadatok) mezői az ÁSZF/Adatkezelés/Impresszum ELŐNÉZETÉBEN
+// is megjelennek (a cégnév stb. mindhárom jogi oldalon kiírva), de a FORM
+// csak a "Cégadatok" fülön rendereli őket. Kattintás-feloldónál emiatt előbb
+// lapot kell váltani, különben a jumpToDomId semmit nem talál (az elem
+// egyszerűen nincs a DOM-ban, amíg más fülön állunk).
+const PAGE_BY_SECTION: Partial<Record<SectionId, PageId>> = Object.fromEntries(
+  (Object.entries(SECTIONS_BY_PAGE) as [PageId, SectionId[]][]).flatMap(([page, sections]) =>
+    sections.map((section) => [section, page])
+  )
+);
+
+function sectionOfAnchor(anchorKey: string): SectionId {
+  return anchorKey.slice(0, anchorKey.indexOf(".")) as SectionId;
+}
+
 // A pontos konstansok itt kellenek, hogy a Tailwind build lássa és
 // legenerálja őket — classList.add-dal adjuk hozzá, nem className-nel.
 const HIGHLIGHT_CLASSES = ["ring-2", "ring-accent-dark", "ring-offset-2", "rounded-2xl", "transition-shadow"];
@@ -61,8 +77,32 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
   const [state, setState] = useState<SaveContentState>(initialSaveState);
   const [activePage, setActivePage] = useState<PageId>("marketing");
   const activeSections = SECTIONS_BY_PAGE[activePage];
+  // Lapváltás után ide ugrunk, amint az új lap form-ja megrenderelt — ref,
+  // nem state, mert az effektben csak beolvassuk/töröljük, nem indítunk vele
+  // újabb renderelést.
+  const pendingDomIdRef = useRef<string | null>(null);
 
   const textIndex = useMemo(() => buildTextIndex(draft), [draft]);
+
+  useEffect(() => {
+    const id = pendingDomIdRef.current;
+    if (!id) return;
+    pendingDomIdRef.current = null;
+    jumpToDomId(id);
+  }, [activePage]);
+
+  // Egy mező (vagy szekció) DOM id-jára ugrik — ha a hozzá tartozó szekció
+  // egy másik lapon van, előbb átvált rá, és a lapváltás utáni renderre
+  // bízza a tényleges ugrást (lásd a fenti useEffect-et).
+  function goToDomId(id: string, section: SectionId) {
+    const targetPage = PAGE_BY_SECTION[section];
+    if (targetPage && targetPage !== activePage) {
+      pendingDomIdRef.current = id;
+      setActivePage(targetPage);
+    } else {
+      jumpToDomId(id);
+    }
+  }
 
   function handleFieldChange(section: SectionId, field: string, value: unknown) {
     setDraft((prev) => ({
@@ -102,7 +142,7 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
       if (text && text.length >= MIN_TEXT_LENGTH) {
         const anchor = textIndex.get(text);
         if (anchor) {
-          jumpToDomId(domId(anchor));
+          goToDomId(domId(anchor), sectionOfAnchor(anchor));
           return;
         }
       }
@@ -114,15 +154,15 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
     const explicitEl = target.closest("[data-field-anchor]");
     const explicitAnchor = explicitEl?.getAttribute("data-field-anchor");
     if (explicitAnchor) {
-      jumpToDomId(domId(explicitAnchor));
+      goToDomId(domId(explicitAnchor), sectionOfAnchor(explicitAnchor));
       return;
     }
 
     // 3) Szekció-szintű esés vissza — mindig működik.
     const sectionEl = target.closest("[data-preview-section]");
-    const sectionId = sectionEl?.getAttribute("data-preview-section");
+    const sectionId = sectionEl?.getAttribute("data-preview-section") as SectionId | null;
     if (sectionId) {
-      jumpToDomId(`admin-section-${sectionId}`);
+      goToDomId(`admin-section-${sectionId}`, sectionId);
     }
   }
 

@@ -20,8 +20,9 @@ export function AdatkezelesContent({
           <div>
             <h2 className="font-display text-xl text-ink">Az adatkezelő</h2>
             <p className="mt-2">
-              Az IdőpontNeked.hu üzemeltetője {legal.company_name} ({legal.company_address}, adószám:{" "}
-              {legal.tax_number}, e-mail:{" "}
+              Az IdőpontNeked.hu üzemeltetője <span data-field-anchor="legal.company_name">{legal.company_name}</span>{" "}
+              (<span data-field-anchor="legal.company_address">{legal.company_address}</span>, adószám:{" "}
+              <span data-field-anchor="legal.tax_number">{legal.tax_number}</span>, e-mail:{" "}
               <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-ink">
                 {SUPPORT_EMAIL}
               </a>

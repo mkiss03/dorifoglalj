@@ -97,15 +97,12 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   { key: "hero.collage_alt", section: "hero", label: "Kép leírása (alt szöveg)", kind: "text", default: "Mosolyogva a telefonját néző nő" },
 
   // ------------------------------------------------------------ categories
-  { key: "categories.eyebrow", section: "categories", label: "Felirat a cím felett", kind: "text", default: "Kategóriák" },
-  { key: "categories.heading", section: "categories", label: "Címsor", kind: "text", default: "Mit szeretnél lefoglalni?" },
-  {
-    key: "categories.intro",
-    section: "categories",
-    label: "Bevezető szöveg",
-    kind: "textarea",
-    default: "Szépségipari szolgáltatók egy helyen: a szolgáltató oldalán pontosan látod, mire foglalsz, és jegyzetet is fűzhetsz hozzá.",
-  },
+  // Az eyebrow/heading/intro mezők szándékosan nincsenek itt — a homepage-en
+  // megjelenő önálló "Kategóriák" szekció (ami ezeket használta) el lett
+  // távolítva, mert duplikálta a hero kereső kategória-chipjeit. Az "items"
+  // (kategórianevek, példa-szolgáltatások) VISZONT továbbra is élesben van:
+  // ebből épül a fejléc-dropdown, a footer "Népszerű kategóriák" sora és a
+  // hero kategória-chipjei (lásd lib/content/resolveCategories.ts).
   {
     key: "categories.items",
     section: "categories",

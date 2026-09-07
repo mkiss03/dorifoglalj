@@ -22,7 +22,8 @@ export function AszfContent({
           <div>
             <h2 className="font-display text-xl text-ink">A szolgáltatás</h2>
             <p className="mt-2 text-sm font-semibold text-ink">
-              Üzemeltető: {legal.company_name} · {legal.company_address}
+              Üzemeltető: <span data-field-anchor="legal.company_name">{legal.company_name}</span> ·{" "}
+              <span data-field-anchor="legal.company_address">{legal.company_address}</span>
             </p>
             <RichText text={aszf.service_body} />
           </div>

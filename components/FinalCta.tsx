@@ -36,7 +36,7 @@ export function FinalCta({ content }: { content: SiteContent["finalcta"] }) {
           </a>
           <Link
             href="/regisztracio"
-            className="flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-paper/25 px-6 py-3.5 text-[15px] font-semibold text-paper transition-colors duration-200 hover:bg-paper/10 sm:flex-1"
+            className="flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-paper px-6 py-3.5 text-[15px] font-semibold text-ink transition-colors duration-200 hover:bg-paper/90 sm:flex-1"
           >
             {content.provider_cta_label}
             <ArrowRight className="h-4 w-4 shrink-0" strokeWidth={2} />

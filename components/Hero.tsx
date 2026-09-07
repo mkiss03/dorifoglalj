@@ -496,22 +496,23 @@ export function Hero({
           </div>
 
           <div className="flex justify-center lg:self-end">
-            <div className="relative h-[380px] w-[260px] lg:h-[600px] lg:w-[440px]">
+            <div className="relative w-[300px] lg:w-[440px]">
               <div
                 aria-hidden
-                className="absolute bottom-8 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-accent-dark/[0.06] blur-2xl lg:h-96 lg:w-96"
+                className="absolute bottom-0 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-accent-dark/[0.06] blur-2xl lg:h-80 lg:w-80"
               />
               {personImageError ? (
-                <div aria-hidden className="h-full w-full" />
+                <div aria-hidden className="aspect-[2048/1366] w-full" />
               ) : (
                 <Image
                   src={content.collage_image}
                   alt={content.collage_alt}
-                  fill
-                  sizes="(min-width: 1024px) 440px, 260px"
+                  width={2048}
+                  height={1366}
+                  sizes="(min-width: 1024px) 440px, 300px"
                   onError={() => setPersonImageError(true)}
                   data-field-anchor="hero.collage_image"
-                  className="object-contain object-bottom"
+                  className="h-auto w-full object-contain object-bottom"
                   style={{
                     WebkitMaskImage: "linear-gradient(to bottom, black 82%, transparent 100%)",
                     maskImage: "linear-gradient(to bottom, black 82%, transparent 100%)",

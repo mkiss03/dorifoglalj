@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -8 112 82" width="112" height="82" fill="none" role="img" aria-label="Welisse">
+  <defs>
+    <linearGradient id="welisseGradBlue" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="100%" stop-color="#4D94FF" />
+    </linearGradient>
+    <linearGradient id="welisseGradCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" />
+      <stop offset="100%" stop-color="#4D94FF" />
+    </linearGradient>
+  </defs>
+  <path d="M10 20 Q 25 60 40 40 T 70 60 L 90 10"
+        stroke="url(#welisseGradBlue)" stroke-width="12"
+        stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <path d="M20 10 Q 35 50 50 30 T 80 50 L 100 0"
+        stroke="url(#welisseGradCyan)" stroke-width="12"
+        stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Container } from "./ui/Container";
 import { Logo } from "./Logo";
 import { FacebookGlyph, InstagramGlyph } from "./icons/BrandIcons";
+import { PoweredByWelisse } from "./PoweredByWelisse";
 import { featuredCities } from "@/lib/cities";
 import type { SiteContent } from "@/lib/content/types";
 import type { ResolvedCategory } from "@/lib/content/resolveCategories";
@@ -122,7 +123,10 @@ export function Footer({
           <p>
             © {new Date().getFullYear()} {content.copyright_suffix}
           </p>
-          <p>{content.bottom_note}</p>
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            <p>{content.bottom_note}</p>
+            <PoweredByWelisse theme="light" utm="idopontneked.hu" />
+          </div>
         </div>
       </Container>
     </footer>

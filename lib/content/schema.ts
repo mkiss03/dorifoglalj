@@ -539,11 +539,29 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   // ------------------------------------------------------------------ legal
   // Az ÁSZF, az Adatkezelési tájékoztató és az Impresszum közös üzemeltetői
   // adatai — egy helyen szerkesztve, mindhárom oldal ezt olvassa.
-  { key: "legal.company_name", section: "legal", label: "Cégnév", kind: "text", default: "[Cégnév]" },
+  {
+    key: "legal.company_name",
+    section: "legal",
+    label: "Vállalkozás neve (egyéni vállalkozónál a nyilvántartás szerinti név)",
+    kind: "text",
+    default: "[Vállalkozás neve]",
+  },
   { key: "legal.company_address", section: "legal", label: "Székhely", kind: "text", default: "[Székhely]" },
   { key: "legal.tax_number", section: "legal", label: "Adószám", kind: "text", default: "[Adószám]" },
-  { key: "legal.registration_number", section: "legal", label: "Cégjegyzékszám", kind: "text", default: "[Cégjegyzékszám]" },
-  { key: "legal.registering_court", section: "legal", label: "Nyilvántartó (illetékes cégbíróság)", kind: "text", default: "[Illetékes cégbíróság]" },
+  {
+    key: "legal.registration_number",
+    section: "legal",
+    label: "Nyilvántartási szám (egyéni vállalkozónál) / cégjegyzékszám (cégnél)",
+    kind: "text",
+    default: "[Nyilvántartási szám]",
+  },
+  {
+    key: "legal.registering_court",
+    section: "legal",
+    label: "Nyilvántartó hatóság (egyéni vállalkozónál pl. NAV, cégnél az illetékes cégbíróság)",
+    kind: "text",
+    default: "[Nyilvántartó hatóság]",
+  },
 
   // ------------------------------------------------------------------- aszf
   {

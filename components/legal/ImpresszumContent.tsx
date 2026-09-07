@@ -24,7 +24,8 @@ export function ImpresszumContent({
               <li>Név: <span data-field-anchor="legal.company_name">{legal.company_name}</span></li>
               <li>Székhely: <span data-field-anchor="legal.company_address">{legal.company_address}</span></li>
               <li>
-                Cégjegyzékszám: <span data-field-anchor="legal.registration_number">{legal.registration_number}</span>
+                Nyilvántartási szám:{" "}
+                <span data-field-anchor="legal.registration_number">{legal.registration_number}</span>
               </li>
               <li>
                 Nyilvántartó hatóság:{" "}

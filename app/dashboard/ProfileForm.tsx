@@ -173,6 +173,22 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
       </div>
 
       <div className="border-t border-line pt-4">
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            name="accepts_card_payment"
+            value="true"
+            defaultChecked={provider?.accepts_card_payment ?? false}
+            className="h-5 w-5 shrink-0 rounded border-line text-accent-dark focus:ring-2 focus:ring-accent-light"
+          />
+          <span className="text-[15px] text-ink">Bankkártyával is lehet fizetni nálam</span>
+        </label>
+        <p className="mt-1.5 text-[13px] text-ink-soft">
+          Ez megjelenik a publikus foglalási oldaladon, hogy a vendégek előre lássák.
+        </p>
+      </div>
+
+      <div className="border-t border-line pt-4">
         <p className={labelClass}>Milyen alkalmakra vállalsz munkát?</p>
         <p className="mb-3 text-[13px] text-ink-soft">
           Válassz legalább egyet, ez alapján tudnak majd rád szűrni a vendégek.

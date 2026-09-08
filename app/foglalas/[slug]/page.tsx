@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Globe, Link2, MapPin, Phone } from "lucide-react";
+import { CreditCard, Globe, Link2, MapPin, Phone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/Container";
 import { categories } from "@/lib/categories";
@@ -153,8 +153,18 @@ export default async function BookingPage({
             </p>
           )}
 
-          {(provider.phone || provider.website || provider.facebook_url || provider.instagram_url) && (
+          {(provider.phone ||
+            provider.website ||
+            provider.facebook_url ||
+            provider.instagram_url ||
+            provider.accepts_card_payment) && (
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-soft">
+              {provider.accepts_card_payment && (
+                <span className="flex items-center gap-1.5">
+                  <CreditCard className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} />
+                  Bankkártyás fizetés lehetséges
+                </span>
+              )}
               {provider.phone && (
                 <a href={`tel:${provider.phone}`} className="flex items-center gap-1.5 hover:text-ink">
                   <Phone className="h-3.5 w-3.5" strokeWidth={2.25} />

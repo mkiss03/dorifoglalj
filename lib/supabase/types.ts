@@ -48,6 +48,9 @@ export type Provider = {
   cover_url: string | null;
   buffer_minutes: number;
   tags: ProviderTag[];
+  /** A szolgáltató maga jelöli be a profiljában — informatív jelző a
+   * vendégek felé, nincs hozzá tényleges online kártyás fizetés. */
+  accepts_card_payment: boolean;
   status: ProviderStatus;
   approved_at: string | null;
   slug: string;
@@ -163,6 +166,7 @@ export type PublicProvider = {
   logo_url: string | null;
   cover_url: string | null;
   tags: ProviderTag[];
+  accepts_card_payment: boolean;
   /** Csak az aktív munkatársak. Ha csak 1 elem van, a foglalási felület
    * nem mutat staff-választót — csendben ezt az egyet használja. */
   staff: {

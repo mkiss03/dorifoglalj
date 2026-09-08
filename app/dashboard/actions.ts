@@ -44,6 +44,7 @@ export async function updateProfileAction(
   const facebookUrl = String(formData.get("facebook_url") ?? "");
   const instagramUrl = String(formData.get("instagram_url") ?? "");
   const tags = formData.getAll("tags").filter((t): t is ProviderTag => PROVIDER_TAGS.includes(t as ProviderTag));
+  const acceptsCardPayment = formData.get("accepts_card_payment") === "true";
 
   if (!businessName) {
     return { status: "error", message: "A vállalkozás neve kötelező." };
@@ -76,6 +77,7 @@ export async function updateProfileAction(
       facebook_url: normalizeUrl(facebookUrl),
       instagram_url: normalizeUrl(instagramUrl),
       tags,
+      accepts_card_payment: acceptsCardPayment,
     })
     .eq("id", user.id);
 

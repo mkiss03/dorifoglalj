@@ -47,3 +47,14 @@ export function WhatsAppGlyph({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export function TikTokGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
+      <path
+        d="M14.1 3h2.6c.18 1.36.82 2.53 1.83 3.32.79.62 1.76.99 2.77 1.05v2.63a7.9 7.9 0 0 1-4.42-1.47v5.98a5.98 5.98 0 1 1-5.98-5.98c.27 0 .53.02.79.06v2.75a3.3 3.3 0 1 0 2.41 3.17V3Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}

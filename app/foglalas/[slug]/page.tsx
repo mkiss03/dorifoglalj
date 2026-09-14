@@ -4,9 +4,21 @@ import Link from "next/link";
 import { CreditCard, Globe, Link2, MapPin, Phone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/Container";
-import { categories } from "@/lib/categories";
+import { categories, OTHER_CATEGORY_SLUG } from "@/lib/categories";
 import { BookingWidget } from "./BookingWidget";
-import { TAG_LABELS, type PublicProvider } from "@/lib/supabase/types";
+import { PAYMENT_METHOD_LABELS, TAG_LABELS, type PaymentMethod, type PublicProvider } from "@/lib/supabase/types";
+
+/** A vendégnek mutatott fizetési módok. Elsődlegesen az új
+ * `payment_methods` listát használjuk; ha az üres (régi profil, amit még
+ * nem mentettek újra), visszaesünk a korábbi `accepts_card_payment`
+ * jelzőre, hogy semmi ne tűnjön el a publikus oldalról. */
+function paymentLabels(provider: PublicProvider): string[] {
+  const methods = (provider.payment_methods ?? []) as PaymentMethod[];
+  if (methods.length > 0) {
+    return methods.filter((m) => PAYMENT_METHOD_LABELS[m]).map((m) => PAYMENT_METHOD_LABELS[m]);
+  }
+  return provider.accepts_card_payment ? [PAYMENT_METHOD_LABELS.bankkartya] : [];
+}
 
 function formatHuf(n: number) {
   return new Intl.NumberFormat("hu-HU").format(n) + " Ft";
@@ -23,7 +35,9 @@ export async function generateMetadata({
   if (!data) return { title: "Szolgáltató nem található" };
 
   const provider = data as PublicProvider;
-  const categoryName = categories.find((c) => c.slug === provider.category)?.name;
+  const categoryName =
+    categories.find((c) => c.slug === provider.category)?.name ??
+    (provider.category === OTHER_CATEGORY_SLUG ? provider.category_other ?? undefined : undefined);
   const title = `${provider.business_name} · Időpontfoglalás`;
   const description = provider.description
     ? provider.description.slice(0, 160)
@@ -63,7 +77,10 @@ export default async function BookingPage({
   if (error || !data) notFound();
 
   const provider = data as PublicProvider;
-  const categoryName = categories.find((c) => c.slug === provider.category)?.name;
+  const categoryName =
+    categories.find((c) => c.slug === provider.category)?.name ??
+    (provider.category === OTHER_CATEGORY_SLUG ? provider.category_other ?? undefined : undefined);
+  const payments = paymentLabels(provider);
   const initial = provider.business_name.trim().charAt(0).toUpperCase() || "?";
   const locationLine = [provider.address, provider.city].filter(Boolean).join(", ");
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://idopontneked.hu";
@@ -157,12 +174,13 @@ export default async function BookingPage({
             provider.website ||
             provider.facebook_url ||
             provider.instagram_url ||
-            provider.accepts_card_payment) && (
+            provider.tiktok_url ||
+            payments.length > 0) && (
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-soft">
-              {provider.accepts_card_payment && (
+              {payments.length > 0 && (
                 <span className="flex items-center gap-1.5">
                   <CreditCard className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} />
-                  Bankkártyás fizetés lehetséges
+                  Fizetés: {payments.join(", ")}
                 </span>
               )}
               {provider.phone && (
@@ -202,6 +220,17 @@ export default async function BookingPage({
                 >
                   <Link2 className="h-3.5 w-3.5" strokeWidth={2.25} />
                   Instagram
+                </a>
+              )}
+              {provider.tiktok_url && (
+                <a
+                  href={provider.tiktok_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 hover:text-ink"
+                >
+                  <Link2 className="h-3.5 w-3.5" strokeWidth={2.25} />
+                  TikTok
                 </a>
               )}
             </div>

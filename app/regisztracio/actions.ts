@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getTrustedSiteUrl } from "@/lib/site-url";
+import { sendProviderSignupNotificationEmail } from "@/lib/email/sendProviderSignupNotificationEmail";
 
 export type SignUpState = {
   status: "idle" | "error" | "success";
@@ -26,6 +28,7 @@ export async function signUpAction(
 
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const passwordConfirm = String(formData.get("password_confirm") ?? "");
   const businessName = String(formData.get("business_name") ?? "").trim();
 
   if (!email || !password || !businessName) {
@@ -33,6 +36,11 @@ export async function signUpAction(
   }
   if (password.length < 8) {
     return { status: "error", message: "A jelszó legalább 8 karakter legyen." };
+  }
+  // A megerősítő mezőt csak akkor kérjük számon, ha meg is érkezett — így egy
+  // régi (cache-elt) űrlapról érkező beküldés sem hibázik el feleslegesen.
+  if (passwordConfirm && passwordConfirm !== password) {
+    return { status: "error", message: "A két jelszó nem egyezik." };
   }
 
   const supabase = await createClient();
@@ -45,5 +53,17 @@ export async function signUpAction(
   if (error) {
     return { status: "error", message: error.message };
   }
+
+  // Értesítő az üzemeltetőnek, hogy minél előbb jóvá lehessen hagyni a
+  // fiókot. Szándékosan nem befolyásolja a regisztráció kimenetelét: ha
+  // nincs Resend kulcs vagy elhasal a küldés, a felhasználó ettől még
+  // sikeresen regisztrált.
+  try {
+    const siteUrl = await getTrustedSiteUrl();
+    await sendProviderSignupNotificationEmail({ businessName, email, siteUrl });
+  } catch {
+    // szándékosan elnyelve
+  }
+
   return { status: "success" };
 }

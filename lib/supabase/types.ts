@@ -25,6 +25,36 @@ export const TAG_LABELS: Record<ProviderTag, string> = {
   ceges_esemeny: "Céges esemény",
 };
 
+/** Elfogadott fizetési módok a szolgáltatónál — a szolgáltató maga jelöli
+ * be a profiljában, informatív jelzés a vendégek felé (nincs tényleges
+ * online fizetés a rendszerben). A korábbi `accepts_card_payment` boolean
+ * megmarad és szinkronban tartjuk vele (bankkartya = true). */
+export type PaymentMethod =
+  | "keszpenz"
+  | "bankkartya"
+  | "atutalas"
+  | "szep_kartya"
+  | "mobilfizetes"
+  | "utalvany";
+
+export const PAYMENT_METHODS: PaymentMethod[] = [
+  "keszpenz",
+  "bankkartya",
+  "atutalas",
+  "szep_kartya",
+  "mobilfizetes",
+  "utalvany",
+];
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  keszpenz: "Készpénz",
+  bankkartya: "Bankkártya",
+  atutalas: "Banki átutalás",
+  szep_kartya: "SZÉP kártya",
+  mobilfizetes: "Mobilfizetés (Revolut, Apple Pay…)",
+  utalvany: "Utalvány, ajándékkártya",
+};
+
 /** Szolgáltató jóváhagyási állapota — a regisztráció után 'pending', amíg
  * Dóri manuálisan aktiválja a Supabase dashboardon. */
 export type ProviderStatus = "pending" | "active" | "suspended";
@@ -33,6 +63,10 @@ export type Provider = {
   id: string;
   business_name: string;
   category: string | null;
+  /** Csak akkor van kitöltve, ha a `category` az "egyeb" — a szolgáltató
+   * által kért, még nem létező kategória-megnevezés (Dóri ez alapján tud
+   * új kategóriát felvenni). */
+  category_other: string | null;
   city: string | null;
   /** A megye HUNGARY_REGIONS-beli id-je (pl. "HU-BA") — a szolgáltató
    * választja ki regisztrációkor, mert szabad szöveges város-mezőből nem
@@ -44,13 +78,18 @@ export type Provider = {
   website: string | null;
   facebook_url: string | null;
   instagram_url: string | null;
+  tiktok_url: string | null;
   logo_url: string | null;
   cover_url: string | null;
   buffer_minutes: number;
   tags: ProviderTag[];
   /** A szolgáltató maga jelöli be a profiljában — informatív jelző a
-   * vendégek felé, nincs hozzá tényleges online kártyás fizetés. */
+   * vendégek felé, nincs hozzá tényleges online kártyás fizetés.
+   * A `payment_methods`-szal szinkronban tartott, visszafelé kompatibilis
+   * mező (igaz, ha a `payment_methods` tartalmazza a "bankkartya"-t). */
   accepts_card_payment: boolean;
+  /** Minden elfogadott fizetési mód (a bankkártyán túl is). */
+  payment_methods: PaymentMethod[];
   status: ProviderStatus;
   approved_at: string | null;
   slug: string;
@@ -158,15 +197,20 @@ export type PublicProvider = {
   city: string | null;
   address: string | null;
   category: string | null;
+  /** "egyeb" kategória esetén a szolgáltató saját megnevezése — ezt
+   * mutatjuk a publikus oldalon a kategória helyén. */
+  category_other: string | null;
   description: string | null;
   phone: string | null;
   website: string | null;
   facebook_url: string | null;
   instagram_url: string | null;
+  tiktok_url: string | null;
   logo_url: string | null;
   cover_url: string | null;
   tags: ProviderTag[];
   accepts_card_payment: boolean;
+  payment_methods: PaymentMethod[];
   /** Csak az aktív munkatársak. Ha csak 1 elem van, a foglalási felület
    * nem mutat staff-választót — csendben ezt az egyet használja. */
   staff: {
@@ -242,6 +286,8 @@ export type AdminProviderRow = {
   email: string;
   phone: string | null;
   category: string | null;
+  /** A szolgáltató által kért, még nem létező kategória-megnevezés. */
+  category_other: string | null;
   city: string | null;
   status: ProviderStatus;
   booking_enabled: boolean;

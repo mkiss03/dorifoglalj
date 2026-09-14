@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { deleteServiceAction, updateServiceAction, type ServiceState } from "./actions";
 import type { ProviderService } from "@/lib/supabase/types";
+import { PriceDurationFields } from "./PriceDurationFields";
 
 const initialState: ServiceState = { status: "idle" };
 
@@ -23,24 +24,12 @@ export function ServiceRow({ service }: { service: ProviderService }) {
         className={inputClass}
         placeholder="Rövid leírás (nem kötelező)"
       />
-      <div className="flex flex-wrap items-center gap-2">
-        <input
-          name="price_huf"
-          type="number"
-          min={0}
-          defaultValue={service.price_huf}
-          className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
-          placeholder="Ft"
+      <div className="flex flex-wrap items-end gap-2">
+        <PriceDurationFields
+          defaultPrice={service.price_huf}
+          defaultDuration={service.duration_minutes}
         />
-        <input
-          name="duration_minutes"
-          type="number"
-          min={1}
-          defaultValue={service.duration_minutes}
-          className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
-          placeholder="perc"
-        />
-        <label className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-ink-soft">
+        <label className="flex shrink-0 items-center gap-1.5 py-2 text-xs font-medium text-ink-soft">
           <input
             type="checkbox"
             name="active"
@@ -59,6 +48,9 @@ export function ServiceRow({ service }: { service: ProviderService }) {
         <button
           type="submit"
           formAction={deleteServiceAction}
+          // Törléskor ne akadjon meg a böngésző beépített validációján, ha
+          // épp üresen maradt az ár vagy az időtartam mező.
+          formNoValidate
           className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-semibold text-ink-soft transition-colors hover:text-ink"
         >
           Törlés

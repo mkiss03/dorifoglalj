@@ -1,4 +1,5 @@
 import { getResendClient, RESEND_FROM_EMAIL } from "./resend";
+import { escapeHtml } from "./escapeHtml";
 
 export type SendCancellationEmailParams = {
   to: string;
@@ -41,14 +42,14 @@ export async function sendCancellationEmail(
 
   const html = `
     <div style="font-family: sans-serif; font-size: 15px; color: #1a1a1a; line-height: 1.6;">
-      <p>Kedves ${params.customerName}!</p>
-      <p>Sajnálattal értesítünk, hogy a(z) <strong>${params.providerName}</strong> lemondta a következő foglalásodat:</p>
+      <p>Kedves ${escapeHtml(params.customerName)}!</p>
+      <p>Sajnálattal értesítünk, hogy a(z) <strong>${escapeHtml(params.providerName)}</strong> lemondta a következő foglalásodat:</p>
       <p style="background: #f5f2ed; border-radius: 12px; padding: 16px 20px; margin: 16px 0;">
-        <strong>${params.serviceName}</strong><br />
+        <strong>${escapeHtml(params.serviceName)}</strong><br />
         ${when}
       </p>
-      ${params.reason ? `<p><em>A szolgáltató üzenete:</em> ${params.reason}</p>` : ""}
-      <p>${contactLine}</p>
+      ${params.reason ? `<p><em>A szolgáltató üzenete:</em> ${escapeHtml(params.reason)}</p>` : ""}
+      <p>${escapeHtml(contactLine)}</p>
       <p>Üdvözlettel,<br />IdőpontNeked.hu</p>
     </div>
   `;

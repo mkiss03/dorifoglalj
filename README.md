@@ -95,10 +95,36 @@ Egyirányú, feliratkozásos `.ics` feed (`app/api/ics/[token]/route.ts`) — a 
 
 ## Amit tudatosan később hagytunk
 
-- Valós idejű, **kétirányú** Google/Apple naptár-szinkron (OAuth-app kellene hozzá — külön, nagyobb projekt).
+- Valós idejű, **kétirányú** Google/Apple naptár-szinkron (Google Calendar API + OAuth-app,
+  Google-ellenőrzéssel és token-tárolással — külön, nagyobb projekt; a jelenlegi
+  egyirányú `.ics` feed kiváltása).
 - Több munkatárs / több oszlopos naptár egy szolgáltatónál.
 - Vendég-oldali visszaigazoló/emlékeztető e-mailek (csak a szolgáltató általi *lemondás* értesít emailben, ld. lent) — ehhez a Supabase beépített e-mailje nem elég, csak auth-ra való.
 - Fizetés/előleg, vendég-oldali átfoglalás/lemondás.
+
+## Auth e-mail sablonok (Supabase)
+
+A regisztráció megerősítő, a "belépés linkkel" és a jelszó-visszaállító levelet
+a Supabase küldi, nem az alkalmazás — ezek tartalma **nem** a kódból jön, hanem a
+Supabase projekt beállításaiból. A brandelt, magyar sablonok (amikben ott van a
+weboldal és a bejelentkezés linkje is) a [`supabase/email-templates/`](./supabase/email-templates/)
+mappában vannak, a bemásolás menetével együtt. Amíg ezek nincsenek beillesztve a
+Supabase Dashboardon, az alapértelmezett angol sablonok mennek ki.
+
+## Üzemeltetői értesítő e-mailek (Resend)
+
+- **Új szolgáltatói regisztráció** → `lib/email/sendProviderSignupNotificationEmail.ts`.
+  Minden sikeres regisztráció után azonnal kimegy egy értesítő a jóváhagyó panel
+  (`/admin/szolgaltatok?status=pending`) linkjével, hogy ne kelljen kézzel nézegetni
+  a listát. Szándékosan "best effort": ha nincs `RESEND_API_KEY`, vagy a küldés
+  elhasal, a regisztráció attól még sikeres.
+- **"Egyéb" kategória kérése** → `lib/email/sendCategoryRequestEmail.ts`. Ha a
+  szolgáltató a profilban az „Egyéb” kategóriát választja és beírja, milyen
+  megnevezést kér, arról értesítő megy ki (a kérés emellett a `providers.category_other`
+  oszlopban és az admin listában is látszik).
+
+A címzettet az `ADMIN_NOTIFICATION_EMAIL` env-változó adja (vesszővel több cím is),
+alapértelmezésben a `lib/contact.ts`-beli `SUPPORT_EMAIL`.
 
 ## Lemondás-értesítő email (Resend)
 

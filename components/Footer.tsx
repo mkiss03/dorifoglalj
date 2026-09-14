@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Container } from "./ui/Container";
 import { Logo } from "./Logo";
-import { FacebookGlyph, InstagramGlyph } from "./icons/BrandIcons";
+import { FacebookGlyph, InstagramGlyph, TikTokGlyph } from "./icons/BrandIcons";
 import { PoweredByWelisse } from "./PoweredByWelisse";
 import { featuredCities } from "@/lib/cities";
 import type { SiteContent } from "@/lib/content/types";
@@ -22,7 +22,10 @@ export function Footer({
   content: SiteContent["footer"];
   categories: ResolvedCategory[];
 }) {
-  const hasSocial = isRealUrl(content.facebook_url) || isRealUrl(content.instagram_url);
+  const hasSocial =
+    isRealUrl(content.facebook_url) ||
+    isRealUrl(content.instagram_url) ||
+    isRealUrl(content.tiktok_url);
 
   return (
     <footer className="bg-paper pt-14 pb-10">
@@ -90,6 +93,17 @@ export function Footer({
                     className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
                   >
                     <InstagramGlyph className="h-4 w-4" />
+                  </a>
+                )}
+                {isRealUrl(content.tiktok_url) && (
+                  <a
+                    href={content.tiktok_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="TikTok"
+                    className="shadow-card flex h-9 w-9 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:text-accent-dark"
+                  >
+                    <TikTokGlyph className="h-4 w-4" />
                   </a>
                 )}
               </div>

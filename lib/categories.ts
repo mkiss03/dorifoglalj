@@ -115,3 +115,12 @@ export const categories: Category[] = [
 export const categoryIconBySlug: Record<string, LucideIcon> = Object.fromEntries(
   categories.map((c) => [c.slug, c.icon])
 );
+
+/** Nem valódi kategória, csak a szolgáltatói profil választójában
+ * felajánlott "Egyéb" sor: ha a szolgáltató olyan szolgáltatást nyújt,
+ * amire még nincs kategóriánk, ezt választja, és szabad szövegként megírja,
+ * milyen megnevezést kér. A `categories` tömbbe szándékosan NEM kerül bele,
+ * hogy a nyitóoldali kategória-csempék és a kereső szűrői változatlanok
+ * maradjanak. */
+export const OTHER_CATEGORY_SLUG = "egyeb";
+export const OTHER_CATEGORY_LABEL = "Egyéb (új megnevezést kérek)";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { categories } from "@/lib/categories";
+import { categories, OTHER_CATEGORY_SLUG } from "@/lib/categories";
 import type { AdminProviderRow, ProviderStatus } from "@/lib/supabase/types";
 import { setProviderStatusAction } from "./actions";
 
@@ -101,7 +101,9 @@ export default async function AdminSzolgaltatokPage({
         )}
 
         {visible.map((p) => {
-          const categoryName = categories.find((c) => c.slug === p.category)?.name ?? p.category;
+          const categoryName =
+            categories.find((c) => c.slug === p.category)?.name ??
+            (p.category === OTHER_CATEGORY_SLUG ? "Egyéb" : p.category);
           return (
             <div key={p.id} className="shadow-card flex flex-col gap-3 rounded-2xl bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
@@ -124,6 +126,11 @@ export default async function AdminSzolgaltatokPage({
                   )}
                   {(categoryName || p.city) && <span>{[categoryName, p.city].filter(Boolean).join(" · ")}</span>}
                 </div>
+                {p.category_other && (
+                  <p className="mt-1.5 inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900">
+                    Új kategóriát kér: {p.category_other}
+                  </p>
+                )}
                 <p className="mt-1 text-xs text-ink-soft">
                   Regisztrált: {formatDate(p.created_at)}
                   {p.status === "active" && p.approved_at && <> · Jóváhagyva: {formatDate(p.approved_at)}</>}

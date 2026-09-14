@@ -162,6 +162,7 @@ export type SiteContent = {
     bottom_note: string;
     facebook_url: string;
     instagram_url: string;
+    tiktok_url: string;
     popular_categories_label: string;
     popular_cities_label: string;
   };

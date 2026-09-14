@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { setPasswordAction, type SetPasswordState } from "./actions";
 
 const initialState: SetPasswordState = { status: "idle" };
@@ -34,10 +35,9 @@ export function SetPasswordForm() {
         <label htmlFor="password" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-soft">
           Új jelszó
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}
@@ -52,10 +52,9 @@ export function SetPasswordForm() {
         >
           Új jelszó mégegyszer
         </label>
-        <input
+        <PasswordInput
           id="password_confirm"
           name="password_confirm"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}

@@ -1,11 +1,17 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { updateProfileAction, type ProfileState } from "./actions";
-import { categories } from "@/lib/categories";
+import { categories, OTHER_CATEGORY_LABEL, OTHER_CATEGORY_SLUG } from "@/lib/categories";
 import { cities } from "@/lib/cities";
 import { HUNGARY_REGIONS } from "@/lib/hungaryMap";
-import { PROVIDER_TAGS, TAG_LABELS, type Provider } from "@/lib/supabase/types";
+import {
+  PAYMENT_METHODS,
+  PAYMENT_METHOD_LABELS,
+  PROVIDER_TAGS,
+  TAG_LABELS,
+  type Provider,
+} from "@/lib/supabase/types";
 
 const initialState: ProfileState = { status: "idle" };
 
@@ -20,6 +26,7 @@ function stripProtocol(url: string | null) {
 
 export function ProfileForm({ provider }: { provider: Provider | null }) {
   const [state, formAction, pending] = useActionState(updateProfileAction, initialState);
+  const [category, setCategory] = useState(provider?.category ?? "");
 
   return (
     <form action={formAction} className="space-y-4">
@@ -42,13 +49,20 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
           <label htmlFor="category" className={labelClass}>
             Kategória
           </label>
-          <select id="category" name="category" defaultValue={provider?.category ?? ""} className={inputClass}>
+          <select
+            id="category"
+            name="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className={inputClass}
+          >
             <option value="">Válassz…</option>
             {categories.map((c) => (
               <option key={c.slug} value={c.slug}>
                 {c.name}
               </option>
             ))}
+            <option value={OTHER_CATEGORY_SLUG}>{OTHER_CATEGORY_LABEL}</option>
           </select>
         </div>
         <div>
@@ -71,6 +85,27 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
           </datalist>
         </div>
       </div>
+
+      {category === OTHER_CATEGORY_SLUG && (
+        <div className="rounded-2xl border border-accent-dark/20 bg-accent-light/30 p-4">
+          <label htmlFor="category_other" className={labelClass}>
+            Milyen megnevezést kérsz?
+          </label>
+          <input
+            id="category_other"
+            name="category_other"
+            type="text"
+            maxLength={60}
+            defaultValue={provider?.category_other ?? ""}
+            className={inputClass}
+            placeholder="pl. Gyógytorna"
+          />
+          <p className="mt-1.5 text-[13px] text-ink-soft">
+            Írd be, hogyan nevezzük a szolgáltatásodat — megnézzük, és ha illik a kínálatba,
+            felvesszük új kategóriaként. Addig a profilod „Egyéb” kategóriában marad.
+          </p>
+        </div>
+      )}
 
       <div>
         <label htmlFor="county" className={labelClass}>
@@ -129,7 +164,7 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
 
       <div className="border-t border-line pt-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Online jelenlét</p>
-        <div className="mt-2 grid gap-3 sm:grid-cols-3">
+        <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label htmlFor="website" className="mb-1 block text-xs text-ink-soft">
               Weboldal
@@ -169,23 +204,50 @@ export function ProfileForm({ provider }: { provider: Provider | null }) {
               placeholder="instagram.com/pelda"
             />
           </div>
+          <div>
+            <label htmlFor="tiktok_url" className="mb-1 block text-xs text-ink-soft">
+              TikTok
+            </label>
+            <input
+              id="tiktok_url"
+              name="tiktok_url"
+              type="text"
+              defaultValue={stripProtocol(provider?.tiktok_url ?? null)}
+              className={inputClass}
+              placeholder="tiktok.com/@pelda"
+            />
+          </div>
         </div>
       </div>
 
       <div className="border-t border-line pt-4">
-        <label className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            name="accepts_card_payment"
-            value="true"
-            defaultChecked={provider?.accepts_card_payment ?? false}
-            className="h-5 w-5 shrink-0 rounded border-line text-accent-dark focus:ring-2 focus:ring-accent-light"
-          />
-          <span className="text-[15px] text-ink">Bankkártyával is lehet fizetni nálam</span>
-        </label>
-        <p className="mt-1.5 text-[13px] text-ink-soft">
-          Ez megjelenik a publikus foglalási oldaladon, hogy a vendégek előre lássák.
+        <p className={labelClass}>Milyen fizetési módot fogadsz el?</p>
+        <p className="mb-3 text-[13px] text-ink-soft">
+          Jelöld be az összeset, amivel fizethetnek nálad — ez megjelenik a publikus
+          foglalási oldaladon, hogy a vendégek előre lássák.
         </p>
+        <div className="flex flex-wrap gap-2">
+          {PAYMENT_METHODS.map((method) => (
+            <label key={method} className="cursor-pointer">
+              <input
+                type="checkbox"
+                name="payment_methods"
+                value={method}
+                defaultChecked={
+                  // Ha van már mentett lista, az dönt; ha még nincs (régi
+                  // profil), a korábbi bankkártya-jelzőből indulunk ki.
+                  (provider?.payment_methods?.length ?? 0) > 0
+                    ? provider!.payment_methods.includes(method)
+                    : method === "bankkartya" && (provider?.accepts_card_payment ?? false)
+                }
+                className="peer sr-only"
+              />
+              <span className="inline-block rounded-full border border-line bg-paper-alt px-4 py-2 text-sm font-medium text-ink-soft transition-colors duration-200 peer-checked:border-accent-dark peer-checked:bg-accent-dark peer-checked:text-paper peer-focus-visible:ring-2 peer-focus-visible:ring-accent-light">
+                {PAYMENT_METHOD_LABELS[method]}
+              </span>
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="border-t border-line pt-4">

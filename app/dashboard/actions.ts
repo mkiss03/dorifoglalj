@@ -2,10 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
-import { categories } from "@/lib/categories";
+import { categories, OTHER_CATEGORY_SLUG } from "@/lib/categories";
 import { HUNGARY_REGIONS } from "@/lib/hungaryMap";
-import { PROVIDER_TAGS, type CreateBookingResult, type ProviderTag } from "@/lib/supabase/types";
+import {
+  PAYMENT_METHODS,
+  PROVIDER_TAGS,
+  type CreateBookingResult,
+  type PaymentMethod,
+  type ProviderTag,
+} from "@/lib/supabase/types";
 import { sendCancellationEmail } from "@/lib/email/sendCancellationEmail";
+import { sendCategoryRequestEmail } from "@/lib/email/sendCategoryRequestEmail";
 import { getTrustedSiteUrl } from "@/lib/site-url";
 
 export type ProfileState = {
@@ -13,7 +20,9 @@ export type ProfileState = {
   message?: string;
 };
 
-const categorySlugs = new Set(categories.map((c) => c.slug));
+// Az "egyeb" nincs benne a `categories` tömbben (nem valódi, kereshető
+// kategória), de a profilban választható — ezért külön engedjük át.
+const categorySlugs = new Set([...categories.map((c) => c.slug), OTHER_CATEGORY_SLUG]);
 const countyIds = new Set(HUNGARY_REGIONS.map((r) => r.id));
 // Nincs többé fix városlista-allowlist — bármilyen magyar település
 // megadható, csak formai szemét ellen véd (hossz, nyilvánvalóan hibás
@@ -43,14 +52,25 @@ export async function updateProfileAction(
   const website = String(formData.get("website") ?? "");
   const facebookUrl = String(formData.get("facebook_url") ?? "");
   const instagramUrl = String(formData.get("instagram_url") ?? "");
+  const tiktokUrl = String(formData.get("tiktok_url") ?? "");
   const tags = formData.getAll("tags").filter((t): t is ProviderTag => PROVIDER_TAGS.includes(t as ProviderTag));
-  const acceptsCardPayment = formData.get("accepts_card_payment") === "true";
+  const paymentMethods = formData
+    .getAll("payment_methods")
+    .filter((m): m is PaymentMethod => PAYMENT_METHODS.includes(m as PaymentMethod));
+  // A régi, egymezős jelzőt szinkronban tartjuk, hogy minden korábbi
+  // megjelenítés (publikus oldal, RPC-k) változatlanul működjön.
+  const acceptsCardPayment = paymentMethods.includes("bankkartya");
+  const categoryOther =
+    category === OTHER_CATEGORY_SLUG ? String(formData.get("category_other") ?? "").trim().slice(0, 60) : "";
 
   if (!businessName) {
     return { status: "error", message: "A vállalkozás neve kötelező." };
   }
   if (category && !categorySlugs.has(category)) {
     return { status: "error", message: "Érvénytelen kategória." };
+  }
+  if (category === OTHER_CATEGORY_SLUG && !categoryOther) {
+    return { status: "error", message: "Írd be, milyen megnevezést kérsz az „Egyéb” kategóriához." };
   }
   if (city && !CITY_PATTERN.test(city)) {
     return { status: "error", message: "Érvénytelen település." };
@@ -63,11 +83,21 @@ export async function updateProfileAction(
   }
 
   const supabase = await createClient();
+
+  // A korábbi "egyéb kategória" kérés — csak akkor értesítjük az admint, ha
+  // ténylegesen új/megváltozott kérésről van szó.
+  const { data: previous } = await supabase
+    .from("providers")
+    .select("category_other")
+    .eq("id", user.id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("providers")
     .update({
       business_name: businessName,
       category: category || null,
+      category_other: categoryOther || null,
       city: city || null,
       county: city ? county : null,
       address: address || null,
@@ -76,13 +106,25 @@ export async function updateProfileAction(
       website: normalizeUrl(website),
       facebook_url: normalizeUrl(facebookUrl),
       instagram_url: normalizeUrl(instagramUrl),
+      tiktok_url: normalizeUrl(tiktokUrl),
       tags,
       accepts_card_payment: acceptsCardPayment,
+      payment_methods: paymentMethods,
     })
     .eq("id", user.id);
 
   if (error) {
     return { status: "error", message: "Hiba történt a mentés során." };
+  }
+
+  if (categoryOther && categoryOther !== (previous?.category_other ?? "")) {
+    // Tájékoztató email — ha nem megy ki (nincs API kulcs), a mentés attól
+    // még sikeres, a kérés az adatbázisban és az admin listában is ott van.
+    await sendCategoryRequestEmail({
+      businessName,
+      requestedCategory: categoryOther,
+      contactEmail: user.email ?? null,
+    }).catch(() => undefined);
   }
 
   revalidatePath("/dashboard", "layout");

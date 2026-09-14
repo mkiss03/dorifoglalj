@@ -530,6 +530,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   { key: "footer.bottom_note", section: "footer", label: "Alsó sor jobb oldali szövege", kind: "text", default: "Készült Magyarországon" },
   { key: "footer.facebook_url", section: "footer", label: "Facebook link", kind: "text", default: "#" },
   { key: "footer.instagram_url", section: "footer", label: "Instagram link", kind: "text", default: "#" },
+  { key: "footer.tiktok_url", section: "footer", label: "TikTok link", kind: "text", default: "#" },
   { key: "footer.popular_categories_label", section: "footer", label: "„Népszerű kategóriák” felirat", kind: "text", default: "Népszerű kategóriák" },
   { key: "footer.popular_cities_label", section: "footer", label: "„Népszerű települések” felirat", kind: "text", default: "Népszerű települések" },
 

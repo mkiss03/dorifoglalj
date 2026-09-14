@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { signInAction, type SignInState } from "./actions";
 
 const initialState: SignInState = { status: "idle" };
@@ -41,10 +42,9 @@ export function SignInForm({ action = signInAction }: { action?: typeof signInAc
             Elfelejtetted?
           </Link>
         </div>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="current-password"
           required
           className={inputClass}

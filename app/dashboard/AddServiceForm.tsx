@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { addServiceAction, type ServiceState } from "./actions";
+import { PriceDurationFields } from "./PriceDurationFields";
 
 const initialState: ServiceState = { status: "idle" };
 
@@ -23,23 +24,8 @@ export function AddServiceForm() {
     <form ref={formRef} action={formAction} className="mt-4 space-y-2 border-t border-line pt-4">
       <input name="name" required className={inputClass} placeholder="Új szolgáltatás neve" />
       <textarea name="description" rows={2} className={inputClass} placeholder="Rövid leírás (nem kötelező)" />
-      <div className="flex flex-wrap items-center gap-2">
-        <input
-          name="price_huf"
-          type="number"
-          min={0}
-          required
-          className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
-          placeholder="Ft"
-        />
-        <input
-          name="duration_minutes"
-          type="number"
-          min={1}
-          required
-          className={`${inputClass} w-0 min-w-[4.5rem] flex-1`}
-          placeholder="perc"
-        />
+      <div className="flex flex-wrap items-end gap-2">
+        <PriceDurationFields />
         <button
           type="submit"
           disabled={pending}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { signUpAction, type SignUpState } from "./actions";
 
 const initialState: SignUpState = { status: "idle" };
@@ -66,15 +67,31 @@ export function SignUpForm() {
         <label htmlFor="password" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-soft">
           Jelszó
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}
           className={inputClass}
           placeholder="Legalább 8 karakter"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="password_confirm"
+          className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-soft"
+        >
+          Jelszó mégegyszer
+        </label>
+        <PasswordInput
+          id="password_confirm"
+          name="password_confirm"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          className={inputClass}
+          placeholder="Írd be ugyanazt a jelszót"
         />
       </div>
 

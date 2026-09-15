@@ -121,6 +121,11 @@ export default async function BookingPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
       />
+      {provider.status !== "active" && (
+        <div className="border-b border-amber-200 bg-amber-50 py-3 text-center text-sm font-semibold text-amber-900">
+          Előnézet — ez a profil még nem jóváhagyott, vendégek nem látják.
+        </div>
+      )}
       <div className="h-36 w-full overflow-hidden sm:h-52">
         {provider.cover_url ? (
           // eslint-disable-next-line @next/next/no-img-element

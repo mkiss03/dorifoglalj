@@ -211,6 +211,11 @@ export type PublicProvider = {
   tags: ProviderTag[];
   accepts_card_payment: boolean;
   payment_methods: PaymentMethod[];
+  /** Admin (Dóri) jóváhagyás előtt is látja a profilt — ilyenkor ez nem
+   * 'active', és a felület emiatt egy "előnézet" jelzést mutat. Vendégnek
+   * ez sosem lehet más, mint 'active' (a get_public_provider RPC csak
+   * akkor ad vissza sort más státusznál, ha a hívó admin). */
+  status: ProviderStatus;
   /** Csak az aktív munkatársak. Ha csak 1 elem van, a foglalási felület
    * nem mutat staff-választót — csendben ezt az egyet használja. */
   staff: {
@@ -283,6 +288,7 @@ export type CreateHoldResult =
 export type AdminProviderRow = {
   id: string;
   business_name: string;
+  slug: string;
   email: string;
   phone: string | null;
   category: string | null;

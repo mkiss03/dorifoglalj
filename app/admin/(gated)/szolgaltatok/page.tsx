@@ -137,7 +137,15 @@ export default async function AdminSzolgaltatokPage({
                 </p>
               </div>
 
-              <div className="flex shrink-0 gap-2">
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <Link
+                  href={`/foglalas/${p.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-paper-alt px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-panel"
+                >
+                  Profil megtekintése
+                </Link>
                 {p.status !== "active" && (
                   <form action={setProviderStatusAction}>
                     <input type="hidden" name="provider_id" value={p.id} />

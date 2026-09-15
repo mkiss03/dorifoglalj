@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Database,
   ExternalLink,
+  Eye,
   HardDrive,
   ShieldCheck,
   TriangleAlert,
@@ -233,10 +234,26 @@ export default async function AdminMonitoringPage() {
           <BarChart3 className="h-6 w-6 text-accent-dark" strokeWidth={2.25} />
           <h2 className="font-display text-xl text-ink">Oldal-látogatottság</h2>
         </div>
-        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-          A látogatói forgalmat (oldalmegtekintések, forgalmi források, eszköztípusok) a Vercel Web Analytics méri.
-          Ez a szolgáltatás <strong>cookie-mentes és nem használ egyedi azonosítót</strong> a látogatók
-          követésére, így a jelenlegi magyar adatvédelmi (GDPR / Infotv.) értelmezés szerint nem igényel
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          <StatCard icon={Eye} label="Oldalmegtekintés ma" value={stats.today_page_views.toLocaleString("hu-HU")} />
+          <StatCard
+            icon={Eye}
+            label="Oldalmegtekintés (7 nap)"
+            value={stats.week_page_views.toLocaleString("hu-HU")}
+          />
+          <StatCard icon={Eye} label="Összes oldalmegtekintés" value={stats.total_page_views.toLocaleString("hu-HU")} />
+        </div>
+        <p className="mt-4 text-xs leading-relaxed text-ink-soft">
+          Ez a saját, durva számláló minden nyilvános oldalbetöltést számol (nem egyedi látogatót — sem cookie,
+          sem azonosító nem tárolódik hozzá), így ugyanaz a vendég több oldalmegtekintést is adhat egy látogatás
+          alatt.
+        </p>
+
+        <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+          A részletesebb forgalmi adatokat (egyedi látogatók, forgalmi források, eszköztípusok) a Vercel Web
+          Analytics méri. Ez a szolgáltatás <strong>cookie-mentes és nem használ egyedi azonosítót</strong> a
+          látogatók követésére, így a jelenlegi magyar adatvédelmi (GDPR / Infotv.) értelmezés szerint nem igényel
           sütiengedélyező (cookie consent) felugró ablakot. A részletes, napi bontású grafikonok a Vercel saját
           irányítópultján érhetők el.
         </p>

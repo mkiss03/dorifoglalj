@@ -326,4 +326,10 @@ export type AdminMonitoringStats = {
   media_files_count: number;
   media_bytes_estimated: number;
   total_db_rows: number;
+  /** Saját, cookie-mentes oldalmegtekintés-számláló (nem egyedi látogató) —
+   * a `daily_page_views` táblából, a marketing layout minden betöltésnél
+   * növeli. Kiegészíti a részletesebb Vercel Web Analytics-ot. */
+  total_page_views: number;
+  today_page_views: number;
+  week_page_views: number;
 };

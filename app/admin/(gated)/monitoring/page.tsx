@@ -236,13 +236,17 @@ export default async function AdminMonitoringPage() {
         </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          <StatCard icon={Eye} label="Oldalmegtekintés ma" value={stats.today_page_views.toLocaleString("hu-HU")} />
+          <StatCard icon={Eye} label="Oldalmegtekintés ma" value={(stats.today_page_views ?? 0).toLocaleString("hu-HU")} />
           <StatCard
             icon={Eye}
             label="Oldalmegtekintés (7 nap)"
-            value={stats.week_page_views.toLocaleString("hu-HU")}
+            value={(stats.week_page_views ?? 0).toLocaleString("hu-HU")}
           />
-          <StatCard icon={Eye} label="Összes oldalmegtekintés" value={stats.total_page_views.toLocaleString("hu-HU")} />
+          <StatCard
+            icon={Eye}
+            label="Összes oldalmegtekintés"
+            value={(stats.total_page_views ?? 0).toLocaleString("hu-HU")}
+          />
         </div>
         <p className="mt-4 text-xs leading-relaxed text-ink-soft">
           Ez a saját, durva számláló minden nyilvános oldalbetöltést számol (nem egyedi látogatót — sem cookie,

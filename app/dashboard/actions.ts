@@ -158,6 +158,7 @@ async function uploadProviderMedia(
     .upload(path, file, { upsert: true, contentType: file.type });
 
   if (uploadError) {
+    console.error("provider-media upload failed", { path, size: file.size, type: file.type, error: uploadError.message });
     return { error: "Hiba történt a feltöltés során." };
   }
 

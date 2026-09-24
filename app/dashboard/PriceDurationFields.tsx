@@ -38,7 +38,7 @@ export function PriceDurationFields({
             name="price_huf"
             type="number"
             min={0}
-            step={100}
+            step={1}
             inputMode="numeric"
             required
             defaultValue={defaultPrice}
@@ -61,7 +61,7 @@ export function PriceDurationFields({
             name="duration_minutes"
             type="number"
             min={1}
-            step={5}
+            step={1}
             inputMode="numeric"
             required
             defaultValue={defaultDuration}

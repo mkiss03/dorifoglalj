@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { startTransition, useActionState, type ChangeEvent } from "react";
 import { Camera } from "lucide-react";
+import { downscaleImage } from "@/lib/image/downscaleImage";
 import { deleteStaffAction, updateStaffAction, updateStaffPhotoAction, type StaffState } from "./actions";
 import type { MediaState } from "./actions";
 import type { ProviderService, StaffMemberWithServices } from "@/lib/supabase/types";
@@ -13,14 +14,24 @@ const inputClass =
   "w-full rounded-xl bg-paper-alt px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-soft/60 focus:ring-2 focus:ring-accent-light";
 
 function PhotoUploader({ staffId, photoUrl, name }: { staffId: string; photoUrl: string | null; name: string }) {
-  const [state, formAction] = useActionState(updateStaffPhotoAction, initialMediaState);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [state, formAction, pending] = useActionState(updateStaffPhotoAction, initialMediaState);
   const initial = name.trim().charAt(0).toUpperCase() || "?";
 
+  async function handleChange(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+    const prepared = await downscaleImage(file, 600);
+    const formData = new FormData();
+    formData.set("staff_id", staffId);
+    formData.set("photo", prepared);
+    startTransition(() => formAction(formData));
+    input.value = "";
+  }
+
   return (
-    <form ref={formRef} action={formAction} className="relative h-14 w-14 shrink-0">
-      <input type="hidden" name="staff_id" value={staffId} />
-      <div className="h-14 w-14 overflow-hidden rounded-full bg-accent-light">
+    <div className="relative h-14 w-14 shrink-0">
+      <div className={`h-14 w-14 overflow-hidden rounded-full bg-accent-light ${pending ? "opacity-60" : ""}`}>
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photoUrl} alt="" className="h-full w-full object-cover" />
@@ -34,14 +45,17 @@ function PhotoUploader({ staffId, photoUrl, name }: { staffId: string; photoUrl:
         <Camera className="h-3 w-3" strokeWidth={2.5} />
         <input
           type="file"
-          name="photo"
           accept="image/png,image/jpeg,image/webp"
           className="sr-only"
-          onChange={() => formRef.current?.requestSubmit()}
+          disabled={pending}
+          onChange={handleChange}
         />
       </label>
-      {state.status === "error" && <p className="absolute top-full mt-1 w-32 text-[10px] text-red-700">{state.message}</p>}
-    </form>
+      {pending && <p className="absolute top-full mt-1 w-32 text-[10px] font-semibold text-ink-soft">Feltöltés…</p>}
+      {state.status === "error" && !pending && (
+        <p className="absolute top-full mt-1 w-32 text-[10px] text-red-700">{state.message}</p>
+      )}
+    </div>
   );
 }
 

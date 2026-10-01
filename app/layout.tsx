@@ -46,17 +46,9 @@ export const metadata: Metadata = {
     siteName: "IdőpontNeked.hu",
     locale: "hu_HU",
     type: "website",
-    images: [
-      {
-        url: "/apple-icon.png",
-        width: 512,
-        height: 512,
-        alt: "IdőpontNeked.hu logó",
-      },
-    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "IdőpontNeked.hu · Ahol a szabad időpontok várnak",
     description: "Online időpontfoglaló piactér szépségipari szolgáltatóknak és vendégeknek.",
   },

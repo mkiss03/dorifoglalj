@@ -4,13 +4,14 @@ import { useActionState, useRef, useState } from "react";
 import { Check, Copy, Download, ExternalLink, RefreshCw } from "lucide-react";
 import {
   regenerateIcsTokenAction,
+  regenerateStaffIcsTokenAction,
   updateBookingLinkAction,
   updateIcsPrivacyAction,
   type BookingLinkState,
   type CalendarLinkState,
 } from "./actions";
 import { FacebookGlyph, WhatsAppGlyph } from "@/components/icons/BrandIcons";
-import type { Provider } from "@/lib/supabase/types";
+import type { Provider, StaffMember } from "@/lib/supabase/types";
 
 const initialState: BookingLinkState = { status: "idle" };
 const initialCalendarState: CalendarLinkState = { status: "idle" };
@@ -19,6 +20,60 @@ function StatusLine({ state }: { state: CalendarLinkState }) {
   if (state.status === "idle") return null;
   return (
     <p className={"text-xs " + (state.status === "error" ? "text-red-700" : "text-accent-dark")}>{state.message}</p>
+  );
+}
+
+function StaffCalendarRow({
+  staffId,
+  name,
+  url,
+  copied,
+  onCopy,
+}: {
+  staffId: string;
+  name: string;
+  url: string;
+  copied: boolean;
+  onCopy: (url: string) => void;
+}) {
+  const [state, action, pending] = useActionState(regenerateStaffIcsTokenAction, initialCalendarState);
+  return (
+    <li className="rounded-2xl bg-paper-alt p-2 pl-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="shrink-0 text-sm font-semibold text-ink">{name}</span>
+        <span className="min-w-0 flex-1 truncate text-xs text-ink-soft">{url}</span>
+        <button
+          type="button"
+          onClick={() => onCopy(url)}
+          className="shadow-card flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-panel"
+        >
+          {copied ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Copy className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          {copied ? "Másolva" : "Másolás"}
+        </button>
+        <form action={action}>
+          <input type="hidden" name="staff_id" value={staffId} />
+          <button
+            type="submit"
+            disabled={pending}
+            title="Új link kérése (a régi azonnal megszűnik)"
+            aria-label={`Új naptár-link kérése: ${name}`}
+            onClick={(e) => {
+              if (!window.confirm(`Biztosan új naptár-linket kérsz ${name} részére? A régi link azonnal megszűnik.`)) {
+                e.preventDefault();
+              }
+            }}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-panel hover:text-ink disabled:opacity-60"
+          >
+            <RefreshCw className="h-3.5 w-3.5" strokeWidth={2.25} />
+          </button>
+        </form>
+      </div>
+      {state.status !== "idle" && (
+        <p className={"mt-1 pr-2 text-xs " + (state.status === "error" ? "text-red-700" : "text-accent-dark")}>
+          {state.message}
+        </p>
+      )}
+    </li>
   );
 }
 
@@ -39,7 +94,7 @@ function CalendarLinkSettings({ hideCustomer }: { hideCustomer: boolean }) {
             onChange={() => privacyForm.current?.requestSubmit()}
             className="mt-0.5 h-4 w-4 shrink-0 accent-accent-dark"
           />
-          <span>A naptárban csak a szolgáltatás és az időpont látszódjon, a vendég neve és telefonszáma nélkül</span>
+          <span>A naptár-linkeken csak a szolgáltatás és az időpont látszódjon, a vendég neve és telefonszáma nélkül</span>
         </label>
         <StatusLine state={privacyState} />
       </form>
@@ -73,15 +128,19 @@ function CalendarLinkSettings({ hideCustomer }: { hideCustomer: boolean }) {
 
 export function BookingLinkCard({
   provider,
+  staff,
   siteUrl,
   qrDataUrl,
 }: {
   provider: Provider;
+  /** Aktív munkatársak — többnél mindegyik saját naptár-linket is kap. */
+  staff: StaffMember[];
   siteUrl: string;
   qrDataUrl: string;
 }) {
   const [state, formAction, pending] = useActionState(updateBookingLinkAction, initialState);
-  const [copiedWhich, setCopiedWhich] = useState<"link" | "ics" | null>(null);
+  const [copiedWhich, setCopiedWhich] = useState<string | null>(null);
+  const staffWithLinks = staff.length > 1 ? staff.filter((m) => m.ics_token) : [];
   const [editingSlug, setEditingSlug] = useState(false);
 
   const bookingUrl = `${siteUrl}/foglalas/${provider.slug}`;
@@ -91,7 +150,7 @@ export function BookingLinkCard({
   const waShareUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${bookingUrl}`)}`;
   const initial = provider.business_name.trim().charAt(0).toUpperCase() || "?";
 
-  function copy(text: string, which: "link" | "ics") {
+  function copy(text: string, which: string) {
     navigator.clipboard?.writeText(text);
     setCopiedWhich(which);
     setTimeout(() => setCopiedWhich(null), 1500);
@@ -265,6 +324,9 @@ export function BookingLinkCard({
             foglalások automatikusan megjelennek benne. A naptárak csak néhány óránként frissítenek, ezért minden új
             foglalásról e-mailt is küldünk neked.
           </p>
+          {staffWithLinks.length > 0 && (
+            <p className="mt-3 text-xs font-semibold text-ink">Összes foglalás (minden munkatárs)</p>
+          )}
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-paper-alt p-2 pl-4">
             <span className="min-w-0 flex-1 truncate text-sm text-ink">{icsUrl}</span>
             <button
@@ -277,6 +339,28 @@ export function BookingLinkCard({
             </button>
           </div>
           <CalendarLinkSettings hideCustomer={provider.ics_hide_customer ?? false} />
+
+          {staffWithLinks.length > 0 && (
+            <div className="mt-5">
+              <p className="text-xs font-semibold text-ink">Munkatársak saját naptára</p>
+              <p className="mt-1 text-sm text-ink-soft">
+                Ezekben csak az adott munkatárs foglalásai szerepelnek. Odaadhatod a munkatársnak, hogy a saját
+                naptárába iratkozzon fel, a többiek foglalásait nem fogja látni.
+              </p>
+              <ul className="mt-2 space-y-2">
+                {staffWithLinks.map((m) => (
+                  <StaffCalendarRow
+                    key={m.id}
+                    staffId={m.id}
+                    name={m.name}
+                    url={`${siteUrl}/api/ics/${m.ics_token}`}
+                    copied={copiedWhich === `ics-${m.id}`}
+                    onCopy={(url) => copy(url, `ics-${m.id}`)}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>

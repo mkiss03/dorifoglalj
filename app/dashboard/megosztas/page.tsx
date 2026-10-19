@@ -1,13 +1,16 @@
 import { headers } from "next/headers";
 import QRCode from "qrcode";
 import { getUser, createClient } from "@/lib/supabase/server";
-import type { Provider } from "@/lib/supabase/types";
+import type { Provider, StaffMember } from "@/lib/supabase/types";
 import { BookingLinkCard } from "../BookingLinkCard";
 
 export default async function DashboardSharingPage() {
   const user = await getUser();
   const supabase = await createClient();
-  const { data: provider } = await supabase.from("providers").select("*").eq("id", user!.id).single();
+  const [{ data: provider }, { data: staff }] = await Promise.all([
+    supabase.from("providers").select("*").eq("id", user!.id).single(),
+    supabase.from("staff_members").select("*").eq("provider_id", user!.id).eq("active", true).order("created_at"),
+  ]);
   const typedProvider = provider as Provider | null;
 
   const headersList = await headers();
@@ -30,6 +33,7 @@ export default async function DashboardSharingPage() {
         {typedProvider ? (
           <BookingLinkCard
             provider={typedProvider}
+            staff={(staff ?? []) as StaffMember[]}
             siteUrl={siteUrl}
             qrDataUrl={await QRCode.toDataURL(`${siteUrl}/foglalas/${typedProvider.slug}`, { margin: 1, width: 480 })}
           />

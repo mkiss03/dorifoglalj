@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { MiniCalendar } from "@/components/ui/MiniCalendar";
 import { CancelBookingModal } from "./CancelBookingModal";
+import { WeekBookingsList } from "./WeekBookingsList";
 import type { Availability, Booking, StaffMember } from "@/lib/supabase/types";
 
 const PX_PER_HOUR = 72;
@@ -51,6 +52,24 @@ function formatTime(iso: string) {
 
 const MIN_COLUMN_WIDTH = 200;
 
+function startOfWeek(d: Date) {
+  const x = startOfDay(d);
+  x.setDate(x.getDate() - (isoWeekday(x) - 1));
+  return x;
+}
+
+function formatWeekRange(start: Date) {
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  const month = (d: Date) => new Intl.DateTimeFormat("hu-HU", { month: "long" }).format(d);
+  const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+  return start.getMonth() === end.getMonth()
+    ? `${cap(month(start))} ${start.getDate()}–${end.getDate()}.`
+    : `${cap(month(start))} ${start.getDate()}. – ${month(end)} ${end.getDate()}.`;
+}
+
+type View = "day" | "week";
+
 export function BookingsSection({
   bookings,
   availability,
@@ -66,6 +85,8 @@ export function BookingsSection({
   const [showMobileCalendar, setShowMobileCalendar] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
   const [nowHour, setNowHour] = useState<number | null>(null);
+  const [todayKey, setTodayKey] = useState<string | null>(null);
+  const [view, setView] = useState<View>("day");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const isToday = sameDay(selectedDate, new Date());
@@ -73,7 +94,10 @@ export function BookingsSection({
   // Csak kliens-oldalon állítjuk be (a szerver-renderelt "most" eltérne a
   // böngésző óráitól, ez hydration-mismatchet okozna), és percenként frissül.
   useEffect(() => {
-    const tick = () => setNowHour(decimalHourNow());
+    const tick = () => {
+      setNowHour(decimalHourNow());
+      setTodayKey(new Date().toDateString());
+    };
     const initial = setTimeout(tick, 0);
     const id = setInterval(tick, 60_000);
     return () => {
@@ -127,37 +151,59 @@ export function BookingsSection({
     el.scrollTop = Math.max((clamped - dayStart) * PX_PER_HOUR - PX_PER_HOUR, 0);
   }, [selectedDate, dayStart, dayEnd, isToday, dayBookings]);
 
+  const weekStart = useMemo(() => startOfWeek(selectedDate), [selectedDate]);
+
+  function shift(days: number) {
+    const next = new Date(selectedDate);
+    next.setDate(next.getDate() + days);
+    setSelectedDate(next);
+  }
+
+  const stepClass =
+    "flex h-8 w-8 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:bg-panel hover:text-ink " +
+    (view === "day" ? "md:hidden" : "");
+
   return (
     <div className="shadow-sheet rounded-3xl bg-white p-4 lg:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => {
-              const prev = new Date(selectedDate);
-              prev.setDate(prev.getDate() - 1);
-              setSelectedDate(prev);
-            }}
-            aria-label="Előző nap"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:bg-panel hover:text-ink md:hidden"
+            onClick={() => shift(view === "week" ? -7 : -1)}
+            aria-label={view === "week" ? "Előző hét" : "Előző nap"}
+            className={stepClass}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <p className="font-display text-lg text-ink">{formatDayHeader(selectedDate)}</p>
+          <p className="font-display text-lg text-ink">
+            {view === "week" ? formatWeekRange(weekStart) : formatDayHeader(selectedDate)}
+          </p>
           <button
             type="button"
-            onClick={() => {
-              const next = new Date(selectedDate);
-              next.setDate(next.getDate() + 1);
-              setSelectedDate(next);
-            }}
-            aria-label="Következő nap"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-paper-alt text-ink-soft transition-colors hover:bg-panel hover:text-ink md:hidden"
+            onClick={() => shift(view === "week" ? 7 : 1)}
+            aria-label={view === "week" ? "Következő hét" : "Következő nap"}
+            className={stepClass}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex rounded-full bg-paper-alt p-0.5" role="group" aria-label="Nézet">
+            {(["day", "week"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setView(v)}
+                aria-pressed={view === v}
+                className={
+                  "rounded-full px-3 py-1 text-xs font-semibold transition-colors " +
+                  (view === v ? "bg-ink text-paper" : "text-ink-soft hover:text-ink")
+                }
+              >
+                {v === "day" ? "Nap" : "Hét"}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             onClick={() => setShowMobileCalendar((v) => !v)}
@@ -171,7 +217,7 @@ export function BookingsSection({
             onClick={() => setSelectedDate(new Date())}
             className="rounded-full bg-paper-alt px-3.5 py-1.5 text-xs font-semibold text-ink-soft transition-colors hover:bg-panel"
           >
-            Ma
+            {view === "week" ? "Ez a hét" : "Ma"}
           </button>
         </div>
       </div>
@@ -194,6 +240,21 @@ export function BookingsSection({
           <MiniCalendar selected={selectedDate} onSelect={setSelectedDate} />
         </div>
 
+        {view === "week" ? (
+          <div className="min-w-0 flex-1">
+            <WeekBookingsList
+              weekStart={weekStart}
+              bookings={bookings}
+              staff={staff}
+              todayKey={todayKey}
+              onCancel={setCancelTarget}
+              onOpenDay={(d) => {
+                setSelectedDate(d);
+                setView("day");
+              }}
+            />
+          </div>
+        ) : (
         <div className="min-w-0 flex-1 overflow-x-auto">
           {columns && (
             <div className="flex" style={{ minWidth: columns.length * MIN_COLUMN_WIDTH + 44 }}>
@@ -301,6 +362,7 @@ export function BookingsSection({
             <p className="mt-4 text-sm text-ink-soft">Ezen a napon nincs foglalásod.</p>
           )}
         </div>
+        )}
       </div>
 
       {cancelTarget && <CancelBookingModal booking={cancelTarget} onClose={() => setCancelTarget(null)} />}

@@ -572,6 +572,31 @@ export async function regenerateIcsTokenAction(): Promise<CalendarLinkState> {
   };
 }
 
+/** Egy munkatárs saját naptár-linkjének cseréje (pl. ha kilépett, vagy a
+ * link illetéktelen kézbe került) — a régi azonnal megszűnik. */
+export async function regenerateStaffIcsTokenAction(
+  _prevState: CalendarLinkState,
+  formData: FormData
+): Promise<CalendarLinkState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const staffId = String(formData.get("staff_id") ?? "");
+  if (!staffId) return { status: "error", message: "Hiányzó munkatárs." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("staff_members")
+    .update({ ics_token: crypto.randomUUID() })
+    .eq("id", staffId)
+    .eq("provider_id", user.id)
+    .select("id");
+  if (error || !data?.length) return { status: "error", message: "Nem sikerült új linket létrehozni." };
+
+  revalidatePath("/dashboard", "layout");
+  return { status: "success", message: "Új link kész, a régi már nem működik." };
+}
+
 export async function updateIcsPrivacyAction(
   _prevState: CalendarLinkState,
   formData: FormData

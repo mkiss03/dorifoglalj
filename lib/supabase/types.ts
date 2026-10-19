@@ -123,6 +123,8 @@ export type StaffMember = {
   specialty: string | null;
   photo_url: string | null;
   active: boolean;
+  /** A munkatárs saját naptár-linkjének titkos tokenje (schema_v24). */
+  ics_token?: string;
   created_at: string;
 };
 

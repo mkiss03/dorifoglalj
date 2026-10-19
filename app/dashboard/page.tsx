@@ -17,6 +17,9 @@ export default async function DashboardOverviewPage() {
   startOfToday.setHours(0, 0, 0, 0);
   const in7Days = new Date(startOfToday);
   in7Days.setDate(in7Days.getDate() + 7);
+  // A heti lista nézet a folyó hét már elmúlt napjait is mutatja.
+  const startOfWeek = new Date(startOfToday);
+  startOfWeek.setDate(startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7));
 
   const [{ data: provider }, { data: services }, staff, { data: availability }, { data: bookings }] =
     await Promise.all([
@@ -29,7 +32,7 @@ export default async function DashboardOverviewPage() {
         .select("*")
         .eq("provider_id", user!.id)
         .eq("status", "confirmed")
-        .gte("starts_at", startOfToday.toISOString())
+        .gte("starts_at", startOfWeek.toISOString())
         .order("starts_at"),
     ]);
 
@@ -40,7 +43,10 @@ export default async function DashboardOverviewPage() {
   const staffList: StaffMember[] = staff;
 
   const todayCount = typedBookings.filter((b) => sameDay(new Date(b.starts_at), startOfToday)).length;
-  const weekCount = typedBookings.filter((b) => new Date(b.starts_at) < in7Days).length;
+  const weekCount = typedBookings.filter((b) => {
+    const t = new Date(b.starts_at);
+    return t >= startOfToday && t < in7Days;
+  }).length;
   const activeServiceCount = typedServices.filter((s) => s.active).length;
   const bookingActive = (typedProvider?.booking_enabled && typedProvider?.status === "active") ?? false;
 

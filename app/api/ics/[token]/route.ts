@@ -20,6 +20,32 @@ function escapeIcs(text: string) {
   return text.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 }
 
+/** Egyedi letöltési fájlnév (naptár neve + budapesti dátum/idő), hogy egy
+ * újabb letöltés ne keveredhessen össze egy korábbi "foglalasok.ics"-szel. */
+function downloadFilename(calendarName: string, now: Date = new Date()) {
+  const slug =
+    calendarName
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "foglalasok";
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Budapest",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(now)
+      .map((p) => [p.type, p.value])
+  );
+  return `${slug}-${parts.year}-${parts.month}-${parts.day}-${parts.hour}${parts.minute}.ics`;
+}
+
 function formatDt(iso: string) {
   return new Date(iso).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 }
@@ -82,7 +108,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   return new NextResponse(body, {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": 'inline; filename="foglalasok.ics"',
+      "Content-Disposition": `inline; filename="${downloadFilename(feed.name)}"`,
       "Cache-Control": "no-store",
     },
   });

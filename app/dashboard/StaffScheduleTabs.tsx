@@ -45,7 +45,7 @@ export function StaffScheduleTabs({
         key={`bl-${selectedId}`}
         staffId={selectedId}
         blocks={staffBlocks}
-        allowAllStaff={staff.length > 1}
+        staff={staff.map((s) => ({ id: s.id, name: s.name }))}
       />
     </div>
   );

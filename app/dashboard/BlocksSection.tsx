@@ -1,9 +1,9 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { addBlockAction, deleteBlockAction, type BlockState } from "./actions";
-import type { ProviderBlock } from "@/lib/supabase/types";
+import type { ProviderBlock, StaffMember } from "@/lib/supabase/types";
 
 const initialState: BlockState = { status: "idle" };
 
@@ -21,15 +21,24 @@ function todayIso() {
 export function BlocksSection({
   blocks,
   staffId,
-  allowAllStaff,
+  staff,
 }: {
   blocks: ProviderBlock[];
   staffId: string;
-  allowAllStaff: boolean;
+  /** Az aktív munkatársak — ha több van, a kizárás többükre is felvehető egyszerre. */
+  staff: Pick<StaffMember, "id" | "name">[];
 }) {
   const [state, formAction, pending] = useActionState(addBlockAction, initialState);
   const [allDay, setAllDay] = useState(false);
-  const [allStaff, setAllStaff] = useState(false);
+  const [selected, setSelected] = useState<string[]>([staffId]);
+
+  const multiStaff = staff.length > 1;
+  const allSelected = staff.every((s) => selected.includes(s.id));
+  const currentName = staff.find((s) => s.id === staffId)?.name ?? "";
+
+  function toggleStaff(id: string) {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
 
   const sorted = [...blocks].sort((a, b) => a.block_date.localeCompare(b.block_date));
 
@@ -78,7 +87,45 @@ export function BlocksSection({
       {sorted.length === 0 && <p className="mt-4 text-sm text-ink-soft">Jelenleg nincs eseti kizárásod.</p>}
 
       <form action={formAction} className="mt-5 flex flex-wrap items-end gap-3 border-t border-line pt-5">
-        <input type="hidden" name="staff_id" value={staffId} />
+        {multiStaff ? (
+          <div className="w-full">
+            <p className="text-xs font-semibold text-ink-soft">Kikre vonatkozik?</p>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              {staff.map((s) => {
+                const on = selected.includes(s.id);
+                return (
+                  <label
+                    key={s.id}
+                    className={
+                      "flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors focus-within:ring-2 focus-within:ring-accent-light " +
+                      (on ? "bg-ink text-paper" : "bg-paper-alt text-ink-soft hover:bg-panel")
+                    }
+                  >
+                    <input
+                      type="checkbox"
+                      name="staff_ids"
+                      value={s.id}
+                      checked={on}
+                      onChange={() => toggleStaff(s.id)}
+                      className="sr-only"
+                    />
+                    {on && <Check className="h-3.5 w-3.5" strokeWidth={2.5} />}
+                    {s.name}
+                  </label>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => setSelected(allSelected ? [staffId] : staff.map((s) => s.id))}
+                className="px-1 text-xs font-semibold text-accent-dark hover:underline"
+              >
+                {allSelected ? `Csak ${currentName}` : "Mindenki"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <input type="hidden" name="staff_ids" value={staffId} />
+        )}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-ink-soft">Dátum</label>
           <input
@@ -100,19 +147,6 @@ export function BlocksSection({
           />
           Egész nap
         </label>
-
-        {allowAllStaff && (
-          <label className="flex items-center gap-2 pb-2.5 text-sm font-medium text-ink">
-            <input
-              type="checkbox"
-              name="all_staff"
-              checked={allStaff}
-              onChange={(e) => setAllStaff(e.target.checked)}
-              className="h-4 w-4 accent-accent-dark"
-            />
-            Minden munkatársra
-          </label>
-        )}
 
         {!allDay && (
           <>
@@ -152,7 +186,7 @@ export function BlocksSection({
 
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || selected.length === 0}
           className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ink/90 disabled:opacity-60"
         >
           {pending ? "Mentés…" : "Hozzáadás"}

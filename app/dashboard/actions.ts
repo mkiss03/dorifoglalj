@@ -390,8 +390,7 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   const startTime = String(formData.get("start_time") ?? "");
   const endTime = String(formData.get("end_time") ?? "");
   const note = String(formData.get("note") ?? "").trim();
-  const allStaff = formData.get("all_staff") === "on";
-  const staffId = String(formData.get("staff_id") ?? "");
+  const requestedStaffIds = [...new Set(formData.getAll("staff_ids").map(String).filter(Boolean))];
 
   if (!blockDate || !/^\d{4}-\d{2}-\d{2}$/.test(blockDate)) {
     return { status: "error", message: "Add meg a dátumot." };
@@ -399,25 +398,21 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   if (!allDay && (!startTime || !endTime || startTime >= endTime)) {
     return { status: "error", message: "A záró időpontnak a kezdő után kell lennie." };
   }
-  if (!allStaff && !staffId) {
-    return { status: "error", message: "Hiányzó munkatárs." };
+  if (requestedStaffIds.length === 0) {
+    return { status: "error", message: "Válassz legalább egy munkatársat." };
   }
 
   const supabase = await createClient();
 
-  let staffIds: string[];
-  if (allStaff) {
-    const { data: staff } = await supabase
-      .from("staff_members")
-      .select("id")
-      .eq("provider_id", user.id)
-      .eq("active", true);
-    staffIds = (staff ?? []).map((s) => s.id);
-    if (staffIds.length === 0) {
-      return { status: "error", message: "Nincs aktív munkatárs." };
-    }
-  } else {
-    staffIds = [staffId];
+  // Csak a saját munkatársakra vehető fel kizárás.
+  const { data: ownStaff } = await supabase
+    .from("staff_members")
+    .select("id")
+    .eq("provider_id", user.id)
+    .in("id", requestedStaffIds);
+  const staffIds = (ownStaff ?? []).map((s) => s.id);
+  if (staffIds.length !== requestedStaffIds.length) {
+    return { status: "error", message: "Érvénytelen munkatárs." };
   }
 
   const { error } = await supabase.from("provider_blocks").insert(
@@ -461,11 +456,12 @@ export async function addBlockAction(_prevState: BlockState, formData: FormData)
   });
 
   revalidatePath("/dashboard", "layout");
+  const saved = staffIds.length > 1 ? `Kizárás mentve ${staffIds.length} munkatársnál.` : "Kizárás mentve.";
   return {
     status: "success",
     message: hasOverlap
-      ? "Kizárás mentve. Figyelem: erre az időszakra már van visszaigazolt foglalás, érdemes egyeztetni a vendéggel."
-      : "Kizárás mentve.",
+      ? `${saved} Figyelem: erre az időszakra már van visszaigazolt foglalás, érdemes egyeztetni a vendéggel.`
+      : saved,
   };
 }
 

@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import type { CreateBookingResult } from "@/lib/supabase/types";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { sendBookingConfirmationEmail } from "@/lib/email/sendBookingConfirmationEmail";
+import { notifyProviderOfBooking } from "@/lib/notifications/notifyProviderOfBooking";
+import { getTrustedSiteUrl } from "@/lib/site-url";
 
 export type BookingFormState = {
   status: "idle" | "error" | "success";
@@ -73,6 +75,17 @@ export async function createBookingAction(
   if (!result.ok) {
     return { status: "error", message: ERROR_MESSAGES[result.error] ?? "Nem sikerült a foglalás." };
   }
+
+  // A headers()-alapú fallback az after() callbackben már nem elérhető,
+  // ezért a válasz előtt oldjuk fel.
+  const siteUrl = await getTrustedSiteUrl();
+  after(async () => {
+    try {
+      await notifyProviderOfBooking(result.booking_id, siteUrl);
+    } catch (err) {
+      console.error("[createBookingAction] Szolgáltatói értesítő hibázott:", err);
+    }
+  });
 
   if (email) {
     // Két korábbi hiba miatt nem ment ki ez az email:

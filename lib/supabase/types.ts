@@ -94,6 +94,8 @@ export type Provider = {
   approved_at: string | null;
   slug: string;
   ics_token: string;
+  /** Ha igaz, a naptár-linken (ics) a vendég neve és telefonszáma nem jelenik meg. */
+  ics_hide_customer: boolean;
   booking_enabled: boolean;
   created_at: string;
   updated_at: string;

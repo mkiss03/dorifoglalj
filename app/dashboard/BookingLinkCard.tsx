@@ -1,12 +1,75 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { Check, Copy, Download, ExternalLink } from "lucide-react";
-import { updateBookingLinkAction, type BookingLinkState } from "./actions";
+import { useActionState, useRef, useState } from "react";
+import { Check, Copy, Download, ExternalLink, RefreshCw } from "lucide-react";
+import {
+  regenerateIcsTokenAction,
+  updateBookingLinkAction,
+  updateIcsPrivacyAction,
+  type BookingLinkState,
+  type CalendarLinkState,
+} from "./actions";
 import { FacebookGlyph, WhatsAppGlyph } from "@/components/icons/BrandIcons";
 import type { Provider } from "@/lib/supabase/types";
 
 const initialState: BookingLinkState = { status: "idle" };
+const initialCalendarState: CalendarLinkState = { status: "idle" };
+
+function StatusLine({ state }: { state: CalendarLinkState }) {
+  if (state.status === "idle") return null;
+  return (
+    <p className={"text-xs " + (state.status === "error" ? "text-red-700" : "text-accent-dark")}>{state.message}</p>
+  );
+}
+
+function CalendarLinkSettings({ hideCustomer }: { hideCustomer: boolean }) {
+  const [privacyState, privacyAction, privacyPending] = useActionState(updateIcsPrivacyAction, initialCalendarState);
+  const [regenState, regenAction, regenPending] = useActionState(regenerateIcsTokenAction, initialCalendarState);
+  const privacyForm = useRef<HTMLFormElement>(null);
+
+  return (
+    <div className="mt-3 space-y-3">
+      <form ref={privacyForm} action={privacyAction} className="space-y-1">
+        <label className="flex cursor-pointer items-start gap-2 text-sm text-ink">
+          <input
+            type="checkbox"
+            name="ics_hide_customer"
+            defaultChecked={hideCustomer}
+            disabled={privacyPending}
+            onChange={() => privacyForm.current?.requestSubmit()}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-accent-dark"
+          />
+          <span>A naptárban csak a szolgáltatás és az időpont látszódjon, a vendég neve és telefonszáma nélkül</span>
+        </label>
+        <StatusLine state={privacyState} />
+      </form>
+
+      <form action={regenAction} className="space-y-1">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <button
+            type="submit"
+            disabled={regenPending}
+            onClick={(e) => {
+              if (
+                !window.confirm(
+                  "Biztosan új naptár-linket kérsz? A régi link azonnal megszűnik, és a naptáradban újra fel kell iratkoznod az újra."
+                )
+              ) {
+                e.preventDefault();
+              }
+            }}
+            className="flex items-center gap-1.5 rounded-full bg-paper-alt px-3.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-panel disabled:opacity-60"
+          >
+            <RefreshCw className="h-3.5 w-3.5" strokeWidth={2.25} />
+            {regenPending ? "Új link készül…" : "Új link kérése"}
+          </button>
+          <span className="text-xs text-ink-soft">Ha a link illetéktelen kézbe került. A régi azonnal megszűnik.</span>
+        </div>
+        <StatusLine state={regenState} />
+      </form>
+    </div>
+  );
+}
 
 export function BookingLinkCard({
   provider,
@@ -199,7 +262,8 @@ export function BookingLinkCard({
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Naptár-szinkron (Google / Apple)</p>
           <p className="mt-1 text-sm text-ink-soft">
             Told be ezt a linket a saját naptáradba („Feliratkozás URL alapján” / „Új naptár-előfizetés”), és az új
-            foglalások automatikusan megjelennek benne.
+            foglalások automatikusan megjelennek benne. A naptárak csak néhány óránként frissítenek, ezért minden új
+            foglalásról e-mailt is küldünk neked.
           </p>
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-paper-alt p-2 pl-4">
             <span className="min-w-0 flex-1 truncate text-sm text-ink">{icsUrl}</span>
@@ -212,6 +276,7 @@ export function BookingLinkCard({
               {copiedWhich === "ics" ? "Másolva" : "Másolás"}
             </button>
           </div>
+          <CalendarLinkSettings hideCustomer={provider.ics_hide_customer ?? false} />
         </div>
       </div>
     </div>

@@ -126,6 +126,27 @@ Supabase Dashboardon, az alapértelmezett angol sablonok mennek ki.
 A címzettet az `ADMIN_NOTIFICATION_EMAIL` env-változó adja (vesszővel több cím is),
 alapértelmezésben a `lib/contact.ts`-beli `SUPPORT_EMAIL`.
 
+## Foglalási értesítők és emlékeztető (Resend)
+
+- **Szolgáltatói értesítő** → `lib/notifications/notifyProviderOfBooking.ts`. Minden vendég által
+  létrehozott foglalás után e-mail megy a szolgáltató bejelentkezési címére (vendég neve,
+  telefonszáma, e-mailje, szolgáltatás, időpont). A kézi (dashboardos) foglalásról nem megy.
+- **Vendég-emlékeztető** → `app/api/cron/booking-reminders/route.ts`, a `vercel.json` cronja
+  naponta egyszer futtatja (14:00 UTC, a Hobby csomagban ±59 perc). A holnapi (budapesti
+  naptári nap) érvényes foglalások vendégeinek küld emlékeztetőt, ha van e-mail-címük;
+  a `bookings.reminder_sent_at` jelöli a kiküldést, így nincs duplikáció.
+
+Mindkettőhöz bejelentkezett felhasználó nélkül kell több szolgáltató adatát olvasni, ezért a
+Vercelben két környezeti változó kell (Production):
+
+- `SUPABASE_SECRET_KEY` — Supabase Dashboard → Project Settings → API Keys → secret key
+  (vagy a régi `service_role` kulcs). Csak szerveroldalon használjuk (`lib/supabase/admin.ts`).
+- `CRON_SECRET` — tetszőleges hosszú, véletlen szöveg. A Vercel ezt küldi a cron hívásakor,
+  e nélkül a végpont 401-et ad.
+
+Ha valamelyik hiányzik, a foglalás ettől még működik, csak az értesítő/emlékeztető marad ki
+(a Vercel logban látszik). A Resend ingyenes csomagja napi 100 levelet enged.
+
 ## Lemondás-értesítő email (Resend)
 
 Ha a szolgáltató a `/dashboard` naptárban lemond egy foglalást, a rendszer — ha a vendégnek van rögzített email címe — automatikus értesítőt küld neki a Resend API-n keresztül (`lib/email/sendCancellationEmail.ts`). Ehhez a `RESEND_API_KEY` környezeti változó beállítása **és** egy verifikált küldő domain szükséges a Resend fiókban (ld. `.env.local.example`); enélkül a lemondás önmagában továbbra is működik, csak email nem megy ki — ekkor a felület jelzi, hogy érdemes telefonon is értesíteni a vendéget.
@@ -146,6 +167,8 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=
+SUPABASE_SECRET_KEY=   # értesítők, emlékeztető (csak szerveroldal)
+CRON_SECRET=           # a napi emlékeztető cron védelme
 ```
 
-Supabase oldalon a `supabase/schema*.sql` fájlokat kell egyszer, sorrendben (schema → v2 → v3 → v4) lefuttatni az SQL Editorban. Új service-role kulcs vagy egyéb env-változó nem szükséges — minden anon-oldali hozzáférés a fent leírt RPC-ken keresztül, biztonságosan történik.
+Supabase oldalon a `supabase/schema*.sql` fájlokat kell egyszer, sorrendben (schema → v2 → v3 → v4) lefuttatni az SQL Editorban. A vendég- és szolgáltatói oldal minden adatbázis-hozzáférése a fent leírt RPC-ken és RLS-en keresztül történik; a titkos kulcsot (`SUPABASE_SECRET_KEY`) kizárólag a szerveroldali értesítők és a napi emlékeztető használja.

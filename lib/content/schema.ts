@@ -295,7 +295,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
   {
     key: "forproviders.founding_note",
     section: "forproviders",
-    label: "Kezdeti/ingyenes időszak megjegyzése (üresen hagyva eltűnik)",
+    label: "Alapító tagos / kezdeti időszak doboz a gomb fölött (új sor: Enter; felsorolás: kezdd a sort •-tal vagy kötőjellel; üresen hagyva eltűnik)",
     kind: "textarea",
     default:
       "A platform jelenleg induló, ingyenes időszakban jár, a most csatlakozó szolgáltatóknak a regisztráció és a foglalási rendszer használata díjmentes. A díjszabás esetleges bevezetéséről a meglévő szolgáltatókat előre, e-mailben értesítjük.",

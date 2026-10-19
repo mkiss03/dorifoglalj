@@ -27,6 +27,6 @@ export const faqItems: FaqItem[] = [
   {
     question: "Lemondható vagy módosítható a foglalás?",
     answer:
-      "Igen. A foglalás visszaigazoló e-mailjében találsz egy „Foglalás lemondása” és egy „Időpont módosítása” gombot is, ezekre kattintva a vendég önállóan, a szolgáltató megkeresése nélkül tudja rendezni a foglalását.\n\nLemondás vagy módosítás esetén mind a vendég, mind a szolgáltató automatikus értesítést kap. A foglalt időpont előtt emlékeztető e-mailt (később SMS-t is) küldünk, hogy senki ne felejtse el az időpontját.",
+      "Igen, közvetlenül a szolgáltatónál: az elérhetőségét megtalálod a foglalás visszaigazoló e-mailjében. Ha a szolgáltató mondja le az időpontot, erről automatikus e-mailt kapsz.\n\nHa megadod az e-mail-címedet, a foglalt időpont előtti napon emlékeztetőt is küldünk, hogy ne felejtsd el.",
   },
 ];

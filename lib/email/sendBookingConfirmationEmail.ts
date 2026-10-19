@@ -1,4 +1,6 @@
 import { getResendClient, RESEND_FROM_EMAIL } from "./resend";
+import { escapeHtml } from "./escapeHtml";
+import { formatHuf, formatStartsAt } from "./format";
 
 export type SendBookingConfirmationEmailParams = {
   to: string;
@@ -17,22 +19,7 @@ export type SendBookingConfirmationEmailResult =
   | { ok: true }
   | { ok: false; error: "missing_api_key" | "send_failed" };
 
-function formatStartsAt(iso: string): string {
-  const formatted = new Intl.DateTimeFormat("hu-HU", {
-    timeZone: "Europe/Budapest",
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
-  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-}
 
-function formatHuf(price: number): string {
-  return new Intl.NumberFormat("hu-HU").format(price) + " Ft";
-}
 
 export async function sendBookingConfirmationEmail(
   params: SendBookingConfirmationEmailParams
@@ -56,22 +43,22 @@ export async function sendBookingConfirmationEmail(
 
       <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 20px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         <h2 style="font-size: 18px; margin-top: 0; color: #1a1a1a;">Foglalás visszaigazolva!</h2>
-        <p style="margin-bottom: 20px;">Kedves <strong>${params.customerName}</strong>! Sikeresen rögzítettük az időpontodat.</p>
+        <p style="margin-bottom: 20px;">Kedves <strong>${escapeHtml(params.customerName)}</strong>! Sikeresen rögzítettük az időpontodat.</p>
 
         <div style="background: #f5f2ed; border-radius: 14px; padding: 18px 20px; margin: 20px 0;">
           <div style="font-size: 16px; font-weight: bold; color: #1a1a1a; margin-bottom: 4px;">
-            ${params.serviceName}
+            ${escapeHtml(params.serviceName)}
           </div>
           <div style="font-size: 14px; color: #a82348; font-weight: 600; margin-bottom: 12px;">
             ${formatHuf(params.priceHuf)}
           </div>
           <hr style="border: 0; border-top: 1px solid #e2ddd5; margin: 10px 0;" />
           <div style="font-size: 14px; color: #374151; margin-top: 8px;">
-            <strong>Szolgáltató:</strong> ${params.providerName}<br />
-            ${params.staffName ? `<strong>Munkatárs:</strong> ${params.staffName}<br />` : ""}
+            <strong>Szolgáltató:</strong> ${escapeHtml(params.providerName)}<br />
+            ${params.staffName ? `<strong>Munkatárs:</strong> ${escapeHtml(params.staffName)}<br />` : ""}
             <strong>Időpont:</strong> ${when}<br />
-            ${location ? `<strong>Cím:</strong> ${location}<br />` : ""}
-            ${params.providerPhone ? `<strong>Telefon:</strong> ${params.providerPhone}<br />` : ""}
+            ${location ? `<strong>Cím:</strong> ${escapeHtml(location)}<br />` : ""}
+            ${params.providerPhone ? `<strong>Telefon:</strong> ${escapeHtml(params.providerPhone)}<br />` : ""}
           </div>
         </div>
 

@@ -6,8 +6,9 @@ type IcsBookingRow = {
   service_name: string;
   starts_at: string;
   ends_at: string;
-  customer_name: string;
-  customer_phone: string;
+  /** null, ha a szolgáltató a naptárban elrejtette a vendég adatait. */
+  customer_name: string | null;
+  customer_phone: string | null;
   created_at: string;
 };
 
@@ -38,10 +39,12 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         `DTSTAMP:${formatDt(b.created_at)}`,
         `DTSTART:${formatDt(b.starts_at)}`,
         `DTEND:${formatDt(b.ends_at)}`,
-        `SUMMARY:${escapeIcs(`${b.service_name} · ${b.customer_name}`)}`,
-        `DESCRIPTION:${escapeIcs(`Tel: ${b.customer_phone}`)}`,
+        `SUMMARY:${escapeIcs(b.customer_name ? `${b.service_name} · ${b.customer_name}` : b.service_name)}`,
+        b.customer_phone ? `DESCRIPTION:${escapeIcs(`Tel: ${b.customer_phone}`)}` : null,
         "END:VEVENT",
-      ].join("\r\n")
+      ]
+        .filter(Boolean)
+        .join("\r\n")
     )
     .join("\r\n");
 

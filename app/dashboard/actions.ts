@@ -554,6 +554,49 @@ export async function updateBookingLinkAction(
   return { status: "success", message: "Mentve." };
 }
 
+export type CalendarLinkState = {
+  status: "idle" | "error" | "success";
+  message?: string;
+};
+
+/** Új naptár-link: a régi token azonnal érvénytelen lesz (pl. ha a link
+ * illetéktelen kézbe került). */
+export async function regenerateIcsTokenAction(): Promise<CalendarLinkState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("providers").update({ ics_token: crypto.randomUUID() }).eq("id", user.id);
+  if (error) return { status: "error", message: "Nem sikerült új linket létrehozni." };
+
+  revalidatePath("/dashboard", "layout");
+  return {
+    status: "success",
+    message: "Új link kész, a régi már nem működik. A naptáradban iratkozz fel az új linkre (a régi naptárat törölheted).",
+  };
+}
+
+export async function updateIcsPrivacyAction(
+  _prevState: CalendarLinkState,
+  formData: FormData
+): Promise<CalendarLinkState> {
+  const user = await getUser();
+  if (!user) return { status: "error", message: "Nincs bejelentkezve." };
+
+  const hide = formData.get("ics_hide_customer") === "on";
+  const supabase = await createClient();
+  const { error } = await supabase.from("providers").update({ ics_hide_customer: hide }).eq("id", user.id);
+  if (error) return { status: "error", message: "Hiba történt a mentés során." };
+
+  revalidatePath("/dashboard", "layout");
+  return {
+    status: "success",
+    message: hide
+      ? "Mentve: a naptárban csak a szolgáltatás és az időpont látszik."
+      : "Mentve: a naptárban a vendég neve és telefonszáma is látszik.",
+  };
+}
+
 export type CancelBookingState =
   | { status: "idle" }
   | { status: "error"; message: string }

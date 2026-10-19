@@ -11,10 +11,10 @@ import {
   Repeat,
   FileCheck2,
   Plus,
-  BadgePercent,
   type LucideIcon,
 } from "lucide-react";
 import { Container } from "./ui/Container";
+import { FoundingNote } from "./FoundingNote";
 import { FacebookGlyph } from "./icons/BrandIcons";
 import { MiniCalendar } from "./ui/MiniCalendar";
 import type { SiteContent } from "@/lib/content/types";
@@ -146,9 +146,11 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
               })}
             </div>
 
+            {content.founding_note && <FoundingNote text={content.founding_note} className="mt-8" />}
+
             <Link
               href="/regisztracio"
-              className="mt-10 inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-3.5 text-[15px] font-semibold text-paper shadow-card transition-colors duration-200 hover:bg-ink/90"
+              className={`${content.founding_note ? "mt-6" : "mt-10"} inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-3.5 text-[15px] font-semibold text-paper shadow-card transition-colors duration-200 hover:bg-ink/90`}
             >
               {content.cta_label}
             </Link>
@@ -188,13 +190,6 @@ export function ForProviders({ content }: { content: SiteContent["forproviders"]
             </div>
           </div>
         </div>
-
-        {content.founding_note && (
-          <div className="mt-10 flex items-start gap-3 rounded-2xl border border-accent-dark/20 bg-accent-light/40 p-5 lg:mt-14">
-            <BadgePercent className="mt-0.5 h-4 w-4 shrink-0 text-accent-dark" strokeWidth={2} />
-            <p className="text-[13px] leading-relaxed text-ink">{content.founding_note}</p>
-          </div>
-        )}
       </Container>
     </section>
   );

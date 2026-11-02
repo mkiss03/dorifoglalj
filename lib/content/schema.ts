@@ -687,7 +687,7 @@ export const CONTENT_SCHEMA: ContentEntry[] = [
     label: "„Tárhelyszolgáltató” szövege",
     kind: "richtext",
     default:
-      "Supabase, Inc. (adatbázis- és tárhelyszolgáltatás) · Vercel Inc. (alkalmazás-üzemeltetés). Az oldal tényleges infrastruktúra-szolgáltatóinak pontos, aktuális elérhetőségei itt kerülnek feltüntetésre.",
+      "Vercel Inc. – 440 N Barranca Avenue #4133, Covina, CA 91723, Amerikai Egyesült Államok – privacy@vercel.com\n\nAdatbázis-szolgáltató: Supabase Pte. Ltd. – 65 Chulia Street #38-02/03, OCBC Centre, Singapore 049513, Szingapúr – legal@supabase.io",
   },
   {
     key: "impresszum.enforcement_body",

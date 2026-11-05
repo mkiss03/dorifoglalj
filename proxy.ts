@@ -51,7 +51,14 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     // durva, admin-panelbeli oldalmegtekintés-számlálót növeljük a
     // háttérben (ISR/statikus cache mellett is minden kérésnél lefut, mert a
     // middleware a cache ELŐTT ül).
-    event.waitUntil(recordPageView());
+    // A <Link>-ek háttér-előtöltése (prefetch) és a keresőrobotok nem valódi
+    // oldalmegtekintések — ezek nélkül a számláló jóval többet mutatna.
+    const isPrefetch =
+      request.headers.has("next-router-prefetch") ||
+      request.headers.has("next-router-segment-prefetch") ||
+      request.headers.get("purpose") === "prefetch";
+    const isBot = /bot|crawl|spider|slurp|preview|lighthouse/i.test(request.headers.get("user-agent") ?? "");
+    if (!isPrefetch && !isBot) event.waitUntil(recordPageView());
     return NextResponse.next({ request });
   }
 

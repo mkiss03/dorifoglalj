@@ -19,6 +19,13 @@ export function initLenis() {
 
   lenis = new Lenis({ lerp: 0.08 });
 
+  // A Lenis alapból a <html> méretváltozását figyeli, de nálunk a <html>
+  // `h-full` (= viewport-magas), így nem nő a tartalommal. Kliens oldali
+  // navigációnál (rövid oldalról hosszú ÁSZF-re) a Lenis a régi oldalhosszal
+  // számolt tovább: a görgetés megakadt, a kézi húzás után visszaugrott.
+  // A <body> valóban a tartalommal együtt nő — ezt figyeljük.
+  new ResizeObserver(() => lenis?.resize()).observe(document.body);
+
   // Háttérben lévő fülön a böngésző visszafogja/leállítja a
   // requestAnimationFrame-et. Amikor a fül újra láthatóvá válik, a
   // következő raf-hívás egy nagyon nagy időbélyeg-ugrást kap (a rejtett

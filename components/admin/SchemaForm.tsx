@@ -24,8 +24,6 @@ export const MARKETING_SECTION_ORDER: SectionId[] = [
 ];
 
 export const LEGAL_SECTION_ORDER: SectionId[] = ["legal"];
-export const ASZF_SECTION_ORDER: SectionId[] = ["aszf"];
-export const ADATKEZELES_SECTION_ORDER: SectionId[] = ["adatkezeles"];
 export const IMPRESSZUM_SECTION_ORDER: SectionId[] = ["impresszum"];
 
 function entriesBySection() {

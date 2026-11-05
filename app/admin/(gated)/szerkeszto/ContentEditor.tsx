@@ -6,14 +6,10 @@ import {
   SectionJumpNav,
   MARKETING_SECTION_ORDER,
   LEGAL_SECTION_ORDER,
-  ASZF_SECTION_ORDER,
-  ADATKEZELES_SECTION_ORDER,
   IMPRESSZUM_SECTION_ORDER,
 } from "@/components/admin/SchemaForm";
 import { MarketingPreview, Section } from "@/components/admin/MarketingPreview";
 import { DevicePreview } from "@/components/admin/DevicePreview";
-import { AszfContent } from "@/components/legal/AszfContent";
-import { AdatkezelesContent } from "@/components/legal/AdatkezelesContent";
 import { ImpresszumContent } from "@/components/legal/ImpresszumContent";
 import { buildTextIndex } from "@/lib/content/reverseIndex";
 import { domId } from "@/lib/content/anchors";
@@ -22,21 +18,17 @@ import type { SectionId, SiteContent } from "@/lib/content/types";
 
 const initialSaveState: SaveContentState = { status: "idle" };
 
-type PageId = "marketing" | "legal" | "aszf" | "adatkezeles" | "impresszum";
+type PageId = "marketing" | "legal" | "impresszum";
 
 const PAGES: { id: PageId; label: string }[] = [
   { id: "marketing", label: "Főoldal" },
   { id: "legal", label: "Cégadatok" },
-  { id: "aszf", label: "ÁSZF" },
-  { id: "adatkezeles", label: "Adatkezelés" },
   { id: "impresszum", label: "Impresszum" },
 ];
 
 const SECTIONS_BY_PAGE: Record<PageId, SectionId[]> = {
   marketing: MARKETING_SECTION_ORDER,
   legal: LEGAL_SECTION_ORDER,
-  aszf: ASZF_SECTION_ORDER,
-  adatkezeles: ADATKEZELES_SECTION_ORDER,
   impresszum: IMPRESSZUM_SECTION_ORDER,
 };
 
@@ -232,16 +224,6 @@ export function ContentEditor({ initialContent }: { initialContent: SiteContent 
               {activePage === "legal" && (
                 <Section id="legal">
                   <ImpresszumContent legal={draft.legal} impresszum={draft.impresszum} />
-                </Section>
-              )}
-              {activePage === "aszf" && (
-                <Section id="aszf">
-                  <AszfContent legal={draft.legal} aszf={draft.aszf} />
-                </Section>
-              )}
-              {activePage === "adatkezeles" && (
-                <Section id="adatkezeles">
-                  <AdatkezelesContent legal={draft.legal} adatkezeles={draft.adatkezeles} />
                 </Section>
               )}
               {activePage === "impresszum" && (
